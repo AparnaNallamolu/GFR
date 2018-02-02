@@ -1,19 +1,3 @@
-# file BGFRA/methods.R
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 or 3 of the License
-#  (at your option).
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  A copy of the GNU General Public License is available at
-#  http://www.r-project.org/Licenses/
-
-
 #' @title Summary.BGFRA
 #'
 #' @description Solo es una prueba
@@ -21,8 +5,6 @@
 #' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
 #'
 #' @export
-#'
-#'
 summary.BGFRA=function(object,...){
 
     if(!inherits(object, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
@@ -102,9 +84,8 @@ summary.BGFRA=function(object,...){
 #'
 #' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
 #'
+#'
 #' @export
-#'
-#'
 residuals.BGFRA <- function(object,...) {
     if(!inherits(object, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
 	object$y-object$yHat
@@ -117,8 +98,6 @@ residuals.BGFRA <- function(object,...) {
 #' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
 #'
 #' @export
-#'
-#'
 predict.BGFRA <- function(object,newdata,...){
     if (!inherits(object, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
 	object$yHat
@@ -132,8 +111,6 @@ predict.BGFRA <- function(object,newdata,...){
 #' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
 #'
 #' @export
-#'
-#'
 plot.BGFRA <- function(x, ...){
   ### Check that object is compatible
   if(!inherits(x, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
@@ -150,11 +127,9 @@ plot.BGFRA <- function(x, ...){
 #' @param object \code{BGFRA-CV object} Objeto BGFRA-CV, resultado de ejecutar BGFRA() con el parametro folds > 2
 #'
 #' @export
-#'
-#'
-boxplot.BGFRA_CV <- function(x, ordered=F,...){
+boxplot.BGFRACV <- function(x, ordered=F,...){
   ### Check that object is compatible
-  if(!inherits(x, "BGFRA-CV")) stop("This function only works for objects of class `BGFRA'")
+  if(!inherits(x, "BGFRACV")) stop("This function only works for objects of class `BGFRA'")
   results <- x$results
 
   if(ordered){
