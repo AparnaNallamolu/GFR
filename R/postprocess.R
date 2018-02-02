@@ -6,7 +6,7 @@
 #' @export
 #'
 
-Cor_MSEP_Env_f<-function(Tab){
+Cor_Env<-function(Tab){
   Envs = unique(Tab$Env)
   Res = data.frame(Fold=NA, Env = Envs, Cor = NA, MSEP = NA)
   for(i in 1:length(Envs)){

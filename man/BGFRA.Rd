@@ -4,43 +4,40 @@
 \alias{BGFRA}
 \title{BGFRA}
 \usage{
-BGFRA(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
+BGFRA(data, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
   nIter = 1500, burnIn = 500, thin = 5, saveAt = "", S0 = NULL,
-  df0 = 5, R2 = 0.5, weights = NULL, verbose = FALSE,
-  rmExistingFiles = TRUE, groups = NULL, Folds = 0, set_seed = NULL)
+  df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE,
+  rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL)
 }
 \arguments{
-\item{y}{\code{data.frame} the data with $Response, $Line and $Env, defined on it (NAs allowed).}
+\item{data}{(\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).}
 
-\item{response_type}{\code{string} can be "gaussian" or "ordinal"}
+\item{response_type}{(\code{string}) It can be "gaussian" or "ordinal".}
 
-\item{a, b}{\code{numeric} .}
+\item{ETA}{(\code{list}) Two level list used to specify the regression function.}
 
-\item{ETA}{\code{list} two level list.}
+\item{saveAt}{(\code{string}) This may include a path and a pre-fix that will be added to the name of the files that are saved as the program runs.}
 
-\item{nIter, burnIN, thin}{\code{integer}}
+\item{R2}{(\code{numeric},$0<R2<1$) The proportion of variance that one expects, a priori, to be explained by the regression. Only used if the hyper-parameters are not specified.}
 
-\item{saveAt}{\code{string}}
+\item{weights}{(\code{numeric}, $n$) a vector of weights, may be NULL. The residual variance of each data-point is set to be proportional to the inverse of the squared-weight. Only used with Gaussian outcomes.}
 
-\item{S0, df0}{\code{numeric}}
+\item{verbose}{(\code{logical}) By default is \code{TRUE} and shows a fitting model progress bar if Folds <=1 or cross validation progress bar if Folds > 2.}
 
-\item{R2}{\code{numeric}}
+\item{rmExistingFiles}{(\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.}
 
-\item{weights}{\code{numeric}}
+\item{groups}{(\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.}
 
-\item{verbose}{\code{logical}}
-
-\item{rmExistingFiles}{\code{logical}}
-
-\item{groups}{\code{factor}}
-
-\item{Folds}{\code{integer}}
-
-\item{set.seed}{\code{integer} to reproducible research}
+\item{folds}{(\code{integer}) A $n$ number of the cross validations.}
 }
 \description{
 Bayesian Genomic Functional Regression Analysis
 }
 \details{
-This is a generic function
+BGFRA is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
+}
+\seealso{
+\code{\link[BGLR]{BGLR}}
+
+examples
 }

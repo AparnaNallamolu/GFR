@@ -2,65 +2,103 @@
 #'
 #' @description Bayesian Genomic Functional Regression Analysis
 #'
-#' @details This is a generic function
 #'
-#' @param y \code{data.frame} the data with $Response, $Line and $Env, defined on it (NAs allowed).
-#' @param response_type \code{string} can be "gaussian" or "ordinal"
-#' @param a,b \code{numeric} .
-#' @param ETA \code{list} two level list.
-#' @param weights \code{numeric}
-#' @param nIter,burnIN,thin \code{integer}
-#' @param saveAt \code{string}
-#' @param S0,df0 \code{numeric}
-#' @param R2 \code{numeric}
-#' @param verbose \code{logical}
-#' @param rmExistingFiles \code{logical}
-#' @param groups \code{factor}
-#' @param Folds \code{integer}
-#' @param set.seed \code{integer} to reproducible research
+#' @param data (\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).
+#' @param response_type (\code{string}) It can be "gaussian" or "ordinal".
+#' @param ETA (\code{list}) Two level list used to specify the regression function.
+#' @param weights (\code{numeric}, $n$) a vector of weights, may be NULL. The residual variance of each data-point is set to be proportional to the inverse of the squared-weight. Only used with Gaussian outcomes.
+#' @param saveAt (\code{string}) This may include a path and a pre-fix that will be added to the name of the files that are saved as the program runs.
+#' @param R2 (\code{numeric},$0<R2<1$) The proportion of variance that one expects, a priori, to be explained by the regression. Only used if the hyper-parameters are not specified.
+#' @param verbose (\code{logical}) By default is \code{TRUE} and shows a fitting model progress bar if Folds <=1 or cross validation progress bar if Folds > 2.
+#' @param rmExistingFiles (\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.
+#' @param groups (\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.
+#' @param a
+#' @param b
+#' @param nIter
+#' @param burnIn
+#' @param thin
+#' @param S0
+#' @param df0
+#' @param set_seed
+#' @param folds (\code{integer}) A $n$ number of the cross validations.
+#'
+#' @details BGFRA is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
 #'
 #'
+#' @seealso \code{\link[BGLR]{BGLR}}
+#'
+#' examples
 #'
 #' @export
 
-BGFRA <- function(y, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, nIter = 1500,
-                 burnIn = 500, thin = 5, saveAt = "", S0 = NULL, df0 =5, R2 = 0.5, weights = NULL,
-                 verbose = FALSE, rmExistingFiles = TRUE, groups=NULL, Folds=0, set_seed=NULL){
-
-  if (Folds>0) {
-    if (is.null(dim(y)[2])||dim(y)[2]<2) {
-      stop("To realice Fold Cross-validation BGFRA requieres y param like a data.frame with Line and Env specified on it")
+BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, nIter = 1500,
+                  burnIn = 500, thin = 5, saveAt = "", S0 = NULL, df0 =5, R2 = 0.5, weights = NULL,
+                  verbose = TRUE, rmExistingFiles = TRUE, groups=NULL, folds=1, set_seed=NULL){
+  if (folds>1) {
+    if (is.null(dim(data)[2])||dim(data)[2]<2) {
+      stop("To realice Fold Cross-validation BGFRA requieres data param like a data.frame with $Response, $Line and optional the $Env specified on it")
     }
 
-    PT <- crossvalidation(y, Folds, set_seed)
+    cat("This might be time demanding, let's take sit and a cup of coffe\n")
+    pb <- progress::progress_bar$new(format = ":what [:bar] Time elapsed: :elapsed", total = folds, clear = FALSE)
 
+    ## Partitions
+    PT <- crossvalidation(data, folds, set_seed)
     saveFile(PT, paste0(saveAt, "crossValidation_Partitions.RData"),rmExistingFiles)
-    Tab_Pred = data.frame()
 
-    for (i in 1:Folds) {
-      y_NA <-  y$response
-      Pos_NA = PT$g_Pos_ls[[paste('g',i,sep='')]]
-      y_NA[Pos_NA] = NA
-      fm <- BGLR::BGLR(y_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                 verbose = F, rmExistingFiles, groups)
+    data$Predictions <- NA
+    Tab_Pred <- data.frame()
+
+    ## Init cross validation
+    for (i in 1:folds) {
+      pb$tick(tokens = list(what = paste0("Fitting the model - ", i, " CV of ", folds)))
+
+      y_NA <-  data$response
+      Pos_NA <- PT$cv[[paste0('partition',i)]]
+      y_NA[Pos_NA] <- NA
+
+      fm <- BGLR(y_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
+                       verbose = F, rmExistingFiles, groups)
 
       saveFile(fm, paste0(saveAt, "FittedModel_CValidation_Fold-",i,".RData"))
 
       if (response_type == "gaussian") {
-        yHat = fm$yHat
-        Tab = data.frame(Env = y$Env[Pos_NA], Fold=i, y_p = yHat[Pos_NA], y_o = y$response[Pos_NA] )
-        Tab_Pred = rbind(Tab_Pred, Cor_MSEP_Env_f(Tab))
+        yHat <- fm$yHat
+        data$Predictions <- yHat[Pos_NA]
+
+        if (is.null(data$Env)) {
+          Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i,
+                            Cor = cor(yHat[Pos_NA],data$response[Pos_NA]),
+                            mean((yHat[Pos_NA]-data$response[Pos_NA])**2)))
+        }else{
+          Tab <- data.frame(Env = data$Env[Pos_NA], Fold=i, y_p = yHat[Pos_NA], y_o = data$response[Pos_NA] )
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
+        }
+
       } else{
         stop(paste0(response_type, " - Not implemented yet"))
       }
     }
-    Tab_Pred <- add_mean_amb(Tab_Pred)
-    saveFile(Tab_Pred, paste0(saveAt, "Results.RData"))
 
-    return(Tab_Pred)
+    if (!is.null(data$Env)) {
+      Tab_Pred <- add_mean_amb(Tab_Pred)
+    }
+
+    saveFile(Tab_Pred, paste0(saveAt, "Results.RData"))
+    cat("\nDone.")
+
+    out <- list(
+      results = Tab_Pred,
+      cv = PT$cv,
+      response = data$response,
+      NA_predictions = data$Predictions
+    )
+
+    class(out) <- "BGFRA-CV"
+    return(out)
   }else{
-    return(BGLR::BGLR(y$response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                    verbose, rmExistingFiles, groups))
+    return(BGLR(data$response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
+                      verbose, rmExistingFiles, groups))
   }
 }
 
