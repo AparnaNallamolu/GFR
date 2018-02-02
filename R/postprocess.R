@@ -15,7 +15,8 @@ Cor_Env<-function(Tab){
     Res$MSEP[i] = mean((Tab_i$y_p-Tab_i$y_o)**2)
     Res$Fold[i] = Tab$Fold[i]
   }
-  Res
+
+  return(Res)
 }
 
 saveFile <- function(Data, fname, rmExistingFiles=TRUE){
@@ -31,10 +32,18 @@ saveFile <- function(Data, fname, rmExistingFiles=TRUE){
 add_mean_amb <- function(Tab_Pred){
   Envs = unique(Tab_Pred$Env)
   Res = data.frame(Fold = NA, Env = Envs, Cor = NA, MSEP = NA)
-  for(i in 1:length(Envs)){
-     Res$Cor[i] <- mean(Tab_Pred$Cor[which(Tab_Pred$Env==Envs[i])])
-     Res$MSEP[i] <- mean(Tab_Pred$MSEP[which(Tab_Pred$Env==Envs[i])])
-     Res$Fold[i] <- "Average_all"
+  if(is.na(Envs[1])){
+    Res$Cor[1] <- mean(Tab_Pred$Cor)
+    Res$MSEP[1] <- mean(Tab_Pred$MSEP)
+    Res$Fold[1] <- "Average_all"
+  }else{
+    for(i in 1:length(Envs)){
+      Res$Cor[i] <- mean(Tab_Pred$Cor[which(Tab_Pred$Env==Envs[i])])
+      Res$MSEP[i] <- mean(Tab_Pred$MSEP[which(Tab_Pred$Env==Envs[i])])
+      Res$Fold[i] <- "Average_all"
+    }
   }
-  rbind(Tab_Pred,Res)
+
+
+  return(rbind(Tab_Pred,Res))
 }

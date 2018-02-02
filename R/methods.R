@@ -130,12 +130,17 @@ plot.BGFRA <- function(x, ...){
 boxplot.BGFRACV <- function(x, ordered=F,...){
   ### Check that object is compatible
   if(!inherits(x, "BGFRACV")) stop("This function only works for objects of class `BGFRA'")
+
   results <- x$results
 
-  if(ordered){
-    results$Env <- with(results, reorder(Env , Cor, median, na.rm=T))
+  if(length(unique(results$Env))>1){
+    if(ordered){
+      results$Env <- with(results, reorder(Env , Cor, median, na.rm=T))
+    }
+    boxplot(results$Cor ~ results$Env, col="grey", xlab='Environment', ylab='Correlation')
+  }else{
+    boxplot(results$Cor, col="grey", xlab='Environment', ylab='Correlation')
   }
-  limits<-range(results$Cor,na.rm=TRUE)
-  boxplot(results$Cor ~ results$Env, col="grey", xlab='Environment', ylab='Correlation')
 }
+
 

@@ -68,8 +68,9 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
 
         if (is.null(data$Env)) {
           Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i,
+                            Env = NA,
                             Cor = cor(yHat[Pos_NA],data$response[Pos_NA]),
-                            mean((yHat[Pos_NA]-data$response[Pos_NA])**2)))
+                            MSEP = mean((yHat[Pos_NA]-data$response[Pos_NA])**2)))
         }else{
           Tab <- data.frame(Env = data$Env[Pos_NA], Fold=i, y_p = yHat[Pos_NA], y_o = data$response[Pos_NA] )
           Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
@@ -80,9 +81,9 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
       }
     }
 
-    if (!is.null(data$Env)) {
+
       Tab_Pred <- add_mean_amb(Tab_Pred)
-    }
+
 
     saveFile(Tab_Pred, paste0(saveAt, "Results.RData"))
     cat("\nDone.")
