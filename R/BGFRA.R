@@ -94,7 +94,7 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
       NA_predictions = data$Predictions
     )
 
-    class(out) <- "BGFRA-CV"
+    class(out) <- "BGFRACV"
     return(out)
   }else{
     return(BGLR(data$response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
