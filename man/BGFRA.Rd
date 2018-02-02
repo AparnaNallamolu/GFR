@@ -14,9 +14,23 @@ BGFRA(data, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
 
 \item{response_type}{(\code{string}) It can be "gaussian" or "ordinal".}
 
+\item{a}{(\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.}
+
+\item{b}{(\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.}
+
 \item{ETA}{(\code{list}) Two level list used to specify the regression function.}
 
+\item{nIter}{(\code{integer}) The number of iterations.}
+
+\item{burnIn}{(\code{integer}) The number of burn-in.}
+
+\item{thin}{(\code{integer}) The number of thinning.}
+
 \item{saveAt}{(\code{string}) This may include a path and a pre-fix that will be added to the name of the files that are saved as the program runs.}
+
+\item{S0}{(\code{numeric}) The scale parameter for the scaled inverse-chi squared prior assigned to the residual variance, only used with Gaussian outcomes.}
+
+\item{df0}{(\code{numeric}) The scale parameter for the scaled inverse-chi squared prior assigned to the residual variance, only used with Gaussian outcomes.}
 
 \item{R2}{(\code{numeric},$0<R2<1$) The proportion of variance that one expects, a priori, to be explained by the regression. Only used if the hyper-parameters are not specified.}
 
@@ -29,6 +43,8 @@ BGFRA(data, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
 \item{groups}{(\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.}
 
 \item{folds}{(\code{integer}) A $n$ number of the cross validations.}
+
+\item{set_seed}{(\code{integer}) A seed to replicable research.}
 }
 \description{
 Bayesian Genomic Functional Regression Analysis
