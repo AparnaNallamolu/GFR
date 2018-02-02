@@ -1,6 +1,6 @@
 Package: BGFRA
 Title: BGFRA (Bayesian Genomic Functional Regression Analysis)
-Version: 0.1.2
+Version: 0.2.1
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = c("aut", "res"))
              )
