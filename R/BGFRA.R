@@ -5,22 +5,22 @@
 #'
 #' @param data (\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).
 #' @param response_type (\code{string}) It can be "gaussian" or "ordinal".
+#' @param a (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.
+#' @param b (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.
 #' @param ETA (\code{list}) Two level list used to specify the regression function.
-#' @param weights (\code{numeric}, $n$) a vector of weights, may be NULL. The residual variance of each data-point is set to be proportional to the inverse of the squared-weight. Only used with Gaussian outcomes.
+#' @param nIter (\code{integer}) The number of iterations.
+#' @param burnIn (\code{integer}) The number of burn-in.
+#' @param thin (\code{integer}) The number of thinning.
 #' @param saveAt (\code{string}) This may include a path and a pre-fix that will be added to the name of the files that are saved as the program runs.
+#' @param S0 (\code{numeric}) The scale parameter for the scaled inverse-chi squared prior assigned to the residual variance, only used with Gaussian outcomes.
+#' @param df0 (\code{numeric}) The scale parameter for the scaled inverse-chi squared prior assigned to the residual variance, only used with Gaussian outcomes.
 #' @param R2 (\code{numeric},$0<R2<1$) The proportion of variance that one expects, a priori, to be explained by the regression. Only used if the hyper-parameters are not specified.
+#' @param weights (\code{numeric}, $n$) a vector of weights, may be NULL. The residual variance of each data-point is set to be proportional to the inverse of the squared-weight. Only used with Gaussian outcomes.
 #' @param verbose (\code{logical}) By default is \code{TRUE} and shows a fitting model progress bar if Folds <=1 or cross validation progress bar if Folds > 2.
 #' @param rmExistingFiles (\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.
 #' @param groups (\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.
-#' @param a
-#' @param b
-#' @param nIter
-#' @param burnIn
-#' @param thin
-#' @param S0
-#' @param df0
-#' @param set_seed
 #' @param folds (\code{integer}) A $n$ number of the cross validations.
+#' @param set_seed (\code{integer}) A seed to replicable research.
 #'
 #' @details BGFRA is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
 #'
