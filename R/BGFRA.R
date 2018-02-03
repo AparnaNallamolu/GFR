@@ -64,7 +64,7 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
 
       if (response_type == "gaussian") {
         yHat <- fm$yHat
-        data$Predictions <- yHat[Pos_NA]
+        data$Predictions[Pos_NA] <- yHat[Pos_NA]
 
         if (is.null(data$Env)) {
           Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i,
