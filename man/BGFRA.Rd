@@ -40,7 +40,7 @@ BGFRA(data, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
 
 \item{rmExistingFiles}{(\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.}
 
-\item{groups}{(\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.}
+\item{groups}{(\code{factor}) A vector of the same lenght of \code{data$Response} that associates observations with groups, each group will have an associated variance component for the error term.}
 
 \item{folds}{(\code{integer}) A $n$ number of the cross validations.}
 

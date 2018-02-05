@@ -12,23 +12,23 @@ summary.BGFRA=function(object,...){
     tmp<-paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
 
-    tmp<-paste(' Number of phenotypes=', sum(!is.na(object$y)))
+    tmp<-paste(' Number of phenotypes=', sum(!is.na(object$response)))
     cat(tmp,'\n')
 
-    cat(' Min (TRN)= ', min(object$y,na.rm=TRUE),'\n')
-    cat(' Max (TRN)= ', max(object$y,na.rm=TRUE),'\n')
-    cat(' Variance of phenotypes (TRN)=', round(var(object$y,na.rm=TRUE),4),'\n')
+    cat(' Min (TRN)= ', min(object$response,na.rm=TRUE),'\n')
+    cat(' Max (TRN)= ', max(object$response,na.rm=TRUE),'\n')
+    cat(' Variance of phenotypes (TRN)=', round(var(object$response,na.rm=TRUE),4),'\n')
     cat(' Residual variance=',round(object$varE,4),'\n')
 
-    n<-length(object$y)
+    n<-length(object$response)
 
-    if(any(is.na(object$y)))
+    if(any(is.na(object$response)))
     {
-     		tst<-which(is.na(object$y))
+     		tst<-which(is.na(object$response))
 
      		cat(' N-TRN=',n-length(tst), ' N-TST=',length(tst),'\n')
 
-     		cat(' Correlation TRN=',round(cor(object$y[-tst],object$yHat[-tst]),4),'\n')
+     		cat(' Correlation TRN=',round(cor(object$response[-tst],object$predicted[-tst]),4),'\n')
 
    }else{
        cat(' N-TRN=',n,'  N-TST=0', '\n\n')
@@ -88,7 +88,7 @@ summary.BGFRA=function(object,...){
 #' @export
 residuals.BGFRA <- function(object,...) {
     if(!inherits(object, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
-	object$y-object$yHat
+	object$response-object$predicted
 }
 
 #' @title predict.BGFRA
@@ -100,7 +100,7 @@ residuals.BGFRA <- function(object,...) {
 #' @export
 predict.BGFRA <- function(object,newdata,...){
     if (!inherits(object, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
-	object$yHat
+	object$predicted
 }
 
 
@@ -115,8 +115,8 @@ plot.BGFRA <- function(x, ...){
   ### Check that object is compatible
   if(!inherits(x, "BGFRA")) stop("This function only works for objects of class `BGFRA'")
 
-  limits<-range(c(x$y,x$yHat),na.rm=TRUE)
-  plot(x$y,x$yHat,main="Training",xlim=limits,ylim=limits,xlab='Response',ylab='Prediction');
+  limits<-range(c(x$response,x$predicted),na.rm=TRUE)
+  plot(x$response,x$predicted,main="Training",xlim=limits,ylim=limits,xlab='Response',ylab='Prediction');
   abline(a=0,b=1,lty=3)
 }
 

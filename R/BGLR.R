@@ -1282,7 +1282,7 @@ BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
   }
 
   pb <- progress::progress_bar$new(format = "Fitting the model [:bar] Time remaining: :eta",
-                                   total = nIter, clear = TRUE)
+                                   total = nIter, clear = FALSE)
 
   # Gibbs sampler
   #time = proc.time()[3]
@@ -2118,7 +2118,7 @@ BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
   #return goodies
 
   out <- list(
-    y = y0,
+    response = y0,
     a = a,
     b = b,
     whichNa = whichNa,
@@ -2133,12 +2133,12 @@ BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
     S0 = S0
   )
 
-  out$yHat = post_yHat
+  out$predicted = post_yHat
 
-  names(out$yHat) = IDs
-  names(out$y) = IDs
+  names(out$predicted) = IDs
+  names(out$response) = IDs
 
-  out$SD.yHat = sqrt(post_yHat2 - (post_yHat^2))
+  out$SD.predicted = sqrt(post_yHat2 - (post_yHat^2))
   out$mu = post_mu
   out$SD.mu = sqrt(post_mu2 - post_mu^2)
   out$varE = post_varE

@@ -18,7 +18,7 @@
 #' @param weights (\code{numeric}, $n$) a vector of weights, may be NULL. The residual variance of each data-point is set to be proportional to the inverse of the squared-weight. Only used with Gaussian outcomes.
 #' @param verbose (\code{logical}) By default is \code{TRUE} and shows a fitting model progress bar if Folds <=1 or cross validation progress bar if Folds > 2.
 #' @param rmExistingFiles (\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.
-#' @param groups (\code{factor}) A vector of the same lenght of \code{data$response} that associates observations with groups, each group will have an associated variance component for the error term.
+#' @param groups (\code{factor}) A vector of the same lenght of \code{data$Response} that associates observations with groups, each group will have an associated variance component for the error term.
 #' @param folds (\code{integer}) A $n$ number of the cross validations.
 #' @param set_seed (\code{integer}) A seed to replicable research.
 #'
@@ -34,8 +34,8 @@
 BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, nIter = 1500,
                   burnIn = 500, thin = 5, saveAt = "", S0 = NULL, df0 =5, R2 = 0.5, weights = NULL,
                   verbose = TRUE, rmExistingFiles = TRUE, groups=NULL, folds=1, set_seed=NULL){
-  if (folds>1) {
-    if (is.null(dim(data)[2])||dim(data)[2]<2) {
+  if (folds > 1) {
+    if (is.null(dim(data)[2]) || dim(data)[2] < 2) {
       stop("To realice Fold Cross-validation BGFRA requieres data param like a data.frame with $Response, $Line and optional the $Env specified on it")
     }
 
@@ -53,37 +53,50 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
     for (i in 1:folds) {
       pb$tick(tokens = list(what = paste0("Fitting the model - ", i, " CV of ", folds)))
 
-      y_NA <-  data$response
+      response_NA <-  data$Response
       Pos_NA <- PT$cv[[paste0('partition',i)]]
-      y_NA[Pos_NA] <- NA
+      response_NA[Pos_NA] <- NA
 
-      fm <- BGLR(y_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
+      fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                        verbose = F, rmExistingFiles, groups)
 
-      saveFile(fm, paste0(saveAt, "FittedModel_CValidation_Fold-",i,".RData"))
+      switch(response_type,
+        gaussian = {
+          predicted <- fm$predicted
+          data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
-      if (response_type == "gaussian") {
-        yHat <- fm$yHat
-        data$Predictions[Pos_NA] <- yHat[Pos_NA]
+          if (is.null(data$Env)) {
+            Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i,
+              Env = NA, Cor = cor(predicted[Pos_NA],data$Response[Pos_NA]),
+              MSEP = mean((predicted[Pos_NA] - data$Response[Pos_NA])**2)))
+          }else{
+            Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
+            Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
+          }
+        },
+        ordinal = {
+          if (is.null(data$Env)) {
+            Tab <- data.frame(Folds = i, Lines = data$Line, Response = data$Response, Probs = fm$probs)
+            form <- as.formula(paste("Response ~ ", paste(names(Tab)[-1], collapse = "+")))
 
-        if (is.null(data$Env)) {
-          Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i,
-                            Env = NA,
-                            Cor = cor(yHat[Pos_NA],data$response[Pos_NA]),
-                            MSEP = mean((yHat[Pos_NA]-data$response[Pos_NA])**2)))
-        }else{
-          Tab <- data.frame(Env = data$Env[Pos_NA], Fold=i, y_p = yHat[Pos_NA], y_o = data$response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
-        }
+            Tab$Score <- ifelse(Tab$Response > 0,  scoring::calcscore(form, data = Tab, fam = 'pow', bounds = c(0,1)), NA)
+            Tab <- Tab[Pos_NA, ]
+            Tab <- with(Tab, tapply(Score, Fold, mean, na.rm = TRUE))
+            Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i, Env = NA, Cor = Tab))
+          }else{
+            Tab <- data.frame(Folds = i, Env = data$Env, Response = data$Response, Probs = fm$probs)
+            form <- as.formula(paste("Response ~ ", paste(names(Tab)[-c(1:3)], collapse = "+")))
 
-      } else{
-        stop(paste0(response_type, " - Not implemented yet"))
-      }
+            Tab$Score <- ifelse(Tab$Response > 0,  scoring::calcscore(form, data = Tab, fam = 'pow', bounds = c(0,1)), NA)
+            Tab <- Tab[Pos_NA, ]
+            Tab_Mean <- with(Tab, tapply(Score, Env, mean, na.rm = TRUE))
+            Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i, Env = unique(Env), Cor = Tab_Mean, row.names = NULL))
+          }
+        },
+          stop(paste0("The response_type: ", response_type, " is't implemented"))
+      )
     }
-
-
-      Tab_Pred <- add_mean_amb(Tab_Pred)
-
+    Tab_Pred <- add_mean_amb(Tab_Pred)
 
     saveFile(Tab_Pred, paste0(saveAt, "Results.RData"))
     cat("\nDone.")
@@ -91,14 +104,14 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
     out <- list(
       results = Tab_Pred,
       cv = PT$cv,
-      response = data$response,
+      response = data$Response,
       NA_predictions = data$Predictions
     )
 
     class(out) <- "BGFRACV"
     return(out)
   }else{
-    return(BGLR(data$response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
+    return(BGLR(data$Response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                       verbose, rmExistingFiles, groups))
   }
 }
