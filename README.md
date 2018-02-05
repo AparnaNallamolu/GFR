@@ -19,6 +19,8 @@ devtools::install_github('frahik/BGFRA')
 
 ### Quick use
 
+#### Load data
+
 ``` r
 rm(list = ls())
 library(BGFRA)
@@ -28,12 +30,17 @@ data <- Wheat # Load from data wheat_BGFRA
 Bands <- Bands # Load from data wheat_BGFRA
 Wavelengths <- Wavelengths # Load from data wheat_BGFRA
 
+## Linear predictor
 ETA2 <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR")
 )
+```
 
-fm2 <- BGFRA(data, ETA = ETA2, nIter = 10000, burnIn= 5000)
+#### Fit model
+
+``` r
+fm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300)
 ```
 
     ##  Degree of freedom of LP 2  set to default value (5).
@@ -51,7 +58,7 @@ summary(fm2)
     ##  Min (TRN)=  0.3184033 
     ##  Max (TRN)=  7.971726 
     ##  Variance of phenotypes (TRN)= 3.701 
-    ##  Residual variance= 0.2529 
+    ##  Residual variance= 0.2514 
     ##  N-TRN= 300   N-TST=0 
     ## 
     ## 
@@ -65,7 +72,15 @@ summary(fm2)
     ## ------------------------------------------------------------------
 
 ``` r
-pm2 <- BGFRA(data, ETA = ETA2, nIter = 10000, burnIn= 5000, folds = 5, set_seed =10)
+plot(fm2)
+```
+
+![](README_files/figure-markdown_github-ascii_identifiers/fitModel-1.png)
+
+### Cross-validation model
+
+``` r
+pm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300, folds = 5, set_seed =10)
 ```
 
     ## This might be time demanding, let's take sit and a cup of coffe
@@ -77,32 +92,42 @@ pm2$results
 ```
 
     ##           Fold              Env         Cor       MSEP
-    ## 1            1        Irrigated  0.20687165 0.14548834
-    ## 2            1          Drought  0.22593705 0.44091643
-    ## 3            1 ReducedIrrigated  0.61967623 0.06633322
-    ## 4            2 ReducedIrrigated  0.39126710 0.18704834
-    ## 5            2          Drought  0.62786649 0.14501644
-    ## 6            2        Irrigated  0.06380636 0.45363129
-    ## 7            3 ReducedIrrigated  0.20638512 0.21356324
-    ## 8            3          Drought  0.70661890 0.31135811
-    ## 9            3        Irrigated  0.39376149 0.21275294
-    ## 10           4 ReducedIrrigated  0.69832098 0.08372290
-    ## 11           4        Irrigated -0.29252165 0.47707559
-    ## 12           4          Drought  0.83981568 0.17260975
-    ## 13           5        Irrigated -0.17877933 0.56578443
-    ## 14           5 ReducedIrrigated  0.41622654 0.11252914
-    ## 15           5          Drought  0.77003307 0.24211191
-    ## 16 Average_all        Irrigated  0.03862771 0.37094652
-    ## 17 Average_all          Drought  0.63405424 0.26240253
-    ## 18 Average_all ReducedIrrigated  0.46637519 0.13263937
+    ## 1            1        Irrigated  0.21192022 0.13730302
+    ## 2            1          Drought  0.21282402 0.46105609
+    ## 3            1 ReducedIrrigated  0.63841829 0.06404149
+    ## 4            2 ReducedIrrigated  0.40629549 0.18485351
+    ## 5            2          Drought  0.62740928 0.14495250
+    ## 6            2        Irrigated  0.07102850 0.45498638
+    ## 7            3 ReducedIrrigated  0.22143619 0.21653148
+    ## 8            3          Drought  0.71513720 0.30818454
+    ## 9            3        Irrigated  0.38237363 0.21510980
+    ## 10           4 ReducedIrrigated  0.69529837 0.08445748
+    ## 11           4        Irrigated -0.30202594 0.47252300
+    ## 12           4          Drought  0.83894772 0.17124229
+    ## 13           5        Irrigated -0.15164323 0.57306379
+    ## 14           5 ReducedIrrigated  0.41910797 0.11134734
+    ## 15           5          Drought  0.75624440 0.24737482
+    ## 16 Average_all        Irrigated  0.04233063 0.37059720
+    ## 17 Average_all          Drought  0.63011253 0.26656205
+    ## 18 Average_all ReducedIrrigated  0.47611126 0.13224626
 
 ``` r
 boxplot(pm2)
 ```
 
-![](README_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-2-1.png)
+![](README_files/figure-markdown_github-ascii_identifiers/CVModel-1.png)
 
 ### Params
+
+In progress
+
+Advanced demos
+--------------
+
+Citation
+--------
+
+How to cite the package...
 
 Authors
 -------

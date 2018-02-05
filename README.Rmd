@@ -13,14 +13,16 @@ Bayesian Genomic Functional Regression Analysis in R
 
 To complete installation of dev version of BGFRA from GitHub, you have to install a few packages first.
 
-```{r, eval = FALSE}
+```{r installation, eval = FALSE}
 install.packages('devtools')
 devtools::install_github('frahik/BGFRA')
 ```
 
-### Quick use
+### Quick use 
 
-```{r}
+#### Load data
+
+```{r loadData}
 rm(list = ls())
 library(BGFRA)
 data("wheat_BGFRA")
@@ -29,14 +31,24 @@ data <- Wheat # Load from data wheat_BGFRA
 Bands <- Bands # Load from data wheat_BGFRA
 Wavelengths <- Wavelengths # Load from data wheat_BGFRA
 
+## Linear predictor
 ETA2 <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR")
 )
+```
 
+#### Fit model
+
+```{r fitModel}
 fm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300)
 summary(fm2)
+plot(fm2)
+```
 
+### Cross-validation model
+
+```{r CVModel}
 pm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300, folds = 5, set_seed =10)
 pm2$results
 boxplot(pm2)
@@ -48,6 +60,10 @@ In progress
 
 ## Advanced demos
 
+
+## Citation
+
+How to cite the package...
 
 ## Authors
 
