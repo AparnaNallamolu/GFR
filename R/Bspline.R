@@ -8,56 +8,23 @@
 #' @param interaction \code{matrix}
 #' @export
 #'
-#'
-Bspline.Basis <- function(Bands, Wavelengths=NULL, n.basis=1, interaction=NULL){
-  if(is.null(Wavelengths)){
+Bspline.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = NULL){
+  if (is.null(Wavelengths)) {
     stop("Wavelengths names was not provided")
   }
 
-  bspl <- fda::create.bspline.basis(range(c(Wavelengths)), nbasis=n.basis, breaks = NULL, norder=4)
+  bspl <- fda::create.bspline.basis(range(c(Wavelengths)), nbasis = n.basis, breaks = NULL, norder = 4)
   n.ind <- dim(Bands)[1]
-  X.FDA <- matrix(NA, nrow=n.ind, ncol=n.basis)
-  for (h in 1:n.ind){
-    smf <- fda::smooth.basisPar(argvals=c(Wavelengths), y=as.numeric(Bands[h,]), lambda=0.1, fdobj=bspl, Lfdobj=2)
+  X.FDA <- matrix(NA, nrow = n.ind, ncol = n.basis)
+  for (h in 1:n.ind) {
+    smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h, ]),  lambda = 0.1, fdobj = bspl, Lfdobj = 2)
     cv_sp_pn <- smf$fd$coefs
     I_KL <- fda::inprod(bspl, bspl)
-    xt_h <- t(I_KL%*%cv_sp_pn)
+    xt_h <- t(I_KL %*% cv_sp_pn)
     X.FDA[h,] <- xt_h
   }
 
   ifelse(is.null(interaction),
          return(X.FDA),
-         return(doubleinteractionMatrix(X.FDA,interaction)))
-}
-
-#' @title Fourier.Basis
-#'
-#' @description Solo es una prueba
-#'
-#' @param Bands \code{matrix}
-#' @param Wavelenghts \code{vector}
-#' @param n.basis \code{integer}
-#' @param interaction \code{matrix}
-#' @export
-#'
-#'
-Fourier.Basis <- function(Bands, Wavelengths, n.basis=1, interaction=NULL){
-  if(is.null(Wavelengths)){
-    stop("Wavelengths names was not provided")
-  }
-
-  bspF <- fda::create.fourier.basis(range(c(Wavelengths)), nbasis=n.basis, period=diff(range(c(Wavelengths))))
-  n.ind <- dim(Bands)[1]
-  X.Fu <- matrix(NA, nrow=n.ind,ncol=n.basis)
-  for (h in 1:n.ind){
-    smf <- fda::smooth.basisPar(argvals=c(Wavelengths), y=as.numeric(Bands[h,]), lambda=0.1, fdobj=bspF, Lfdobj=2)
-    cv_sp_pn <- smf$fd$coefs
-    I_KL <- fda::inprod(bspl, bspl)
-    xt_h <- t(I_KL%*%cv_sp_pn)
-    X.Fu[h,] <- xt_h
-  }
-
-  ifelse(is.null(interaction),
-         return(X.Fu),
-         return(doubleinteractionMatrix(X.Fu,interaction)))
+         return(model.matrix(~0+X.FDA:interaction)))
 }
