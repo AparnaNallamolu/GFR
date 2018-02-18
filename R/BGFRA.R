@@ -1,10 +1,22 @@
-#' @title BGFRA
+#' BGFRA
 #'
-#' @description Bayesian Genomic Functional Regression Analysis
+#' Bayesian Genomic Functional Regression Analysis
+#'
+#' More details about the package.
+#'
+#' @docType package
+"_PACKAGE"
+
+
+#' BGFRA
+#'
+#' Bayesian Genomic Functional Regression Analysis
+#'
+#' BGFRA is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
 #'
 #'
 #' @param data (\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).
-#' @param response_type (\code{string}) It can be "gaussian" or "ordinal".
+#' @param response_type (\code{string}) It can be 'gaussian' or 'ordinal'.
 #' @param a (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.
 #' @param b (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.
 #' @param ETA (\code{list}) Two level list used to specify the regression function.
@@ -22,8 +34,6 @@
 #' @param folds (\code{integer}) A $n$ number of the cross validations.
 #' @param set_seed (\code{integer}) A seed to replicable research.
 #'
-#' @details BGFRA is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
-#'
 #'
 #' @seealso \code{\link[BGLR]{BGLR}}
 #'
@@ -31,27 +41,30 @@
 #'
 #' @export
 
-BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, nIter = 1500,
-                  burnIn = 500, thin = 5, saveAt = "", S0 = NULL, df0 =5, R2 = 0.5, weights = NULL,
-                  verbose = TRUE, rmExistingFiles = TRUE, groups=NULL, folds=1, set_seed=NULL){
+BGFRA <- function(data, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, nIter = 1500,
+                  burnIn = 500, thin = 5, saveAt = '', S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL,
+                  verbose = TRUE, rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL){
   if (folds > 1) {
     if (is.null(dim(data)[2]) || dim(data)[2] < 2) {
-      stop("To realice Fold Cross-validation BGFRA requieres data param like a data.frame with $Response, $Line and optional the $Env specified on it")
+      stop('To realice Fold Cross-validation BGFRA requieres data param like a data.frame with $Response, $Line and optional the $Env specified on it')
     }
 
-    cat("This might be time demanding, let's take sit and a cup of coffe\n")
-    pb <- progress::progress_bar$new(format = ":what [:bar] Time elapsed: :elapsed", total = folds, clear = FALSE)
+    if (verbose) {
+      cat("This might be time demanding, let's take sit and a cup of coffe\n")
+      pb <- progress::progress_bar$new(format = ':what [:bar] Time elapsed: :elapsed', total = folds, clear = FALSE)
+    }
 
     ## Partitions
     PT <- crossvalidation(data, folds, set_seed)
-    saveFile(PT, paste0(saveAt, "crossValidation_Partitions.RData"),rmExistingFiles)
 
     data$Predictions <- NA
     Tab_Pred <- data.frame()
 
     ## Init cross validation
     for (i in 1:folds) {
-      pb$tick(tokens = list(what = paste0("Fitting the model - ", i, " CV of ", folds)))
+      if (verbose) {
+        pb$tick(tokens = list(what = paste0('Fitting the model - ', i, ' CV of ', folds)))
+      }
 
       response_NA <-  data$Response
       Pos_NA <- PT$cv[[paste0('partition',i)]]
@@ -75,40 +88,35 @@ BGFRA <- function(data, response_type = "gaussian", a=NULL, b=NULL, ETA = NULL, 
           }
         },
         ordinal = {
-          if (is.null(data$Env)) {
-            Tab <- data.frame(Folds = i, Lines = data$Line, Response = data$Response, Probs = fm$probs)
-            form <- as.formula(paste("Response ~ ", paste(names(Tab)[-1], collapse = "+")))
+          predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
+          data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
-            Tab$Score <- ifelse(Tab$Response > 0,  scoring::calcscore(form, data = Tab, fam = 'pow', bounds = c(0,1)), NA)
-            Tab <- Tab[Pos_NA, ]
-            Tab <- with(Tab, tapply(Score, Fold, mean, na.rm = TRUE))
-            Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i, Env = NA, Cor = Tab))
-          }else{
-            Tab <- data.frame(Folds = i, Env = data$Env, Response = data$Response, Probs = fm$probs)
-            form <- as.formula(paste("Response ~ ", paste(names(Tab)[-c(1:3)], collapse = "+")))
+          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab))
 
-            Tab$Score <- ifelse(Tab$Response > 0,  scoring::calcscore(form, data = Tab, fam = 'pow', bounds = c(0,1)), NA)
-            Tab <- Tab[Pos_NA, ]
-            Tab_Mean <- with(Tab, tapply(Score, Env, mean, na.rm = TRUE))
-            Tab_Pred <- rbind(Tab_Pred, data.frame(Fold = i, Env = unique(Env), Cor = Tab_Mean, row.names = NULL))
-          }
+
+          tabla <- table(data$Predictions[tst], data$obs[tst])
+          prop.tabla <- prop.table(tabla)
+          sum(diag(prop.tabla)) ## CAPACIDAD PREDICTIVA, falta separar por ambiente.
+
+
         },
-          stop(paste0("The response_type: ", response_type, " is't implemented"))
+          stop(paste0('The response_type: ', response_type, " is't implemented"))
       )
     }
     Tab_Pred <- add_mean_amb(Tab_Pred)
-
-    saveFile(Tab_Pred, paste0(saveAt, "Results.RData"))
-    cat("\nDone.")
+    if (verbose) {
+    cat('\nDone.')
+    }
 
     out <- list(
-      results = Tab_Pred,
+      predictions_Summary = Tab_Pred,
       cv = PT$cv,
       response = data$Response,
-      NA_predictions = data$Predictions
+      predictions = data$Predictions
     )
 
-    class(out) <- "BGFRACV"
+    class(out) <- 'BGFRACV'
     return(out)
   }else{
     return(BGLR(data$Response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
