@@ -1,27 +1,31 @@
 Package: BGFRA
 Title: BGFRA (Bayesian Genomic Functional Regression Analysis)
 Version: 0.2.3
+Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
-             person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = c("aut", "res"))
+             person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut")
              )
+Maintainer: Francisco Javier Luna-Vazquez <frahik@gmail.com>
 Description: Needs a good description
 Depends: 
   R (>= 3.0.0)
-License: GPL-3 + file LICENSE
+License: LGPL-3
 Encoding: UTF-8
 LazyData: true
+Type: Package
 RoxygenNote: 6.0.1
-URL: http://none.com
-BugReports: https://github.com/frahik/BGFRA
+URL: https://github.com/frahik/BGFRA
+BugReports: https://github.com/frahik/BGFRA/issues/new
 NeedsCompilation: yes
 Collate:
   BGFRA.R
-  BGLR.R
   Bspline.R
-  Cross-validation.R
+  Core.R
+  CrossValidation.R
   Fourier.R
-  methods.R
-  postprocess.R
+  Methods.R
+  Utils.R
+  wheat_BGFRA.R
 Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),
