@@ -2133,12 +2133,12 @@ BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
     S0 = S0
   )
 
-  out$predicted = post_yHat
+  out$predictions = post_yHat
 
-  names(out$predicted) = IDs
+  names(out$predictions) = IDs
   names(out$response) = IDs
 
-  out$SD.predicted = sqrt(post_yHat2 - (post_yHat^2))
+  out$SD.predictions = sqrt(post_yHat2 - (post_yHat^2))
   out$mu = post_mu
   out$SD.mu = sqrt(post_mu2 - post_mu^2)
   out$varE = post_varE
