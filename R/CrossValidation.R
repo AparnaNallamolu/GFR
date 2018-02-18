@@ -1,8 +1,8 @@
-#' @title Cross-Validation
+#' @title Cross-Validation with K Folds
 #'
 #' @description Example
 #'
-#' @param data \code{data.frame}
+#' @param data \code{data.frame} Object with the $Response, $Line and $Env especified on it.
 #' @param K \code{integer} Number of groups to the cross-validation.
 #' @param set_seed \code{integer} Number of seed for replicable research.
 #'
