@@ -43,7 +43,7 @@
 
 BGFRA <- function(data, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, nIter = 1500,
                   burnIn = 500, thin = 5, saveAt = '', S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL,
-                  verbose = TRUE, rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL){
+                  verbose = TRUE, rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL, dec = 4){
   if (folds > 1) {
     if (is.null(dim(data)[2]) || dim(data)[2] < 2) {
       stop('To realice Fold Cross-validation BGFRA requieres data param like a data.frame with $Response, $Line and optional the $Env specified on it')
@@ -61,7 +61,7 @@ BGFRA <- function(data, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, 
     Tab_Pred <- data.frame()
 
     ## Init cross validation
-    for (i in 1:folds) {
+    for (i in seq_len(folds)) {
       if (verbose) {
         pb$tick(tokens = list(what = paste0('Fitting the model - ', i, ' CV of ', folds)))
       }
@@ -75,7 +75,7 @@ BGFRA <- function(data, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, 
 
       switch(response_type,
         gaussian = {
-          predicted <- fm$predicted
+          predicted <- fm$predictions
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
           if (is.null(data$Env)) {
@@ -86,27 +86,23 @@ BGFRA <- function(data, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, 
             Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
             Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
           }
+
         },
         ordinal = {
           predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
           Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab))
-
-
-          tabla <- table(data$Predictions[tst], data$obs[tst])
-          prop.tabla <- prop.table(tabla)
-          sum(diag(prop.tabla)) ## CAPACIDAD PREDICTIVA, falta separar por ambiente.
-
-
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, folds))
         },
           stop(paste0('The response_type: ', response_type, " is't implemented"))
       )
     }
-    Tab_Pred <- add_mean_amb(Tab_Pred)
+
+    Tab_Pred <- add_mean_amb(Tab_Pred, dec)
+
     if (verbose) {
-    cat('\nDone.')
+      cat('\nDone.')
     }
 
     out <- list(
