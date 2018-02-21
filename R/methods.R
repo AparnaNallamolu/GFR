@@ -28,7 +28,7 @@ summary.BGFRA <- function(object,...){
 
      		cat(' N-TRN=',n-length(tst), ' N-TST=',length(tst),'\n')
 
-     		cat(' Correlation TRN=',round(cor(object$response[-tst],object$predicted[-tst]),4),'\n')
+     		cat(' Correlation TRN=',round(cor(object$response[-tst],object$predictions[-tst]),4),'\n')
 
    }else{
        cat(' N-TRN=',n,'  N-TST=0', '\n\n')
@@ -88,7 +88,7 @@ summary.BGFRA <- function(object,...){
 #' @export
 residuals.BGFRA <- function(object,...) {
     if (!inherits(object, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
-	object$response - object$predicted
+	object$response - object$predictions
 }
 
 #' @title predict.BGFRA
@@ -100,7 +100,7 @@ residuals.BGFRA <- function(object,...) {
 #' @export
 predict.BGFRA <- function(object,newdata,...){
     if (!inherits(object, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
-	object$predicted
+	object$predictions
 }
 
 
@@ -115,8 +115,8 @@ plot.BGFRA <- function(x, ...){
   ### Check that object is compatible
   if (!inherits(x, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
 
-  limits <- range(c(x$response, x$predicted), na.rm = TRUE)
-  plot(x$response, x$predicted, main = "Training", xlim = limits, ylim = limits, xlab = 'Response', ylab = 'Prediction', ...);
+  limits <- range(c(x$response, x$predictions), na.rm = TRUE)
+  plot(x$response, x$predictions, main = "Training", xlim = limits, ylim = limits, xlab = 'Response', ylab = 'Prediction', ...);
   abline(a = 0, b = 1, lty = 3)
 }
 
