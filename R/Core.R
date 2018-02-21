@@ -884,7 +884,7 @@ metropLambda <- function (tau2, lambda, shape1 = 1.2, shape2 = 1.2, max = 200, n
 #Using the rtruncnorm function in the truncnorm package
 rtrun <- function(mu, sigma, a, b){
   n <- max(c(length(mu), length(sigma), length(a), length(b)))
-  rtruncnorm(n, a, b, mu, sigma)
+  truncnorm::rtruncnorm(n, a, b, mu, sigma)
 }
 
 
