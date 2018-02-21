@@ -7,12 +7,13 @@
 BGFRA(data, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
   nIter = 1500, burnIn = 500, thin = 5, saveAt = "", S0 = NULL,
   df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE,
-  rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL)
+  rmExistingFiles = TRUE, groups = NULL, folds = 1, set_seed = NULL,
+  dec = 4)
 }
 \arguments{
 \item{data}{(\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).}
 
-\item{response_type}{(\code{string}) It can be "gaussian" or "ordinal".}
+\item{response_type}{(\code{string}) It can be 'gaussian' or 'ordinal'.}
 
 \item{a}{(\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.}
 
