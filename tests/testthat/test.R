@@ -51,7 +51,7 @@ test_that('IBCF function', {
   expect_is(CV$n_CL, 'integer')
 })
 
-context('BGFRA Tests')
+context('BGFRA Gaussian Tests')
 test_that('BGFRA Fitting model Tests',{
   data('wheat_BGFRA')
   data <- Wheat
@@ -62,8 +62,59 @@ test_that('BGFRA Fitting model Tests',{
                BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
   )
 
-  fm <- BGFRA(data, ETA = ETA, nIter = 10000, burnIn = 5000, verbose = F)
+  fm <- BGFRA(data, ETA = ETA, nIter = 1000, burnIn = 750, verbose = F)
   expect_output(str(fm), 'List of 21')
+
+  expect_false(any(is.na(fm$response)))
+  expect_false(any(is.na(fm$predictions)))
+  expect_length(fm$response, length(fm$predictions))
+})
+
+
+test_that('BGFRA Predictive model Tests', {
+  data('wheat_BGFRA')
+  data <- Wheat
+
+  ETA <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
+              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
+              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR"),
+              BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
+  )
+
+  pm <- BGFRA(data, ETA = ETA, folds = 5, nIter = 1000, burnIn = 750, set_seed = 10, verbose = F)
+  ## Error in data$Predictions[Pos_NA] <- predicted[Pos_NA] :
+  ## replacement has length zero
+  expect_output(str(pm), 'List of 4')
+  expect_is(pm, 'BGFRACV')
+
+  expect_output(str(pm$predictions_Summary), '18 obs. of  4 variables')
+  expect_false(any(is.na(pm$predictions_Summary)))
+  expect_is(pm$predictions_Summary[1, 1], 'character')
+  #expect_is(pm$predictions_Summary[1, 2], 'numeric')
+
+  expect_output(str(pm$cv), 'List of 5')
+  expect_false(any(is.na(pm$cv)))
+
+  expect_false(any(is.na(pm$response)))
+  expect_false(any(is.na(pm$predictions)))
+  expect_length(pm$response, length(pm$predictions))
+})
+
+context('BGFRA Binary Tests')
+test_that('BGFRA Fitting model Tests', {
+  data('wheat_BGFRA')
+  data <- Wheat
+
+  data$Response <- ifelse(data$Response > 3.5, 1, 0)
+
+  ETA <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
+              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
+              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR"),
+              BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
+  )
+
+  fm <- BGFRA(data, response_type = 'ordinal', ETA = ETA, nIter = 1000, burnIn = 750, verbose = F)
+  expect_output(str(fm), 'List of 27')
 
   expect_false(any(is.na(fm$response)))
   expect_false(any(is.na(fm$predictions)))
@@ -74,6 +125,7 @@ test_that('BGFRA Fitting model Tests',{
 test_that('BGFRA Predictive model Tests',{
   data('wheat_BGFRA')
   data <- Wheat
+  data$Response <- ifelse(data$Response > 3.5, 1, 0)
 
   ETA <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
               Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
@@ -81,23 +133,77 @@ test_that('BGFRA Predictive model Tests',{
               BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
   )
 
-  pm <- BGFRA(data, ETA = ETA, folds = 5, nIter = 10000, burnIn = 5000, set_seed = 10, verbose = F)
+  pm <- BGFRA(data, response_type = 'ordinal', ETA = ETA, folds = 5, nIter = 1000, burnIn = 750, verbose = F)
 
   expect_output(str(pm), 'List of 4')
   expect_is(pm, 'BGFRACV')
 
   expect_output(str(pm$predictions_Summary), '18 obs. of  4 variables')
   expect_false(any(is.na(pm$predictions_Summary)))
-  expect_is(pm$predictions_Summary[1, 1], 'numeric')
-  expect_is(pm$predictions_Summary[1, 2], 'numeric')
+  expect_is(pm$predictions_Summary[1, 1], 'character')
+  #expect_is(pm$predictions_Summary[1, 2], 'numeric')
 
   expect_output(str(pm$cv), 'List of 5')
   expect_false(any(is.na(pm$cv)))
 
-  expect_false(any(is.na(pm$observed)))
+  expect_false(any(is.na(pm$response)))
   expect_false(any(is.na(pm$predictions)))
-  expect_length(pm$observed, length(pm$predictions))
+  expect_length(pm$response, length(pm$predictions))
 })
+
+context('BGFRA Ordinal Tests')
+test_that('BGFRA Fitting model Tests', {
+  data('wheat_BGFRA')
+  data <- Wheat
+  y <- data$Response
+  data$Response <-  ifelse(y < quantile(y,1/4),1, ifelse(y < quantile(y,3/4),2,3))
+
+  ETA <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
+              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
+              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR"),
+              BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
+  )
+
+  fm <- BGFRA(data, response_type = 'ordinal', ETA = ETA, nIter = 1000, burnIn = 750, verbose = F)
+  expect_output(str(fm), 'List of 27')
+
+  expect_false(any(is.na(fm$response)))
+  expect_false(any(is.na(fm$predictions)))
+  expect_length(fm$response, length(fm$predictions))
+})
+
+
+test_that('BGFRA Predictive model Tests',{
+  data('wheat_BGFRA')
+  data <- Wheat
+  y <- data$Response
+  data$Response <-  ifelse(y < quantile(y,1/4),1, ifelse(y < quantile(y,3/4),2,3))
+
+  ETA <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
+              Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
+              Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR"),
+              BandsxEnv = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = data$Env), model = "BRR")
+  )
+
+  pm <- BGFRA(data, response_type = 'ordinal', ETA = ETA, folds = 5, nIter = 1000, burnIn = 750, verbose = F)
+
+  expect_output(str(pm), 'List of 4')
+  expect_is(pm, 'BGFRACV')
+
+  expect_output(str(pm$predictions_Summary), '18 obs. of  4 variables')
+  expect_false(any(is.na(pm$predictions_Summary)))
+  expect_is(pm$predictions_Summary[1, 1], 'character')
+  #expect_is(pm$predictions_Summary[1, 2], 'numeric')
+
+  expect_output(str(pm$cv), 'List of 5')
+  expect_false(any(is.na(pm$cv)))
+
+  expect_false(any(is.na(pm$response)))
+  expect_false(any(is.na(pm$predictions)))
+  expect_length(pm$response, length(pm$predictions))
+})
+
+
 
 path_delete <- dir()
 path_delete <- path_delete[which(path_delete != 'test.R')]
