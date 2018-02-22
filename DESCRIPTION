@@ -1,6 +1,6 @@
 Package: BGFRA
 Title: BGFRA (Bayesian Genomic Functional Regression Analysis)
-Version: 0.2.3
+Version: 0.9-1
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut")
@@ -29,8 +29,8 @@ Collate:
 Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),
-  truncnorm,
-  Rcpp
+  Rcpp,
+  truncnorm
 Suggests:
   testthat,
     knitr,
