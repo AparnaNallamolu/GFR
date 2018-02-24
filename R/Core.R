@@ -2275,6 +2275,6 @@ BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
     }
     out$ETA = ETA
   }
-  class(out) <- "BGFRA"
+  class(out) <- "BFR"
   return(out)
 }
