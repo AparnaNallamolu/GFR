@@ -39,8 +39,8 @@ summary.BGFRA <- function(object,...){
    cat('\n')
    cat(' Intercept included by default\n')
 
-  for(k in 1:length(object$ETA)){
-    if(object$ETA[[k]]$model=="FIXED"){
+  for (k in 1:length(object$ETA)) {
+    if (object$ETA[[k]]$model == "FIXED") {
 
 
       if(!is.null(names(object$ETA)[k])){
@@ -127,20 +127,53 @@ plot.BGFRA <- function(x, ...){
 #' @param x \code{BGFRA-CV object} Objeto BGFRA-CV, resultado de ejecutar BGFRA() con el parametro folds > 2
 #'
 #' @export
-boxplot.BGFRACV <- function(x, select = 'Pearson', ordered=F, ...){
+boxplot.BGFRACV <- function(x, select = 'Pearson', ordered=T, ...){
   ### Check that object is compatible
   if (!inherits(x, "BGFRACV")) stop("This function only works for objects of class 'BGFRA'")
 
-  results <- x$results
-  results$plot <-
+  results <- x$predictions_Summary
+
   if (length(unique(results$Env)) > 1) {
     if (ordered) {
-      results$Env <- with(results, reorder(Env , Cor, median, na.rm = T))
+      results$Env <- with(results, reorder(Env, Pearson, median, na.rm = T))
     }
-    boxplot(results$Cor ~ results$Env, col = "grey", xlab = 'Environment', ylab = 'Correlation')
+    boxplot(results$Pearson ~ results$Env, col = "grey", xlab = 'Environment', ylab = 'Correlation')
   }else{
-    boxplot(results$Cor, col = "grey", xlab = 'Environment', ylab = 'Correlation')
+    boxplot(results$Pearson, col = "grey", xlab = 'Environment', ylab = "Pearson's Correlation")
   }
 }
 
+#' @title Plot BGFRACV graph
+#'
+#' @description Plot from BGFRACV object
+#'
+#' @param x \code{BGFRACV object} BGFRACV object, result of use the BGFRA() function
+#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the BGFRACV Object, else ('MSEP'), plot the MSEP of the BGFRACV Object.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @importFrom graphics arrows axis plot
+#' @export
+plot.BGFRACV <- function(x, select = 'Pearson', ...){
+  ### Check that object is compatible
+  if (!inherits(x, "BGFRACV")) stop("This function only works for objects of class 'BGFRACV'")
+
+  results <- x$predictions_Summary
+
+  results$Env <- results$Env[order(results[, select])]
+  results[, select] <- results[order(results[, select]), select]
+
+  if (select == "Pearson") {
+    results$SE <- 1.96 * results$SE_Pearson
+    ylab <- "Pearson's Correlation"
+  } else if (select == "MSEP") {
+    results$SE <- results$SE_MSEP
+    ylab <- select
+  }
+
+  x <- 1:length(results$Env)
+  plot(x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
+       type = 'p', ylab = ylab, xlab = '', xaxt = "n", las = 2)
+  axis(1, at = x, labels = results$Env, las = 2)
+  arrows(x, results[, select] - results$SE, x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
+}
 
