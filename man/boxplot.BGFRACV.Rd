@@ -4,7 +4,7 @@
 \alias{boxplot.BGFRACV}
 \title{boxplot.BGFRA-CV}
 \usage{
-\method{boxplot}{BGFRACV}(x, select = "Pearson", ordered = F, ...)
+\method{boxplot}{BGFRACV}(x, select = "Pearson", ordered = T, ...)
 }
 \arguments{
 \item{x}{\code{BGFRA-CV object} Objeto BGFRA-CV, resultado de ejecutar BGFRA() con el parametro folds > 2}
