@@ -1,5 +1,5 @@
-Package: BGFRA
-Title: BGFRA (Bayesian Genomic Functional Regression Analysis)
+Package: BFR
+Title: BFR (Bayesian Functional Regression)
 Version: 0.9-1
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
@@ -18,10 +18,11 @@ URL: https://github.com/frahik/BGFRA
 BugReports: https://github.com/frahik/BGFRA/issues/new
 NeedsCompilation: yes
 Collate:
-  BGFRA.R
+  BFR.R
   Bspline.R
   Core.R
   CrossValidation.R
+  ETA.R
   Fourier.R
   Methods.R
   Utils.R
