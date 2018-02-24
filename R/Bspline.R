@@ -24,7 +24,6 @@ Bspline.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
     X.FDA[h,] <- xt_h
   }
 
-  ifelse(is.null(interaction),
-         return(X.FDA),
-         return(model.matrix(~0+X.FDA:interaction)))
+  X.FDA <- ifelse(is.null(interaction), X.FDA, model.matrix(~0+X.FDA:interaction))
+  return(X.FDA)
 }

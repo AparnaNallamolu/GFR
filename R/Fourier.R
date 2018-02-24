@@ -24,7 +24,6 @@ Fourier.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
     X.Fu[h,] <- xt_h
   }
 
-  ifelse(is.null(interaction),
-         return(X.Fu),
-         return(model.matrix(~0+X.Fu:interaction)))
+  X.Fu <- ifelse(is.null(interaction), X.Fu, model.matrix(~0+X.Fu:interaction))
+  return(X.Fu)
 }
