@@ -19,7 +19,7 @@ BFR(data = NULL, response_type = "gaussian", a = NULL, b = NULL,
 
 \item{b}{(\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.}
 
-\item{ETA}{(\code{list}) Two level list used to specify the regression function.}
+\item{ETA}{(\code{list}) Two level list used to specify the regression function, also could be generate by ETAGenerate() function for easy-use.}
 
 \item{nIter}{(\code{integer}) The number of iterations.}
 
@@ -46,6 +46,8 @@ BFR(data = NULL, response_type = "gaussian", a = NULL, b = NULL,
 \item{CrossValidation}{(\code{list}) Especified list to KFold Crossvalidation use list(Type = 'KFold', nIter = 5), and to Random Partiton Cross validation use list(Type = 'RandomPartition', nIter = 5, PTesting = 0.20, Traits.testing = NULL)}
 
 \item{set_seed}{(\code{integer}) A seed for replicable research.}
+
+\item{dec}{(\code{integer}) Number of decimals to show on the predictions.}
 }
 \description{
 Bayesian Functional Regression
