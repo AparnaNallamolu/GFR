@@ -19,7 +19,7 @@
 #' @param response_type (\code{character}) It can be 'gaussian' or 'ordinal'.
 #' @param a (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.
 #' @param b (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.
-#' @param ETA (\code{list}) Two level list used to specify the regression function.
+#' @param ETA (\code{list}) Two level list used to specify the regression function, also could be generate by ETAGenerate() function for easy-use.
 #' @param nIter (\code{integer}) The number of iterations.
 #' @param burnIn (\code{integer}) The number of burn-in.
 #' @param thin (\code{integer}) The number of thinning.
@@ -33,6 +33,7 @@
 #' @param groups (\code{factor}) A vector of the same lenght of \code{data$Response} that associates observations with groups, each group will have an associated variance component for the error term.
 #' @param CrossValidation (\code{list}) Especified list to KFold Crossvalidation use list(Type = 'KFold', nIter = 5), and to Random Partiton Cross validation use list(Type = 'RandomPartition', nIter = 5, PTesting = 0.20, Traits.testing = NULL)
 #' @param set_seed (\code{integer}) A seed for replicable research.
+#' @param dec (\code{integer}) Number of decimals to show on the predictions.
 #'
 #'
 #' @seealso \code{\link[BGLR]{BGLR}}

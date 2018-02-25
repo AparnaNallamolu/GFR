@@ -18,10 +18,8 @@ Bspline.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
   X.FDA <- matrix(NA, nrow = n.ind, ncol = n.basis)
   for (h in 1:n.ind) {
     smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h, ]),  lambda = 0.1, fdobj = bspl, Lfdobj = 2)
-    cv_sp_pn <- smf$fd$coefs
     I_KL <- fda::inprod(bspl, bspl)
-    xt_h <- t(I_KL %*% cv_sp_pn)
-    X.FDA[h,] <- xt_h
+    X.FDA[h,] <- t(I_KL %*% smf$fd$coefs)
   }
 
   X.FDA <- ifelse(is.null(interaction), X.FDA, model.matrix(~0+X.FDA:interaction))
