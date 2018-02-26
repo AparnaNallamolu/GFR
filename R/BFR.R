@@ -19,7 +19,7 @@
 #' @param response_type (\code{character}) It can be 'gaussian' or 'ordinal'.
 #' @param a (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.
 #' @param b (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.
-#' @param ETA (\code{list}) Two level list used to specify the regression function.
+#' @param ETA (\code{list}) Two level list used to specify the regression function, also could be generate by ETAGenerate() function for easy-use.
 #' @param nIter (\code{integer}) The number of iterations.
 #' @param burnIn (\code{integer}) The number of burn-in.
 #' @param thin (\code{integer}) The number of thinning.
@@ -31,8 +31,9 @@
 #' @param verbose (\code{logical}) By default is \code{TRUE} and shows a fitting model progress bar if Folds <=1 or cross validation progress bar if Folds > 2.
 #' @param rmExistingFiles (\code{logical}) By default is \code{TRUE} and removes existing output files from previous runs.
 #' @param groups (\code{factor}) A vector of the same lenght of \code{data$Response} that associates observations with groups, each group will have an associated variance component for the error term.
-#' @param CrossValidation (\code{list}) Especified list to KFold Crossvalidation use list(Type = 'KFold', nIter = 5), and to Random Partiton Cross validation use list(Type = 'RandomPartition', nIter = 5, PTesting = 0.20, Traits.testing = NULL)
+#' @param CrossValidation (\code{list}) Especified list to KFold Crossvalidation use list(Type = 'KFold', nFolds = 5), and to Random Partiton Cross validation use list(Type = 'RandomPartition', nPartitions = 5, pTesting = 0.20, Traits.testing = NULL)
 #' @param set_seed (\code{integer}) A seed for replicable research.
+#' @param dec (\code{integer}) Number of decimals to show on the predictions.
 #'
 #'
 #' @seealso \code{\link[BGLR]{BGLR}}
@@ -53,28 +54,33 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
   }
 
   if (!is.null(CrossValidation)) {
-    if (verbose) {
-      cat("This might be time demanding, let's take sit and a cup of coffe\n")
-      pb <- progress::progress_bar$new(format = ':what [:bar] Time elapsed: :elapsed', total = CrossValidation$nIter, clear = FALSE)
-    }
 
     switch(CrossValidation$Type,
            KFold = {
-             PT <- CV.KFold(data, K = CrossValidation$nIter, set_seed)
+             PT <- CV.KFold(data, K = CrossValidation$nFolds, set_seed)
+             nCV <- CrossValidation$nFolds
            },
            RandomPartition = {
-             PT <- CV.RandomPart(data, NPartitions = CrossValidation$nIter, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
+             PT <- CV.RandomPart(data, NPartitions = CrossValidation$nPartitions, PTesting = CrossValidation$pTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
+             nCV <- CrossValidation$nPartitions
            },
            stop(paste0('ERROR: The Cross Validation  ', CrossValidation$Type, " is't implemented"))
     )
+
+    if (verbose) {
+      cat("This might be time demanding, let's take sit and a cup of coffe\n")
+
+      pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
+    }
 
     data$Predictions <- NA
     Tab_Pred <- data.frame()
 
     ## Init cross validation
-    for (i in seq_len(CrossValidation$nIter)) {
+    for (i in seq_len(nCV)) {
+
       if (verbose) {
-        pb$tick(tokens = list(what = paste0('Fitting the model - ', i, ' CV of ', CrossValidation$nIter)))
+        pb$tick(tokens = list(what = paste0( i, ' CV of ', nCV)))
       }
 
       response_NA <-  data$Response
@@ -96,7 +102,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
           Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, CrossValidation$nIter))
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, nCV))
         },
           stop(paste0('The response_type: ', response_type, " is't implemented"))
       )
@@ -105,6 +111,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
     Tab_Pred <- add_mean_amb(Tab_Pred, dec)
 
     if (verbose) {
+      pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
       cat('Done.\n')
     }
 

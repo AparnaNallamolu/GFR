@@ -1,13 +1,13 @@
-#' @title Summary.BGFRA
+#' @title Summary.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-summary.BGFRA <- function(object,...){
+summary.BFR <- function(object,...){
 
-    if(!inherits(object, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
+    if(!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 
     tmp<-paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
@@ -78,102 +78,112 @@ summary.BGFRA <- function(object,...){
    cat('\n------------------------------------------------------------------\n');
 }
 
-#' @title residuals.BGFRA
+#' @title residuals.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #'
 #' @export
-residuals.BGFRA <- function(object,...) {
-    if (!inherits(object, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
+residuals.BFR <- function(object,...) {
+    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 	object$response - object$predictions
 }
 
-#' @title predict.BGFRA
+#' @title predict.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-predict.BGFRA <- function(object,newdata,...){
-    if (!inherits(object, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
+predict.BFR <- function(object,newdata,...){
+    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 	object$predictions
 }
 
 
-#' @title plot.BGFRA
+#' @title plot.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param x \code{BGFRA object} Objeto BGFRA, resultado de ejecutar BGFRA
+#' @param x \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-plot.BGFRA <- function(x, ...){
+plot.BFR <- function(x, ...){
   ### Check that object is compatible
-  if (!inherits(x, "BGFRA")) stop("This function only works for objects of class 'BGFRA'")
+  if (!inherits(x, "BFR")) stop("This function only works for objects of class 'BFR'")
 
   limits <- range(c(x$response, x$predictions), na.rm = TRUE)
   plot(x$response, x$predictions, main = "Training", xlim = limits, ylim = limits, xlab = 'Response', ylab = 'Prediction', ...);
   abline(a = 0, b = 1, lty = 3)
 }
 
-#' @title boxplot.BGFRA-CV
+#' @title boxplot.BFRCV
 #'
 #' @description Solo es una prueba
 #'
-#' @param x \code{BGFRA-CV object} Objeto BGFRA-CV, resultado de ejecutar BGFRA() con el parametro folds > 2
+#' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
 #'
 #' @export
-boxplot.BGFRACV <- function(x, select = 'Pearson', ordered=T, ...){
+boxplot.BFRCV <- function(x, select = 'Pearson', ordered=T, ...){
   ### Check that object is compatible
-  if (!inherits(x, "BGFRACV")) stop("This function only works for objects of class 'BGFRA'")
+  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
 
   results <- x$predictions_Summary
+
+  if (select == "Pearson") {
+    plot.y <- results$Pearson
+    ylab <- "Pearson's Correlation"
+  } else if (select == "MSEP") {
+    plot.y <- results$MSEP
+    ylab <- "MSEP Average"
+  }
+
 
   if (length(unique(results$Env)) > 1) {
     if (ordered) {
       results$Env <- with(results, reorder(Env, Pearson, median, na.rm = T))
     }
-    boxplot(results$Pearson ~ results$Env, col = "grey", xlab = 'Environment', ylab = 'Correlation')
+    boxplot(plot.y ~ results$Env, col = "grey", xlab = 'Environment', ylab = ylab)
   }else{
-    boxplot(results$Pearson, col = "grey", xlab = 'Environment', ylab = "Pearson's Correlation")
+    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab)
   }
+
+
 }
 
-#' @title Plot BGFRACV graph
+#' @title Plot BFRCV graph
 #'
-#' @description Plot from BGFRACV object
+#' @description Plot from BFRCV object
 #'
-#' @param x \code{BGFRACV object} BGFRACV object, result of use the BGFRA() function
-#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the BGFRACV Object, else ('MSEP'), plot the MSEP of the BGFRACV Object.
+#' @param x \code{BFRCV object} BFRCV object, result of use the BFR() function
+#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the BFR Object, else ('MSEP'), plot the MSEP of the BFRCV Object.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @importFrom graphics arrows axis plot
 #' @export
-plot.BGFRACV <- function(x, select = 'Pearson', ...){
+plot.BFRCV <- function(x, select = 'Pearson', ...){
   ### Check that object is compatible
-  if (!inherits(x, "BGFRACV")) stop("This function only works for objects of class 'BGFRACV'")
+  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
 
-  results <- x$predictions_Summary
+  results <- x$predictions_Summary[which(x$predictions_Summary$Fold == 'Average_all'), ]
 
-  results$Env <- results$Env[order(results[, select])]
-  results[, select] <- results[order(results[, select]), select]
+  results <- results[order(results[, select]),]
 
   if (select == "Pearson") {
     results$SE <- 1.96 * results$SE_Pearson
     ylab <- "Pearson's Correlation"
   } else if (select == "MSEP") {
-    results$SE <- results$SE_MSEP
+    results$SE <- 1.96 * results$SE_MSEP[which(results$Fold == 'Average_all')]
     ylab <- select
   }
 
-  x <- 1:length(results$Env)
-  plot(x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
+  plot.x <- 1:length(results$Env)
+  plot(plot.x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
        type = 'p', ylab = ylab, xlab = '', xaxt = "n", las = 2)
-  axis(1, at = x, labels = results$Env, las = 2)
-  arrows(x, results[, select] - results$SE, x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
+  axis(1, at = plot.x, labels = results$Env, las = 2)
+  arrows(plot.x, results[, select] - results$SE, plot.x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
 }
 

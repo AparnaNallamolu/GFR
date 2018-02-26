@@ -972,8 +972,8 @@ loglik_ordinal = function(y, yHat, threshold){
 #       example, check: (i) residual variance, (ii) plot of effects, (iii) plot
 #        of predictions in trn, (iv) plot of prediction in tst.
 
-#' @useDynLib BGFRA
-BGLR <- function (y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
+#' @useDynLib BFR
+BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
                  saveAt = "", S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE, rmExistingFiles = TRUE, groups = NULL,
                  pb=NULL, iFold=1, Folds=1) {
   IDs <- names(y)
