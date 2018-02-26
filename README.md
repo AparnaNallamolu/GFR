@@ -1,20 +1,26 @@
-BGFRA
+BFR
 ================
-Francisco Javier Luna-Vázquez
-2018-02-05
+Last README update: 2018-02-26
 
-Bayesian Genomic Functional Regression Analysis in R
+*B*ayesian genomic *F*unctional *R*egression analysis in R
+
+[![Release](http://www.r-pkg.org/badges/version-ago/BFR "IBCF.MTME release")](https://cran.r-project.org/package=BFR "CRAN Page") [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg "LGPL, Version 2.0")](https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0") [![Project Status: Active](http://www.repostatus.org/badges/latest/wip.svg "status")](http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public") [![Downloads](http://cranlogs.r-pkg.org/badges/BFR "IBCF.MTME cranlogs")](https://cran.r-project.org/package=BFR "CRAN Page")
+
+New in this dev version
+-----------------------
+
+-   This is a pre-release, be careful.
 
 Instructions for proper implementation
 --------------------------------------
 
 ### Installation
 
-To complete installation of dev version of BGFRA from GitHub, you have to install a few packages first.
+To complete installation of dev version of BFR from GitHub, you have to install a few packages first.
 
 ``` r
 install.packages('devtools')
-devtools::install_github('frahik/BGFRA')
+devtools::install_github('frahik/BFR')
 ```
 
 ### Quick use
@@ -23,99 +29,115 @@ devtools::install_github('frahik/BGFRA')
 
 ``` r
 rm(list = ls())
-library(BGFRA)
-data("wheat_BGFRA")
+library(BFR)
+data("wheat_BFR")
 
-data <- Wheat # Load from data wheat_BGFRA
-Bands <- Bands # Load from data wheat_BGFRA
-Wavelengths <- Wavelengths # Load from data wheat_BGFRA
-
-## Linear predictor
-ETA2 <- list(Env = list(X = model.matrix(~0+as.factor(data$Env)), model = "FIXED"),
-             Line = list(X = model.matrix(~0+as.factor(data$Line)), model = "BRR"),
-             Bands = list(X = Fourier.Basis(Bands, Wavelengths, n.basis = 21, interaction = NULL), model = "BRR")
-)
+data <- Wheat # Load from data wheat_BFR
+Bands <- Bands # Load from data wheat_BFR
+Wavelengths <- Wavelengths # Load from data wheat_BFR
 ```
 
 #### Fit model
 
 ``` r
-fm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300)
+data("wheat_BFR")
+data <- Wheat[which(Wheat$Env == 'Drought'), ]
+
+fm <- BFR(data, nIter = 1000, burnIn = 300)
+
+# summary(fm)
+plot(fm)
 ```
 
-    ##  Degree of freedom of LP 2  set to default value (5).
-    ##  Scale parameter of LP 2  set to default value (4.36140493944161) .
-    ##  Degree of freedom of LP 3  set to default value (5).
-    ##  Scale parameter of LP 3  set to default value (0.0143843271440224) .
+![](README_files/figure-markdown_github/fitModel-1.png)
+
+### Cross-validation model with kfold
 
 ``` r
-summary(fm2)
-```
+data("wheat_BFR")
+data <- Wheat[which(Wheat$Env == 'Drought'), ]
+Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
 
-    ## --------------------> Summary of data & model <-------------------- 
-    ## 
-    ##  Number of phenotypes= 300 
-    ##  Min (TRN)=  0.3184033 
-    ##  Max (TRN)=  7.971726 
-    ##  Variance of phenotypes (TRN)= 3.701 
-    ##  Residual variance= 0.2514 
-    ##  N-TRN= 300   N-TST=0 
-    ## 
-    ## 
-    ##  -- Linear Predictor -- 
-    ## 
-    ##  Intercept included by default
-    ##  Coefficientes in ETA[ 1 ] ( Env ) were asigned a flat prior
-    ##  Coefficientes in ETA[ 2 ] ( Line ) modeled as in  BRR 
-    ##  Coefficientes in ETA[ 3 ] ( Bands ) modeled as in  BRR 
-    ## 
-    ## ------------------------------------------------------------------
-
-``` r
-plot(fm2)
-```
-
-![](README_files/figure-markdown_github-ascii_identifiers/fitModel-1.png)
-
-### Cross-validation model
-
-``` r
-pm2 <- BGFRA(data, ETA = ETA2, nIter = 1000, burnIn = 300, folds = 5, set_seed =10)
+pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list)
 ```
 
     ## This might be time demanding, let's take sit and a cup of coffe
     ## 
+    Fitting the 1 CV of 3  [========----------------------] Time elapsed:  0s
+    Fitting the 2 CV of 3  [===============---------------] Time elapsed:  1s
+
+    ## Warning in cor(Tab_i$y_p, Tab_i$y_o, use = "pairwise.complete.obs"): the
+    ## standard deviation is zero
+
+    ## 
+    Fitting the 3 CV of 3  [======================--------] Time elapsed:  1s
+    Fitting the 3 CV of 3  [==============================] Time elapsed:  2s
     ## Done.
 
 ``` r
-pm2$results
+summary(pm)
 ```
 
-    ##           Fold              Env         Cor       MSEP
-    ## 1            1        Irrigated  0.21192022 0.13730302
-    ## 2            1          Drought  0.21282402 0.46105609
-    ## 3            1 ReducedIrrigated  0.63841829 0.06404149
-    ## 4            2 ReducedIrrigated  0.40629549 0.18485351
-    ## 5            2          Drought  0.62740928 0.14495250
-    ## 6            2        Irrigated  0.07102850 0.45498638
-    ## 7            3 ReducedIrrigated  0.22143619 0.21653148
-    ## 8            3          Drought  0.71513720 0.30818454
-    ## 9            3        Irrigated  0.38237363 0.21510980
-    ## 10           4 ReducedIrrigated  0.69529837 0.08445748
-    ## 11           4        Irrigated -0.30202594 0.47252300
-    ## 12           4          Drought  0.83894772 0.17124229
-    ## 13           5        Irrigated -0.15164323 0.57306379
-    ## 14           5 ReducedIrrigated  0.41910797 0.11134734
-    ## 15           5          Drought  0.75624440 0.24737482
-    ## 16 Average_all        Irrigated  0.04233063 0.37059720
-    ## 17 Average_all          Drought  0.63011253 0.26656205
-    ## 18 Average_all ReducedIrrigated  0.47611126 0.13224626
+    ##                     Length Class      Mode   
+    ## predictions_Summary   6    data.frame list   
+    ## cv                    3    -none-     list   
+    ## response            100    -none-     numeric
+    ## predictions         100    -none-     numeric
 
 ``` r
-boxplot(pm2)
+boxplot(pm)
 ```
 
-![](README_files/figure-markdown_github-ascii_identifiers/CVModel-1.png)
+![](README_files/figure-markdown_github/CVModel-1.png)
+
+### Auto-detection of linear predictor
+
+``` r
+data("wheat_BFR")
+Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
+ETA2 <- ETAGenerate(Wheat, functionalType = 'Bspline.Basis', Bands = Bands, Wavelengths = Wavelengths, priorType = 'BayesB', bandsType = 'Alternative', n.basis = 21)
+
+
+pm2 <- BFR(ETA = ETA2, data, nIter = 10000, burnIn = 3000, set_seed = 10, CrossValidation = Crossvalidation_list)
+```
+
+    ## This might be time demanding, let's take sit and a cup of coffe
+    ## 
+    Fitting the 1 CV of 3  [========----------------------] Time elapsed:  0s
+    Fitting the 2 CV of 3  [===============---------------] Time elapsed:  6s
+    Fitting the 3 CV of 3  [======================--------] Time elapsed: 11s
+    Fitting the 3 CV of 3  [==============================] Time elapsed: 16s
+    ## Done.
+
+``` r
+summary(pm2)
+```
+
+    ##                     Length Class      Mode   
+    ## predictions_Summary   6    data.frame list   
+    ## cv                    3    -none-     list   
+    ## response            300    -none-     numeric
+    ## predictions         300    -none-     numeric
+
+``` r
+plot(pm2)
+```
+
+![](README_files/figure-markdown_github/ETAG-1.png)
+
+### Handmade linear predictor
+
+``` r
+CrossV <- list(Type = 'KFold', nFolds = 5)
+ETA3 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat$Env)), model = 'FIXED'),
+             Line = list(X = model.matrix(~0+as.factor(Wheat$Line)), model = 'BRR'),
+             Bands = list(X = Bspline.Basis(Bands, Wavelengths, n.basis = 23), model = 'BayesA'))
+pm3 <- BFR(data = Wheat, ETA = ETA3, nIter = 15000, burnIn = 10000, CrossValidation = CrossV, set_seed = 10)
+summary(pm3)
+
+plot(pm3, select = 'MSEP')
+boxplot(pm3, select = 'MSEP')
+```
 
 ### Params
 
@@ -127,11 +149,17 @@ Advanced demos
 Citation
 --------
 
-How to cite the package...
+How to cite the package... Coming soon.
+
+Issues
+------
+
+Feel free to report new issues in this link [Issues](https://github.com/frahik/IBCF.MTME/issues/new)
 
 Authors
 -------
 
-Francisco Javier Luna-Vázquez (Author, Maintainer)
-
-Osval Antonio Montesinos-López (Author)
+-   Francisco Javier Luna-Vázquez (Author, Maintainer)
+-   Osval Antonio Montesinos-López (Author)
+-   Abelardo Montesinos-López (Author)
+-   José Crossa (Author)
