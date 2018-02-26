@@ -4,26 +4,26 @@
 \alias{ETAGenerate}
 \title{ETAGenerate}
 \usage{
-ETAGenerate(dataset, datasetID = "Line", Bands = NULL, Wavelengths = NULL,
-  n.basis = 1, functionalType = Fourier.Basis, priorType = "FIXED",
-  bandsType = "Alternative")
+ETAGenerate(dataset, basisType = "Fourier.Basis", Bands = NULL,
+  Wavelengths = NULL, priorType = "FIXED", method = "Alternative",
+  n.basis = 1, datasetID = "Line", ...)
 }
 \arguments{
 \item{dataset}{TidyFormat}
 
-\item{datasetID}{column with the identifiers.}
+\item{basisType}{Basis function, by default is Fourier.Basis also could be Bspline.Basis.}
 
 \item{Bands}{Bands}
 
 \item{Wavelengths}{Wavelenths}
 
-\item{n.basis}{Number of basis by default only use 1 basis.}
-
-\item{functionalType}{Basis function, by default is Fourier.Basis also could be Bspline.Basis.}
-
 \item{priorType}{Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'}
 
-\item{bandsType}{Model to apply in bands, by default 'Alternative' will be used, also could be 'Simple', 'Complex'}
+\item{method}{Model to apply in bands, by default 'Alternative' will be used, also could be 'Simple', 'Complex'}
+
+\item{n.basis}{Number of basis by default only use 1 basis.}
+
+\item{datasetID}{column with the identifiers.}
 }
 \description{
 Function to generate a Linear Predictor from a dataset to BFR.
