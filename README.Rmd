@@ -4,7 +4,7 @@ date: "Last README update: `r format(Sys.Date())`"
 output: github_document
 ---
 
-*B*ayesian genomic *F*unctional *R*egression analysis in R
+**B**ayesian genomic **F**unctional **R**egression analysis in R
 
 [![Release][release-badge]][cran]
 [![License: LGPL v3][LGPL-badge]][LGPL]

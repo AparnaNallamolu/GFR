@@ -2,7 +2,7 @@ BFR
 ================
 Last README update: 2018-02-26
 
-*B*ayesian genomic *F*unctional *R*egression analysis in R
+**B**ayesian genomic **F**unctional **R**egression analysis in R
 
 [![Release](http://www.r-pkg.org/badges/version-ago/BFR "IBCF.MTME release")](https://cran.r-project.org/package=BFR "CRAN Page") [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg "LGPL, Version 2.0")](https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0") [![Project Status: Active](http://www.repostatus.org/badges/latest/wip.svg "status")](http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public") [![Downloads](http://cranlogs.r-pkg.org/badges/BFR "IBCF.MTME cranlogs")](https://cran.r-project.org/package=BFR "CRAN Page")
 
@@ -71,7 +71,7 @@ pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Cro
 
     ## 
     Fitting the 3 CV of 3  [======================--------] Time elapsed:  1s
-    Fitting the 3 CV of 3  [==============================] Time elapsed:  2s
+    Fitting the 3 CV of 3  [==============================] Time elapsed:  1s
     ## Done.
 
 ``` r
@@ -104,9 +104,9 @@ pm2 <- BFR(ETA = ETA2, data, nIter = 10000, burnIn = 3000, set_seed = 10, CrossV
     ## This might be time demanding, let's take sit and a cup of coffe
     ## 
     Fitting the 1 CV of 3  [========----------------------] Time elapsed:  0s
-    Fitting the 2 CV of 3  [===============---------------] Time elapsed:  6s
-    Fitting the 3 CV of 3  [======================--------] Time elapsed: 11s
-    Fitting the 3 CV of 3  [==============================] Time elapsed: 16s
+    Fitting the 2 CV of 3  [===============---------------] Time elapsed:  5s
+    Fitting the 3 CV of 3  [======================--------] Time elapsed: 10s
+    Fitting the 3 CV of 3  [==============================] Time elapsed: 15s
     ## Done.
 
 ``` r
