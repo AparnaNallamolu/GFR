@@ -9,10 +9,10 @@ summary.BFR <- function(object,...){
 
     if(!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 
-    tmp<-paste('--------------------> Summary of data & model <--------------------')
+    tmp <- paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
 
-    tmp<-paste(' Number of phenotypes=', sum(!is.na(object$response)))
+    tmp <- paste(' Number of phenotypes=', sum(!is.na(object$response)))
     cat(tmp,'\n')
 
     cat(' Min (TRN)= ', min(object$response,na.rm=TRUE),'\n')
