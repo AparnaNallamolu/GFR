@@ -75,7 +75,6 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
 
     data$Predictions <- NA
     Tab_Pred <- data.frame()
-
     ## Init cross validation
     for (i in seq_len(nCV)) {
 
@@ -86,23 +85,26 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
       response_NA <-  data$Response
       Pos_NA <- PT$cv[[paste0('partition',i)]]
       response_NA[Pos_NA] <- NA
-
+      time.init <- proc.time()[3]
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                        verbose = F, rmExistingFiles, groups)
+
 
       switch(response_type,
         gaussian = {
           predicted <- fm$predictions
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
-          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab))
+          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA],
+                            y_o = data$Response[Pos_NA])
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
         },
         ordinal = {
           predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
-          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, nCV))
+          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA],
+                            y_o = data$Response[Pos_NA] )
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, nCV, Time = proc.time()[3] - time.init))
         },
           stop(paste0('The response_type: ', response_type, " is't implemented"))
       )
