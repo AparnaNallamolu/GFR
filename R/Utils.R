@@ -6,9 +6,10 @@
 #' @export
 #'
 
-Cor_Env <- function(Tab){
+Cor_Env <- function(Tab, Time){
   Envs <- unique(Tab$Env)
-  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA,  SE_MSEP = NA)
+  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA,  SE_MSEP = NA, Time = NA)
+  Res$Time[1] <- Time
   for (i in 1:length(Envs)) {
     Tab_i <- Tab[Tab$Env == Envs[i],]
     Cor <- cor(Tab_i$y_p, Tab_i$y_o , use = "pairwise.complete.obs")
@@ -22,9 +23,10 @@ Cor_Env <- function(Tab){
   return(Res)
 }
 
-Cor_Env_Ordinal <- function(Tab, Folds=1){
+Cor_Env_Ordinal <- function(Tab, Folds = 1, Time){
   Envs <- unique(Tab$Env)
-  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA, SE_MSEP = NA)
+  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA, SE_MSEP = NA, Time = NA)
+  Res$Time[1] <- Time
   for (i in 1:length(Envs)) {
     Tab_i <- Tab[Tab$Env == Envs[i],]
     tabl <- table(Tab_i$y_p, Tab_i$y_o)
@@ -33,7 +35,6 @@ Cor_Env_Ordinal <- function(Tab, Folds=1){
     Res$Pearson[i] <- Cor
     Res$MSEP[i] <- NA
     Res$Fold[i] <- Tab$Fold[i]
-    Res$Pearson[i] <- Cor
   }
   return(Res)
 }
@@ -50,8 +51,8 @@ saveFile <- function(Data, fname, rmExistingFiles=TRUE) {
 
 add_mean_amb <- function(Tab_Pred, dec = 4){
   Envs <- unique(Tab_Pred$Env)
-  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA, SE_MSEP = NA)
-
+  Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA, SE_MSEP = NA, Time = NA)
+  Res$Time[1] <- mean(Tab_Pred$Time, na.rm = T)
   for (i in seq_len(length(Envs))) {
     Res$Pearson[i] <- mean(Tab_Pred$Pearson[which(Tab_Pred$Env == Envs[i])], na.rm = T)
     Res$MSEP[i] <- mean(Tab_Pred$MSEP[which(Tab_Pred$Env == Envs[i])], na.rm = T)
