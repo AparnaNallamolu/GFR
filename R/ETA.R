@@ -66,12 +66,16 @@ ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wave
   )
   out <- list(ETA = ETA, #Linear predictor
               dataset = dataset, #Fixed Dataset
-              Design = Design) #Type of model
+              Design = Design,
+              Basis = basisType,
+              Prior = priorType,
+              Method = method
+              ) #Type of model
   class(out) <- 'ETA'
   return(out)
 }
 
-validate.dataset <- function(dataset, datasetID) {
+validate.dataset <- function(dataset, datasetID, orderData=T) {
   if (is.null(dataset$Env)) {
     dataset$Env <- ''
   }
@@ -92,6 +96,9 @@ validate.dataset <- function(dataset, datasetID) {
     stop("No identifier provided in dataset, use datesetID parameter to select the column of identifiers")
   })
 
+  if (orderData) {
+    dataset <- dataset[order(dataset$Trait, dataset$Env),]
+  }
   dataset <- dataset[order(dataset$Trait, dataset$Env),]
   return(dataset)
 }
@@ -131,7 +138,7 @@ check <- function(dataset, Bands = NULL) {
 bandsModel <- function(type, Bands, Wavelengths, basisType, n.basis, period = diff(range(c(Wavelengths))), ...) {
   switch(type,
          'Simple' = {
-           return(basisType(Bands, Wavelengths, ...))
+           return(data.matrix(Bands))
          }, 'Complex' = {
            if (basisType == 'Bspline.Basis') {
              Phi <- fda::eval.basis(c(Wavelengths), fda::create.bspline.basis(range(c(Wavelengths)), nbasis = n.basis, breaks = NULL, norder = 4))
