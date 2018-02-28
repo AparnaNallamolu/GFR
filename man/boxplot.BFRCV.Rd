@@ -4,7 +4,7 @@
 \alias{boxplot.BFRCV}
 \title{boxplot.BFRCV}
 \usage{
-\method{boxplot}{BFRCV}(x, select = "Pearson", ordered = T, ...)
+\method{boxplot}{BFRCV}(x, select = "Pearson", ordered = TRUE, ...)
 }
 \arguments{
 \item{x}{\code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2}

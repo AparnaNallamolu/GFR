@@ -2,13 +2,15 @@
 % Please edit documentation in R/Methods.R
 \name{summary.BFRCV}
 \alias{summary.BFRCV}
-\title{Summary.BFRCV}
+\title{Summary}
 \usage{
 \method{summary}{BFRCV}(object, ...)
 }
 \arguments{
-\item{object}{\code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR}
+\item{object}{\code{BFRCV object} BFRCV object, result of use the BFR() function}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \description{
-Solo es una prueba
+Summary of BFRCV object
 }
