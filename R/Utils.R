@@ -23,7 +23,7 @@ Cor_Env <- function(Tab, Time){
   return(Res)
 }
 
-Cor_Env_Ordinal <- function(Tab, Folds = 1, Time){
+Cor_Env_Ordinal <- function(Tab, Time){
   Envs <- unique(Tab$Env)
   Res <- data.frame(Fold = NA, Env = Envs, Pearson = NA, SE_Pearson = NA, MSEP = NA, SE_MSEP = NA, Time = NA)
   Res$Time[1] <- Time
@@ -33,7 +33,7 @@ Cor_Env_Ordinal <- function(Tab, Folds = 1, Time){
     prop.tabl <- prop.table(tabl)
     Cor <- sum(diag(prop.tabl))
     Res$Pearson[i] <- Cor
-    Res$MSEP[i] <- NA
+    Res$MSEP[i] <- 0
     Res$Fold[i] <- Tab$Fold[i]
   }
   return(Res)

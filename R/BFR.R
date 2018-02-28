@@ -104,7 +104,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
 
           Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA],
                             y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, nCV, Time = proc.time()[3] - time.init))
+          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, Time = proc.time()[3] - time.init))
         },
           stop(paste0('The response_type: ', response_type, " is't implemented"))
       )
