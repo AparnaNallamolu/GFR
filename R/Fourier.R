@@ -15,13 +15,15 @@ Fourier.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
 
   bspF <- fda::create.fourier.basis(range(c(Wavelengths)), nbasis = n.basis, period = diff(range(c(Wavelengths))))
   n.ind <- dim(Bands)[1]
-  X.Fu <- matrix(NA, nrow = n.ind,ncol = n.basis)
+  W.bF <- matrix(NA, nrow = n.ind,ncol = n.basis)
   for (h in 1:n.ind) {
-    smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h,]), lambda = 0.1, fdobj = bspF, Lfdobj = 2)
+    smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h,]), lambda = 0, fdobj = bspF)
+    cv_sp_pn <- smf$fd$coefs# Coeficientes cj directamente
     I_KL <- fda::inprod(bspF, bspF)
-    X.Fu[h,] <- t(I_KL %*% smf$fd$coefs)
+    xt_h <- t(I_KL%*%cv_sp_pn)
+    W.bF[h,] <-  xt_h
   }
 
-  X.Fu <- ifelse(is.null(interaction), X.Fu, model.matrix(~0+X.Fu:interaction))
-  return(X.Fu)
+  # X.Fu <- ifelse(is.null(interaction), X.Fu, model.matrix(~0+X.Fu:interaction))
+  return(W.bF)
 }

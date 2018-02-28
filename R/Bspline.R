@@ -15,13 +15,15 @@ Bspline.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
 
   bspl <- fda::create.bspline.basis(range(c(Wavelengths)), nbasis = n.basis, breaks = NULL, norder = 4)
   n.ind <- dim(Bands)[1]
-  X.FDA <- matrix(NA, nrow = n.ind, ncol = n.basis)
+  W.bs <- matrix(NA, nrow = n.ind, ncol = n.basis)
   for (h in 1:n.ind) {
-    smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h, ]),  lambda = 0.1, fdobj = bspl, Lfdobj = 2)
+    smf <- fda::smooth.basisPar(argvals = c(Wavelengths), y = as.numeric(Bands[h,]), lambda = 0, fdobj = bspl)
+    cv_sp_pn <- smf$fd$coefs
     I_KL <- fda::inprod(bspl, bspl)
-    X.FDA[h,] <- t(I_KL %*% smf$fd$coefs)
+    xt_h <- t(I_KL %*% cv_sp_pn)
+    W.bs[h,] <- xt_h
   }
 
-  X.FDA <- ifelse(is.null(interaction), X.FDA, model.matrix(~0+X.FDA:interaction))
-  return(X.FDA)
+  # X.FDA <- ifelse(is.null(interaction), X.FDA, model.matrix(~0+X.FDA:interaction))
+  return(W.bs)
 }
