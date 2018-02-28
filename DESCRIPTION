@@ -24,9 +24,10 @@ Collate:
   CrossValidation.R
   ETA.R
   Fourier.R
+  Maize_BFR.R
   Methods.R
   Utils.R
-  wheat_BGFRA.R
+  Wheat_BFR.R
 Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),
