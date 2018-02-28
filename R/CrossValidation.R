@@ -23,7 +23,7 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
       g_list[[paste0('partition', i)]] <- pm[grs == i]
       ng[i] <- length(g_list[[paste0('partition', i)]])
     }
-    return(list(cv = g_list,
+    return(list(CrossValidation_list = g_list,
                 ng = ng #Lenght in every partition
     ))
   }
@@ -115,7 +115,7 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
 
   n_CL <- length(Pos_1_dat_F)
 
-  return(list(cv = g_list,
+  return(list(CrossValidation_list = g_list,
        ng = ng + n_CL, #Lenght in every partition
        n_CL =  n_CL    # Number of common lines
        ))
@@ -172,7 +172,9 @@ CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.test
     Traits.testing = NULL
   }
 
-  new_Data <- getMatrixForm(DataSet, onlyTrait = F)
+  new_Data <- tidyr::unite(DataSet, 'TraitxEnv', 'Trait', 'Env', sep = "_")
+  new_Data <- tidyr::spread(new_Data, 'TraitxEnv', 'Response')
+
   NLine <- dim(new_Data)[1]
 
   if (length(unique(DataSet$Env)) == 1 ) {
@@ -187,7 +189,7 @@ CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.test
   Env <- unique(DataSet$Env)
 
   p_list <- vector('list', NPartitions)
-  names(p_list) <- paste0('p', 1:NPartitions)
+  names(p_list) <- paste0('partition', 1:NPartitions)
   resp <- rep(1, NLine * NEnv)
   Y <- matrix(resp, ncol = NEnv, byrow = FALSE)
 
@@ -241,13 +243,12 @@ CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.test
 
       B1[, -c(Traits_Selec_F)] = 1
     }
-
-    p_list[[paste('p', i, sep = '')]] = B1
+    pos <- c(B1)
+    p_list[[paste('partition', i, sep = '')]] = which(pos == 2)
   }
 
 
   out <- list(
-    DataSet = new_Data,
     CrossValidation_list = p_list,
     Environments = Env,
     Traits.testing = Traits.testing,

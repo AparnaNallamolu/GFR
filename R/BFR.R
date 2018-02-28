@@ -61,8 +61,8 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
              nCV <- CrossValidation$nFolds
            },
            RandomPartition = {
-             PT <- CV.RandomPart(data, NPartitions = CrossValidation$nPartitions, PTesting = CrossValidation$pTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
-             nCV <- CrossValidation$nPartitions
+             PT <- CV.RandomPart(data, NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
+             nCV <- CrossValidation$NPartitions
            },
            stop(paste0('ERROR: The Cross Validation  ', CrossValidation$Type, " is't implemented"))
     )
@@ -83,7 +83,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
       }
 
       response_NA <-  data$Response
-      Pos_NA <- PT$cv[[paste0('partition',i)]]
+      Pos_NA <- PT$CrossValidation_list[[paste0('partition',i)]]
       response_NA[Pos_NA] <- NA
       time.init <- proc.time()[3]
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
@@ -119,7 +119,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
 
     out <- list(
       predictions_Summary = Tab_Pred,
-      cv = PT$cv,
+      CrossValidation_list = PT$CrossValidation_list,
       response = data$Response,
       predictions = data$Predictions
     )
