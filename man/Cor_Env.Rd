@@ -4,7 +4,7 @@
 \alias{Cor_Env}
 \title{Post-Processing}
 \usage{
-Cor_Env(Tab)
+Cor_Env(Tab, Time)
 }
 \arguments{
 \item{Tab}{\code{data.frame}}
