@@ -24,6 +24,6 @@ Fourier.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
     W.bF[h,] <-  xt_h
   }
 
-  # X.Fu <- ifelse(is.null(interaction), X.Fu, model.matrix(~0+X.Fu:interaction))
+  W.bF <- ifelse(is.null(interaction), W.bF, model.matrix(~0+interaction:W.bF)) #EnvxBand
   return(W.bF)
 }

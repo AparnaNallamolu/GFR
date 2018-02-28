@@ -78,6 +78,21 @@ summary.BFR <- function(object,...){
    cat('\n------------------------------------------------------------------\n');
 }
 
+#' @title Summary
+#'
+#' @description Summary of BFRCV object
+#'
+#' @param object \code{BFRCV object} BFRCV object, result of use the BFR() function
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @export
+summary.BFRCV <- function(object,...){
+  if (!inherits(object, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
+  return(object$predictions_Summary)
+}
+
+
+
 #' @title residuals.BFR
 #'
 #' @description Solo es una prueba
@@ -127,7 +142,7 @@ plot.BFR <- function(x, ...){
 #' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
 #'
 #' @export
-boxplot.BFRCV <- function(x, select = 'Pearson', ordered=T, ...){
+boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   ### Check that object is compatible
   if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
 
@@ -141,14 +156,15 @@ boxplot.BFRCV <- function(x, select = 'Pearson', ordered=T, ...){
     ylab <- "MSEP Average"
   }
 
-
   if (length(unique(results$Env)) > 1) {
+    results$TxE <- paste0(results$Trait, '_', results$Env)
+
     if (ordered) {
-      results$Env <- with(results, reorder(Env, Pearson, median, na.rm = T))
+      results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
     }
-    boxplot(plot.y ~ results$Env, col = "grey", xlab = 'Environment', ylab = ylab)
+    boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
   }else{
-    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab)
+    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
   }
 
 
@@ -179,11 +195,11 @@ plot.BFRCV <- function(x, select = 'Pearson', ...){
     results$SE <- 1.96 * results$SE_MSEP[which(results$Fold == 'Average_all')]
     ylab <- select
   }
-
-  plot.x <- 1:length(results$Env)
+  x.labels <- paste0(results$Trait, '_', results$Env)
+  plot.x <- 1:length(x.labels)
   plot(plot.x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
        type = 'p', ylab = ylab, xlab = '', xaxt = "n", las = 2)
-  axis(1, at = plot.x, labels = results$Env, las = 2)
+  axis(1, at = plot.x, labels = x.labels, las = 2)
   arrows(plot.x, results[, select] - results$SE, plot.x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
 }
 

@@ -24,6 +24,7 @@ Bspline.Basis <- function(Bands, Wavelengths = NULL, n.basis = 1, interaction = 
     W.bs[h,] <- xt_h
   }
 
-  # X.FDA <- ifelse(is.null(interaction), X.FDA, model.matrix(~0+X.FDA:interaction))
+
+  W.bs <- ifelse(is.null(interaction), W.bs, model.matrix(~0+interaction:W.bs)) #EnvxBand
   return(W.bs)
 }
