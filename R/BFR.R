@@ -42,7 +42,7 @@
 #'
 #' @export
 
-BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, nIter = 1500,
+BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=NULL, b=NULL, ETA = NULL, nIter = 1500,
                   burnIn = 500, thin = 5, saveAt = '', S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL,
                   verbose = TRUE, rmExistingFiles = TRUE, groups = NULL, CrossValidation = NULL,
                   set_seed = NULL, dec = 4){
@@ -50,7 +50,7 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
     data <- ETA$data
     ETA <- ETA$ETA
   } else {
-    data <- validate.dataset(data)
+    data <- validate.dataset(data, datasetID, order = F)
   }
 
   if (!is.null(CrossValidation)) {
@@ -89,21 +89,21 @@ BFR <- function(data = NULL, response_type = 'gaussian', a=NULL, b=NULL, ETA = N
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                        verbose = F, rmExistingFiles, groups)
 
-
+      #fm <- BGLR(response_NA, ETA, verbose=F)
       switch(response_type,
         gaussian = {
           predicted <- fm$predictions
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
-          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA],
-                            y_o = data$Response[Pos_NA])
+          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
+                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
           Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
         },
         ordinal = {
           predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
           data$Predictions[Pos_NA] <- predicted[Pos_NA]
 
-          Tab <- data.frame(Env = data$Env[Pos_NA], Fold = i, y_p = predicted[Pos_NA],
-                            y_o = data$Response[Pos_NA] )
+          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
+                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
           Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, Time = proc.time()[3] - time.init))
         },
           stop(paste0('The response_type: ', response_type, " is't implemented"))
