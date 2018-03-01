@@ -8,21 +8,21 @@
 #' @param Wavelengths Wavelenths
 #' @param priorType Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'
 #' @param method Model to apply in bands, by default 'Alternative' will be used, also could be 'Simple', 'Complex'
-#' @param n.basis Number of basis by default only use 1 basis.
+#' @param nBasis Number of basis by default only use 1 basis.
 #' @param datasetID column with the identifiers.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wavelengths = NULL, priorType = 'FIXED', method = 'Alternative', n.basis = 1, datasetID = 'Line', ...) {
+ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wavelengths = NULL, priorType = 'FIXED', method = 'Alternative', nBasis = 1, datasetID = 'Line', ...) {
   dataset <- validate.dataset(dataset, datasetID)
   Design <- check(dataset, Bands)
   switch(Design,
          'Single' = {
            ETA <- NULL
          }, 'SingleBands' = {
-           ETA <- list(Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis, ...), model = priorType))
+           ETA <- list(Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), model = priorType))
          }, 'Env' = {
            ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
                        Line = list(X = model.matrix(~0+as.factor(dataset$Line)), model = priorType),
@@ -31,8 +31,8 @@ ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wave
            ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
                        Line = list(X = model.matrix(~0+as.factor(dataset$Line)), model = priorType),
                        LinexEnv = list(X = model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Env)), model = priorType),
-                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis), model = priorType, ...))
-                       # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis, interaction = dataset$Env, ...), model = priorType))
+                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
+                       # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Env, ...), model = priorType))
          }, 'Trait' = {
            ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
                        Line = list(X = model.matrix(~0+as.factor(dataset$Line)), model = priorType),
@@ -41,8 +41,8 @@ ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wave
            ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
                        Line = list(X = model.matrix(~0+as.factor(dataset$Line)), model = priorType),
                        LinexTrait = list(X = model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Trait)), model = priorType),
-                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis), model = priorType, ...))
-                       # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis, interaction = dataset$Trait, ...), model = priorType))
+                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
+                       # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Trait, ...), model = priorType))
          }, 'Multi' = {
            ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
                        Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
@@ -59,9 +59,9 @@ ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wave
                        LinexTrait = list(X = model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Trait)), model = priorType),
                        EnvxTrait = list(X = model.matrix(~0+as.factor(dataset$Env):as.factor(dataset$Trait)), model = priorType),
                        EnvxTraitxLine = list(X = model.matrix(~0+as.factor(dataset$Env):as.factor(dataset$Trait):as.factor(dataset$Line)), model = priorType),
-                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis), model = priorType, ...))
-                       # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis, interaction = dataset$Env, ...), model = priorType),
-                       # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, n.basis = n.basis, interaction = dataset$Trait, ...), model = priorType))
+                       Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
+                       # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Env, ...), model = priorType),
+                       # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Trait, ...), model = priorType))
          }, stop('Error in dataset or Bands provided')
   )
   out <- list(ETA = ETA, #Linear predictor
@@ -135,22 +135,22 @@ check <- function(dataset, Bands = NULL) {
   }
 }
 
-bandsModel <- function(type, Bands, Wavelengths, basisType, n.basis, period = diff(range(c(Wavelengths))), ...) {
+bandsModel <- function(type, Bands, Wavelengths, basisType, nBasis, period = diff(range(c(Wavelengths))), ...) {
   switch(type,
          'Simple' = {
            return(data.matrix(Bands))
          }, 'Complex' = {
            if (basisType == 'Bspline.Basis') {
-             Phi <- fda::eval.basis(c(Wavelengths), fda::create.bspline.basis(range(c(Wavelengths)), nbasis = n.basis, breaks = NULL, norder = 4))
+             Phi <- fda::eval.basis(c(Wavelengths), fda::create.bspline.basis(range(c(Wavelengths)), nbasis = nBasis, breaks = NULL, norder = 4))
            } else {
-             Phi <- fda::eval.basis(c(Wavelengths), fda::create.fourier.basis(range(c(Wavelengths)), nbasis = n.basis, period = period))
+             Phi <- fda::eval.basis(c(Wavelengths), fda::create.fourier.basis(range(c(Wavelengths)), nbasis = nBasis, period = period))
            }
            return(data.matrix(Bands) %*% Phi %*% solve(t(Phi) %*% Phi) %*% t(Phi))
          }, 'Alternative' = {
            if (basisType == 'Bspline.Basis') {
-             Phi <- fda::eval.basis(c(Wavelengths), fda::create.bspline.basis(range(c(Wavelengths)), nbasis = n.basis, breaks = NULL, norder = 4))
+             Phi <- fda::eval.basis(c(Wavelengths), fda::create.bspline.basis(range(c(Wavelengths)), nbasis = nBasis, breaks = NULL, norder = 4))
            } else {
-             Phi <- fda::eval.basis(c(Wavelengths), fda::create.fourier.basis(range(c(Wavelengths)), nbasis = n.basis, period = period))
+             Phi <- fda::eval.basis(c(Wavelengths), fda::create.fourier.basis(range(c(Wavelengths)), nbasis = nBasis, period = period))
            }
            return(data.matrix(Bands) %*% Phi)
          },

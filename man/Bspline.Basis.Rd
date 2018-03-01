@@ -4,12 +4,12 @@
 \alias{Bspline.Basis}
 \title{Bspline.Basis}
 \usage{
-Bspline.Basis(Bands, Wavelengths = NULL, n.basis = 1, interaction = NULL)
+Bspline.Basis(Bands, Wavelengths = NULL, nBasis = 1, interaction = NULL)
 }
 \arguments{
 \item{Bands}{\code{matrix}}
 
-\item{n.basis}{\code{integer}}
+\item{nBasis}{\code{integer}}
 
 \item{interaction}{\code{matrix}}
 

@@ -6,7 +6,7 @@
 \usage{
 ETAGenerate(dataset, basisType = "Fourier.Basis", Bands = NULL,
   Wavelengths = NULL, priorType = "FIXED", method = "Alternative",
-  n.basis = 1, datasetID = "Line", ...)
+  nBasis = 1, datasetID = "Line", ...)
 }
 \arguments{
 \item{dataset}{TidyFormat}
@@ -21,7 +21,7 @@ ETAGenerate(dataset, basisType = "Fourier.Basis", Bands = NULL,
 
 \item{method}{Model to apply in bands, by default 'Alternative' will be used, also could be 'Simple', 'Complex'}
 
-\item{n.basis}{Number of basis by default only use 1 basis.}
+\item{nBasis}{Number of basis by default only use 1 basis.}
 
 \item{datasetID}{column with the identifiers.}
 }
