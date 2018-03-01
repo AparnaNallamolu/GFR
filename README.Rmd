@@ -4,7 +4,7 @@ date: "Last README update: `r format(Sys.Date())`"
 output: github_document
 ---
 
-**B**ayesian genomic **F**unctional **R**egression analysis in R
+**B**ayesian genomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 3
 
 [![Release][release-badge]][cran]
 [![License: LGPL v3][LGPL-badge]][LGPL]
@@ -32,72 +32,86 @@ devtools::install_github('frahik/BFR')
 ```{r loadData}
 rm(list = ls())
 library(BFR)
-data("wheat_BFR")
+data("Wheat_BFR")
 
-data <- Wheat # Load from data wheat_BFR
-Bands <- Bands # Load from data wheat_BFR
-Wavelengths <- Wavelengths # Load from data wheat_BFR
+data <- Wheat_BFR # Load from data Wheat_BFR
+Bands <- Wheat_Bands # Load from data Wheat_BFR
+Wavelengths <- Wheat_Wavelengths # Load from data Wheat_BFR
+
+data("Maize_BFR")
+data <- Maize_BFR # Load from data Maize_BFR
+Bands <- Maize_Bands # Load from data Maize_BFR
+Wavelengths <- Maize_Wavelenghts # Load from data Maize_BFR
 ```
 
 
 #### Fit model
 
 ```{r fitModel}
-data("wheat_BFR")
-data <- Wheat[which(Wheat$Env == 'Drought'), ]
+data("Wheat_BFR")
+data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
 
-fm <- BFR(data, nIter = 1000, burnIn = 300)
+fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
 
-# summary(fm)
 plot(fm)
 ```
 
 ### Cross-validation model with kfold
 
 ```{r CVModel}
-data("wheat_BFR")
-data <- Wheat[which(Wheat$Env == 'Drought'), ]
+data("Wheat_BFR")
+data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
 
-pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list)
+pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list, verbose = F)
 summary(pm)
 
 boxplot(pm)
 ```
 
-### Auto-detection of linear predictor
+### Auto-detection of linear predictor (Only Environment)
 
 ```{r ETAG}
-data("wheat_BFR")
-Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
-ETA2 <- ETAGenerate(Wheat, functionalType = 'Bspline.Basis', Bands = Bands, Wavelengths = Wavelengths, priorType = 'BayesB', bandsType = 'Alternative', n.basis = 21)
+data("Wheat_BFR")
+CrossV <- list(Type = 'KFold', nFolds = 3)
+ETA2 <- ETAGenerate(Wheat_BFR, basisType = 'Bspline.Basis', 
+                    Bands = Wheat_Bands, Wavelengths = Wheat_Wavelengths,
+                    priorType = 'BayesB', method = 'Alternative', nBasis = 21)
 
 
-pm2 <- BFR(ETA = ETA2, data, nIter = 10000, burnIn = 3000, set_seed = 10, CrossValidation = Crossvalidation_list)
+pm2 <- BFR(ETA = ETA2, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
 summary(pm2)
 
 plot(pm2)
 ```
 
-### Handmade linear predictor
-```{r ETAM, eval=F}
-CrossV <- list(Type = 'KFold', nFolds = 5)
-ETA3 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat$Env)), model = 'FIXED'),
-             Line = list(X = model.matrix(~0+as.factor(Wheat$Line)), model = 'BRR'),
-             Bands = list(X = Bspline.Basis(Bands, Wavelengths, n.basis = 23), model = 'BayesA'))
-pm3 <- BFR(data = Wheat, ETA = ETA3, nIter = 15000, burnIn = 10000, CrossValidation = CrossV, set_seed = 10)
+### Auto-detection of linear predictor (Multi-Trait & Multi-Environment)
+```{r ETA_MTME}
+data("Maize_BFR")
+CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
+ETA3 <- ETAGenerate(Maize_BFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, priorType = 'BRR', method = 'Simple', nBasis = 21)
+ETA3$Design
+ETA3$Basis
+ETA3$Prior
+ETA3$Method
+pm3 <- BFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
 summary(pm3)
-
-plot(pm3, select = 'MSEP')
-boxplot(pm3, select = 'MSEP')
 ```
 
 
-### Params
 
-In progress
+### Handmade linear predictor
+```{r ETAM}
+CrossV <- list(Type = 'KFold', nFolds = 5)
+ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_BFR$Env)), model = 'FIXED'),
+             Line = list(X = model.matrix(~0+as.factor(Wheat_BFR$Line)), model = 'BRR'),
+             Bands = list(X = Bspline.Basis(Wheat_Bands, Wheat_Wavelengths, nBasis = 23), model = 'BayesA'))
+pm4 <- BFR(data = Wheat_BFR, ETA = ETA4, nIter = 1000, burnIn = 300, CrossValidation = CrossV, set_seed = 10, verbose = F)
+summary(pm4)
 
-## Advanced demos
+plot(pm4, select = 'MSEP')
+boxplot(pm4, select = 'MSEP')
+```
 
 
 ## Citation
