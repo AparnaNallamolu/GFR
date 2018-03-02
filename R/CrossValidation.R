@@ -2,19 +2,19 @@
 #'
 #' @description Example
 #'
-#' @param data \code{data.frame} Object with the $Response, $Line and $Env especified on it.
+#' @param DataSet \code{data.frame} Object with the $Response, $Line and $Env especified on it.
 #' @param K \code{integer} Number of groups to the cross-validation.
 #' @param set_seed \code{integer} Number of seed for replicable research.
 #'
 #' @export
 #'
-CV.KFold <- function(data, K = 5, set_seed=NULL) {
+CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
   if (!is.null(set_seed)) {
     set.seed(set_seed)
   }
 
-  if (is.null(data$Env) || length(unique(data$Env)) == 1) {
-    pm <- sample(dim(data)[1])
+  if (is.null(DataSet$Env) || length(unique(DataSet$Env)) == 1) {
+    pm <- sample(dim(DataSet)[1])
     grs <- cut(seq(1, length(pm)), breaks = K, labels = FALSE)
     g_list <- vector('list', K)
     ng <- 0
@@ -28,12 +28,12 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
     ))
   }
 
-  UL <- unique(data$Line)
+  UL <- unique(DataSet$Line)
   #Number of sites where each line appear
   n_UL <- length(UL)
   nSLA <- rep(NA, n_UL)
 
-  nEAL <- table(data[, c('Line')])#Number of Sites that appear  each line
+  nEAL <- table(DataSet[, c('Line')])#Number of Sites that appear  each line
   L_nE <- data.frame(Line = names(nEAL), nE = c(nEAL))
 
   #A list of Positions in data set dat_F that will conform the groups
@@ -43,12 +43,12 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
   #Lines that will appear in all groups because
   # only appear in only one Site
   Pos1 <- which(L_nE$nE == 1)
-  Pos_1_dat_F <- match(L_nE$Line[Pos1], data$Line)
+  Pos_1_dat_F <- match(L_nE$Line[Pos1], DataSet$Line)
   #dat_F[Pos_1_dat_F,]
 
   #Tama?o de cada partici?n sin considerar las lineas
   # que se incluir?n por defaul (las que aparecen en un solo ambiente)
-  n <- dim(data)[1]
+  n <- dim(DataSet)[1]
   nR <- n - length(Pos1)
   ifelse(nR %% K == 0,
          ng <- rep(nR / K, K),
@@ -59,16 +59,16 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
   #First group
   #---------------------------------------------------------------
   if (length(Pos1) == 0) {
-    dat_F_k <- data
+    dat_F_k <- DataSet
   }
   else{
-    dat_F_k <- data[-Pos_1_dat_F,]
+    dat_F_k <- DataSet[-Pos_1_dat_F,]
   }
   #Lineas ?nicas restantes
   UL_k <- unique(dat_F_k$Line)
   Pos_R_k <- rep(NA, length(UL_k))
   for (j in 1:length(UL_k)) {
-    Pos_j_k <-  which(data$Line == UL_k[j])
+    Pos_j_k <-  which(DataSet$Line == UL_k[j])
     Pos_R_k[j] <- sample(Pos_j_k, 1)
   }
   Pos_R_k <- Pos_R_k
@@ -82,18 +82,18 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
   for (k in 2:(K - 1))  {
     #Assigned positions
     Pos_k_a_R <- unique(unlist(g_list[1:(k - 1)]))
-    dat_F_k <- data[-Pos_k_a_R,]
+    dat_F_k <- DataSet[-Pos_k_a_R,]
     UL_k <- unique(dat_F_k$Line)
     #A las lineas que no aparecen en el grupo k-1, se remueve un
     # site donde aparencen para garantizar que ?stas aparezcan
     # en al menos un site
-    UL_k <- UL_k[(UL_k %in% data[Pos_k_a_R,]$Line) == FALSE]
+    UL_k <- UL_k[(UL_k %in% DataSet[Pos_k_a_R,]$Line) == FALSE]
     if (length(UL_k) > 0) {
       #Posiciones de lineas a mantener fuera del grupo k
       Pos_R_k <- rep(NA, length(UL_k))
 
       for (j in 1:length(UL_k)) {
-        Pos_j_k <-  which((data$Line == UL_k[j]))
+        Pos_j_k <-  which((DataSet$Line == UL_k[j]))
         if (length(Pos_j_k) > 1) {
           Pos_R_k[j] <- sample(Pos_j_k, 1)
         }
@@ -137,7 +137,7 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
 #' @param NPartitions \code{integer} Number of Partitions for the Cross-Validation. Is 10 by default.
 #' @param PTesting \code{Double} Percentage of Testing for the Cross-Validation. Is 0.35 by default.
 #' @param Traits.testing \code{character} By default is null and use all the traits to fit the model, else only part of the traits specified be used to fit the model.
-#' @param Set_seed \code{integer} Number of seed for reproducible research. Is NULL by default.
+#' @param set_seed \code{integer} Number of seed for reproducible research. Is NULL by default.
 #'
 #' @return \code{List} A list object with length of \code{NPartitions}, every index has a \code{matrix} \eqn{n \times x}, where \eqn{n} is the number of \code{NLines} and \eqn{x} is the number of  \code{NEnv} \eqn{\times} \code{NTraits}. The values inside is 1 for training and 2 for testing.
 #'
@@ -151,15 +151,15 @@ CV.KFold <- function(data, K = 5, set_seed=NULL) {
 #'   CV.RandomPart(Wheat_IBCF, Traits.testing = 'DH')
 #'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35)
 #'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, Traits.testing = 'DH')
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Set_seed = 5)
+#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, set_seed = 5)
 #'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH')
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH', Set_seed = 5 )
+#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH', set_seed = 5 )
 #' }
 #' @export
-CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.testing = NULL, Set_seed = NULL) {
+CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.testing = NULL, set_seed = NULL) {
 
-  if (!is.null(Set_seed)) {
-    set.seed(Set_seed)
+  if (!is.null(set_seed)) {
+    set.seed(set_seed)
   }
 
   if (length(unique(DataSet$Env)) == 0 ) {
