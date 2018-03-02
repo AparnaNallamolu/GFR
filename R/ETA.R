@@ -15,7 +15,8 @@
 #' @export
 #'
 #' @examples
-ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wavelengths = NULL, priorType = 'FIXED', method = 'Alternative', nBasis = 1, datasetID = 'Line', ...) {
+ETAGenerate <- function(dataset, datasetID = 'Line', priorType = 'FIXED', Bands = NULL, Wavelengths = NULL,
+                        method = 'Alternative', basisType = 'Fourier.Basis', nBasis = 1, ...) {
   dataset <- validate.dataset(dataset, datasetID)
   Design <- check(dataset, Bands)
   switch(Design,
@@ -66,10 +67,12 @@ ETAGenerate <- function(dataset, basisType = 'Fourier.Basis', Bands = NULL, Wave
   )
   out <- list(ETA = ETA, #Linear predictor
               dataset = dataset, #Fixed Dataset
+              ID = datasetID,
               Design = Design,
               Basis = basisType,
               Prior = priorType,
-              Method = method
+              Method = method,
+
               ) #Type of model
   class(out) <- 'ETA'
   return(out)
