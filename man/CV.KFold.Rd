@@ -4,10 +4,10 @@
 \alias{CV.KFold}
 \title{Cross-Validation with K Folds}
 \usage{
-CV.KFold(data, K = 5, set_seed = NULL)
+CV.KFold(DataSet, K = 5, set_seed = NULL)
 }
 \arguments{
-\item{data}{\code{data.frame} Object with the $Response, $Line and $Env especified on it.}
+\item{DataSet}{\code{data.frame} Object with the $Response, $Line and $Env especified on it.}
 
 \item{K}{\code{integer} Number of groups to the cross-validation.}
 
