@@ -71,8 +71,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', priorType = 'FIXED', Bands 
               Design = Design,
               Basis = basisType,
               Prior = priorType,
-              Method = method,
-
+              Method = method
               ) #Type of model
   class(out) <- 'ETA'
   return(out)
