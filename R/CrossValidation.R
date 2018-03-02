@@ -1,10 +1,13 @@
 #' @title Cross-Validation with K Folds
 #'
-#' @description Example
+#' @description This method consists of randomly dividing the training data set and the test data set.
 #'
-#' @param DataSet \code{data.frame} Object with the $Response, $Line and $Env especified on it.
-#' @param K \code{integer} Number of groups to the cross-validation.
-#' @param set_seed \code{integer} Number of seed for replicable research.
+#'  @param DataSet (\code{data.frame}) The object need contain three columns in the Tidy data format:
+#' \code{$Line} is the Line or genotype identifier, and the name of this column could change.
+#' \code{$Env} is the name of the evaluated environment (s).
+#' \code{$Response} Variable response obtained for the row corresponding to line and environment.
+#' @param K (\code{integer}) Number of groups to the cross-validation.
+#' @param set_seed (\code{integer}) Number of seed for replicable research.
 #'
 #' @export
 #'
@@ -133,27 +136,27 @@ CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
 #' \code{$Line} is the Line or genotype identifier, and the name of this column could change.
 #' \code{$Env} is the name of the evaluated environment (s).
 #' \code{$Trait} is the name of the evaluated trait (s).
-#' \code{$Response} Variable response obtained for the row corresponding to line and environment.
+#' \code{$Response} Variable response obtained for the row corresponding to line, trait and environment.
 #' @param NPartitions \code{integer} Number of Partitions for the Cross-Validation. Is 10 by default.
 #' @param PTesting \code{Double} Percentage of Testing for the Cross-Validation. Is 0.35 by default.
 #' @param Traits.testing \code{character} By default is null and use all the traits to fit the model, else only part of the traits specified be used to fit the model.
 #' @param set_seed \code{integer} Number of seed for reproducible research. Is NULL by default.
 #'
-#' @return \code{List} A list object with length of \code{NPartitions}, every index has a \code{matrix} \eqn{n \times x}, where \eqn{n} is the number of \code{NLines} and \eqn{x} is the number of  \code{NEnv} \eqn{\times} \code{NTraits}. The values inside is 1 for training and 2 for testing.
+#' @return \code{List} A list object with length of \code{NPartitions}, every index has a the positions to use like testing.
 #'
 #' @examples
 #' \dontrun{
-#'   library(IBCF.MTME)
-#'   data('Wheat_IBCF')
+#'   library(GFR)
+#'   data('Maize_GFR')
 #'
-#'   CV.RandomPart(Wheat_IBCF)
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10)
-#'   CV.RandomPart(Wheat_IBCF, Traits.testing = 'DH')
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35)
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, Traits.testing = 'DH')
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, set_seed = 5)
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH')
-#'   CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH', set_seed = 5 )
+#'   CV.RandomPart(Wheat_GFR)
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10)
+#'   CV.RandomPart(Wheat_GFR, Traits.testing = 'PH')
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35)
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10, Traits.testing = 'PH')
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, set_seed = 5)
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, Traits.testing = 'PH')
+#'   CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, Traits.testing = 'PH', set_seed = 5 )
 #' }
 #' @export
 CV.RandomPart <- function(DataSet, NPartitions = 10, PTesting = .35, Traits.testing = NULL, set_seed = NULL) {

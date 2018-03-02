@@ -1,6 +1,6 @@
-Package: BFR
-Title: BFR (Bayesian Functional Regression)
-Version: 0.9-3
+Package: GFR
+Title: GFR (Genomic Functional Regression)
+Version: 0.9-5
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut")
@@ -14,20 +14,20 @@ Encoding: UTF-8
 LazyData: true
 Type: Package
 RoxygenNote: 6.0.1
-URL: https://github.com/frahik/BGFRA
-BugReports: https://github.com/frahik/BGFRA/issues/new
+URL: https://github.com/frahik/GFR
+BugReports: https://github.com/frahik/GFR/issues/new
 NeedsCompilation: yes
 Collate:
+  Basis_Bspline.R
+  Basis_Fourier.R
   BFR.R
-  Bspline.R
   Core.R
   CrossValidation.R
   ETA.R
-  Fourier.R
-  Maize_BFR.R
+  Maize_GFR.R
   Methods.R
   Utils.R
-  Wheat_BFR.R
+  Wheat_GFR.R
 Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),

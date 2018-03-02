@@ -4,14 +4,16 @@
 \alias{ETAGenerate}
 \title{ETAGenerate}
 \usage{
-ETAGenerate(dataset, datasetID = "Line", priorType = "FIXED",
-  Bands = NULL, Wavelengths = NULL, method = "Alternative",
-  basisType = "Fourier.Basis", nBasis = 1, ...)
+ETAGenerate(dataset, datasetID = "Line", GenomicMatrix = NULL,
+  priorType = "FIXED", Bands = NULL, Wavelengths = NULL,
+  method = "Simple", basisType = "Fourier.Basis", nBasis = 1, ...)
 }
 \arguments{
 \item{dataset}{TidyFormat}
 
 \item{datasetID}{column with the identifiers.}
+
+\item{GenomicMatrix}{lalalalal}
 
 \item{priorType}{Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'}
 
@@ -26,5 +28,5 @@ ETAGenerate(dataset, datasetID = "Line", priorType = "FIXED",
 \item{nBasis}{Number of basis by default only use 1 basis.}
 }
 \description{
-Function to generate a Linear Predictor from a dataset to BFR.
+Function to generate a Linear Predictor from a dataset to GFR.
 }

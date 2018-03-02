@@ -1,4 +1,4 @@
-#' BFR
+#' GFR
 #'
 #' Bayesian Functional Regression
 #'

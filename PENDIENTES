@@ -1,0 +1,16 @@
+PENDIENTES
+==============
+- [ ] Corregir documentacion
+- [ ] Añadir tests
+  - Probar Bspline.Basis Function
+    - La salida debe ser una matriz
+  - Probar Fourier.Basis Function
+    - La salida debe ser una matriz
+  - Probar ETAGenerate Function
+    - Las salidas son listas de la clase ETA.
+    - Para los 8 casos para los 3 metodos con las dos bases.
+  - Probar BFR ajustando y prediciendo, con todos los casos generados para ETAGenerate.
+- [ ] Generar Viggnetes
+  - Probar ETAGenerate Function
+    - Para los 8 casos para los 3 metodos con las dos bases.
+  - Probar BFR ajustando y prediciendo, con todos los casos generados para ETAGenerate.

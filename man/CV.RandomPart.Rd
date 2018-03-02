@@ -12,7 +12,7 @@ CV.RandomPart(DataSet, NPartitions = 10, PTesting = 0.35,
 \code{$Line} is the Line or genotype identifier, and the name of this column could change.
 \code{$Env} is the name of the evaluated environment (s).
 \code{$Trait} is the name of the evaluated trait (s).
-\code{$Response} Variable response obtained for the row corresponding to line and environment.}
+\code{$Response} Variable response obtained for the row corresponding to line, trait and environment.}
 
 \item{NPartitions}{\code{integer} Number of Partitions for the Cross-Validation. Is 10 by default.}
 
@@ -23,7 +23,7 @@ CV.RandomPart(DataSet, NPartitions = 10, PTesting = 0.35,
 \item{set_seed}{\code{integer} Number of seed for reproducible research. Is NULL by default.}
 }
 \value{
-\code{List} A list object with length of \code{NPartitions}, every index has a \code{matrix} \eqn{n \times x}, where \eqn{n} is the number of \code{NLines} and \eqn{x} is the number of  \code{NEnv} \eqn{\times} \code{NTraits}. The values inside is 1 for training and 2 for testing.
+\code{List} A list object with length of \code{NPartitions}, every index has a the positions to use like testing.
 }
 \description{
 This method consists of randomly dividing the training data set and the test data set.
@@ -32,16 +32,16 @@ The result corresponds to the arithmetic mean of the values obtained for the dif
 }
 \examples{
 \dontrun{
-  library(IBCF.MTME)
-  data('Wheat_IBCF')
+  library(GFR)
+  data('Maize_GFR')
 
-  CV.RandomPart(Wheat_IBCF)
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10)
-  CV.RandomPart(Wheat_IBCF, Traits.testing = 'DH')
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35)
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10, Traits.testing = 'DH')
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, set_seed = 5)
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH')
-  CV.RandomPart(Wheat_IBCF, NPartitions = 10, PTesting = .35, Traits.testing = 'DH', set_seed = 5 )
+  CV.RandomPart(Wheat_GFR)
+  CV.RandomPart(Wheat_GFR, NPartitions = 10)
+  CV.RandomPart(Wheat_GFR, Traits.testing = 'PH')
+  CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35)
+  CV.RandomPart(Wheat_GFR, NPartitions = 10, Traits.testing = 'PH')
+  CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, set_seed = 5)
+  CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, Traits.testing = 'PH')
+  CV.RandomPart(Wheat_GFR, NPartitions = 10, PTesting = .35, Traits.testing = 'PH', set_seed = 5 )
 }
 }

@@ -1,10 +1,10 @@
 ---
-title: "BFR"
+title: "GFR"
 date: "Last README update: `r format(Sys.Date())`"
 output: github_document
 ---
 
-**B**ayesian genomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 3
+**G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 5
 
 [![Release][release-badge]][cran]
 [![License: LGPL v3][LGPL-badge]][LGPL]
@@ -12,17 +12,18 @@ output: github_document
 [![Downloads][downloads-badge]][cran]
 
 ## New in this dev version
+* Rename from BGFRA -> GFR -> GFR
 * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 ## Instructions for proper implementation
 
 ### Installation
 
-To complete installation of dev version of BFR from GitHub, you have to install a few packages first.
+To complete installation of dev version of GFR from GitHub, you have to install a few packages first.
 
 ```{r installation, eval = FALSE}
 install.packages('devtools')
-devtools::install_github('frahik/BFR')
+devtools::install_github('frahik/GFR')
 ```
 
 ### Quick use 
@@ -31,27 +32,27 @@ devtools::install_github('frahik/BFR')
 
 ```{r loadData}
 rm(list = ls())
-library(BFR)
-data("Wheat_BFR")
+library(GFR)
+data("Wheat_GFR")
 
-data <- Wheat_BFR # Load from data Wheat_BFR
-Bands <- Wheat_Bands # Load from data Wheat_BFR
-Wavelengths <- Wheat_Wavelengths # Load from data Wheat_BFR
+data <- Wheat_GFR # Load from data Wheat_GFR
+Bands <- Wheat_Bands # Load from data Wheat_GFR
+Wavelengths <- Wheat_Wavelengths # Load from data Wheat_GFR
 
-data("Maize_BFR")
-data <- Maize_BFR # Load from data Maize_BFR
-Bands <- Maize_Bands # Load from data Maize_BFR
-Wavelengths <- Maize_Wavelengths # Load from data Maize_BFR
+data("Maize_GFR")
+data <- Maize_GFR # Load from data Maize_GFR
+Bands <- Maize_Bands # Load from data Maize_GFR
+Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
 ```
 
 
 #### Fit model
 
 ```{r fitModel}
-data("Wheat_BFR")
-data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
+data("Wheat_GFR")
+data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 
-fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
+fm <- GFR(data, nIter = 1000, burnIn = 300, verbose = F)
 
 plot(fm)
 ```
@@ -59,11 +60,11 @@ plot(fm)
 ### Cross-validation model with kfold
 
 ```{r CVModel}
-data("Wheat_BFR")
-data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
+data("Wheat_GFR")
+data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
 
-pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list, verbose = F)
+pm <- GFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list, verbose = F)
 summary(pm)
 
 boxplot(pm)
@@ -72,14 +73,14 @@ boxplot(pm)
 ### Auto-detection of linear predictor (Only Environment)
 
 ```{r ETAG}
-library(BFR)
-data("Wheat_BFR")
+library(GFR)
+data("Wheat_GFR")
 CrossV <- list(Type = 'KFold', nFolds = 3)
-ETA2 <- ETAGenerate(Wheat_BFR, datasetID = 'Line', priorType = 'BayesB', Bands = Wheat_Bands,
+ETA2 <- ETAGenerate(Wheat_GFR, datasetID = 'Line', priorType = 'BayesB', Bands = Wheat_Bands,
                     Wavelengths = Wheat_Wavelengths, method = 'Alternative', basisType = 'Bspline.Basis', nBasis = 21)
 
 
-pm2 <- BFR(ETA = ETA2, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
+pm2 <- GFR(ETA = ETA2, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
 summary(pm2)
 
 plot(pm2)
@@ -87,14 +88,14 @@ plot(pm2)
 
 ### Auto-detection of linear predictor (Multi-Trait & Multi-Environment)
 ```{r ETA_MTME}
-data("Maize_BFR")
+data("Maize_GFR")
 CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
-ETA3 <- ETAGenerate(Maize_BFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
+ETA3 <- ETAGenerate(Maize_GFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
 ETA3$Design
 ETA3$Basis
 ETA3$Prior
 ETA3$Method
-pm3 <- BFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
+pm3 <- GFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
 summary(pm3)
 ```
 
@@ -103,10 +104,10 @@ summary(pm3)
 ### Handmade linear predictor
 ```{r ETAM}
 CrossV <- list(Type = 'KFold', nFolds = 5)
-ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_BFR$Env)), model = 'FIXED'),
-             Line = list(X = model.matrix(~0+as.factor(Wheat_BFR$Line)), model = 'BRR'),
+ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
+             Line = list(X = model.matrix(~0+as.factor(Wheat_GFR$Line)), model = 'BRR'),
              Bands = list(X = Bspline.Basis(Wheat_Bands, Wheat_Wavelengths, nBasis = 23), model = 'BayesA'))
-pm4 <- BFR(data = Wheat_BFR, ETA = ETA4, nIter = 1000, burnIn = 300, CrossValidation = CrossV, set_seed = 10, verbose = F)
+pm4 <- GFR(data = Wheat_GFR, ETA = ETA4, nIter = 1000, burnIn = 300, CrossValidation = CrossV, set_seed = 10, verbose = F)
 summary(pm4)
 
 plot(pm4, select = 'MSEP')
@@ -126,21 +127,19 @@ Coming soon.
 
 ## Issues
 
-Feel free to report new issues in this link [Issues](https://github.com/frahik/IBCF.MTME/issues/new)
+Feel free to report new issues in this link [Issues](https://github.com/frahik/GFR/issues/new)
 
 
 ## Authors
 
  - Francisco Javier Luna-Vázquez (Author, Maintainer)
  - Osval Antonio Montesinos-López (Author)
- - Abelardo Montesinos-López (Author)
- - José Crossa (Author)
 
 
 [LGPL-badge]: https://img.shields.io/badge/License-LGPL%20v3-blue.svg "LGPL, Version 2.0"
 [status-bagde]: http://www.repostatus.org/badges/latest/wip.svg "status"
-[downloads-badge]: http://cranlogs.r-pkg.org/badges/BFR "IBCF.MTME cranlogs"
-[release-badge]: http://www.r-pkg.org/badges/version-ago/BFR "IBCF.MTME release"
-[cran]: https://cran.r-project.org/package=BFR "CRAN Page"
+[downloads-badge]: http://cranlogs.r-pkg.org/badges/GFR "IBCF.MTME cranlogs"
+[release-badge]: http://www.r-pkg.org/badges/version-ago/GFR "IBCF.MTME release"
+[cran]: https://cran.r-project.org/package=GFR "CRAN Page"
 [LGPL]: https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0"
 [status]: http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public"

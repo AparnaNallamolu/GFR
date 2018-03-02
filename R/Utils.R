@@ -1,11 +1,3 @@
-#' @title Post-Processing
-#'
-#' @description Postprocesamiento
-#' @param Tab \code{data.frame}
-#'
-#' @export
-#'
-
 Cor_Env <- function(Tab, Time){
   Envs <- unique(Tab$Env)
   Traits <- unique(Tab$Trait)
