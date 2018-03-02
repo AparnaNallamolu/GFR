@@ -49,8 +49,11 @@ BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=N
   if (inherits(ETA, 'ETA')) {
     data <- ETA$data
     ETA <- ETA$ETA
+    design <- ETA$Design
+    datasetID <- ETA$ID
   } else {
     data <- validate.dataset(data, datasetID, order = F)
+    design <- 'Handmade'
   }
 
   if (!is.null(CrossValidation)) {
@@ -121,7 +124,8 @@ BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=N
       predictions_Summary = Tab_Pred,
       CrossValidation_list = PT$CrossValidation_list,
       response = data$Response,
-      predictions = data$Predictions
+      predictions = data$Predictions,
+      Design = design
     )
 
     class(out) <- 'BFRCV'
