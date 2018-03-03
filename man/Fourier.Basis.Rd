@@ -9,11 +9,11 @@ Fourier.Basis(Bands, Wavelengths = NULL, nBasis = 1, interaction = NULL)
 \arguments{
 \item{Bands}{(\code{matrix}) Lorem ip sum}
 
+\item{Wavelengths}{(\code{integer}) Lorem ip sum}
+
 \item{nBasis}{(\code{integer}) Lorem ip sum}
 
 \item{interaction}{(\code{matrix}) Lorem ip sum}
-
-\item{Wavelenghts}{(\code{integer}) Lorem ip sum}
 }
 \description{
 Lorem ip sum

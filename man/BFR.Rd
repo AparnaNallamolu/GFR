@@ -13,6 +13,8 @@ BFR(data = NULL, datasetID = "Line", response_type = "gaussian",
 \arguments{
 \item{data}{(\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).}
 
+\item{datasetID}{(\code{string}) The name of the column with the identifiers of each line.}
+
 \item{response_type}{(\code{character}) It can be 'gaussian' or 'ordinal'.}
 
 \item{a}{(\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.}
@@ -47,9 +49,7 @@ BFR(data = NULL, datasetID = "Line", response_type = "gaussian",
 
 \item{set_seed}{(\code{integer}) A seed for replicable research.}
 
-\item{dec}{(\code{integer}) Number of decimals to show on the predictions.
-
-examples}
+\item{dec}{(\code{integer}) Number of decimals to show on the predictions.}
 }
 \description{
 Bayesian Functional Regression

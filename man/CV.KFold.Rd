@@ -7,15 +7,15 @@
 CV.KFold(DataSet, K = 5, set_seed = NULL)
 }
 \arguments{
+\item{DataSet}{(\code{data.frame}) The object need contain three columns in the Tidy data format:
+\code{$Line} is the Line or genotype identifier, and the name of this column could change.
+\code{$Env} is the name of the evaluated environment (s).
+\code{$Response} Variable response obtained for the row corresponding to line and environment.}
+
 \item{K}{(\code{integer}) Number of groups to the cross-validation.}
 
 \item{set_seed}{(\code{integer}) Number of seed for replicable research.}
 }
 \description{
 This method consists of randomly dividing the training data set and the test data set.
-
- @param DataSet (\code{data.frame}) The object need contain three columns in the Tidy data format:
-\code{$Line} is the Line or genotype identifier, and the name of this column could change.
-\code{$Env} is the name of the evaluated environment (s).
-\code{$Response} Variable response obtained for the row corresponding to line and environment.
 }

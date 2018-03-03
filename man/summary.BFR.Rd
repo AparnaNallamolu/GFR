@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{object}{\code{BFR object} Objeto BFR, resultado de ejecutar BFR}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \description{
 Solo es una prueba

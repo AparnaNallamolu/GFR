@@ -8,6 +8,12 @@
 }
 \arguments{
 \item{x}{\code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2}
+
+\item{select}{\code{string} Pearson or MSEP}
+
+\item{ordered}{\code{logic} TRUE or FALSE}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \description{
 Solo es una prueba

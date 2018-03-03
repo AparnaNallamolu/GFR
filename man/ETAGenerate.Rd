@@ -26,6 +26,8 @@ ETAGenerate(dataset, datasetID = "Line", GenomicMatrix = NULL,
 \item{basisType}{Basis function, by default is Fourier.Basis also could be Bspline.Basis.}
 
 \item{nBasis}{Number of basis by default only use 1 basis.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \description{
 Function to generate a Linear Predictor from a dataset to GFR.

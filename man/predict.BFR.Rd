@@ -8,6 +8,10 @@
 }
 \arguments{
 \item{object}{\code{BFR object} Objeto BFR, resultado de ejecutar BFR}
+
+\item{newdata}{\code{data.frame} Predictions}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \description{
 Solo es una prueba
