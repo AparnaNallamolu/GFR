@@ -3,11 +3,14 @@
 #' @description Solo es una prueba
 #'
 #' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @importFrom stats cor
 #'
 #' @export
 summary.BFR <- function(object,...){
 
-    if(!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
+    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 
     tmp <- paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
@@ -15,21 +18,17 @@ summary.BFR <- function(object,...){
     tmp <- paste(' Number of phenotypes=', sum(!is.na(object$response)))
     cat(tmp,'\n')
 
-    cat(' Min (TRN)= ', min(object$response,na.rm=TRUE),'\n')
-    cat(' Max (TRN)= ', max(object$response,na.rm=TRUE),'\n')
-    cat(' Variance of phenotypes (TRN)=', round(var(object$response,na.rm=TRUE),4),'\n')
-    cat(' Residual variance=',round(object$varE,4),'\n')
+    cat(' Min (TRN)= ', min(object$response,na.rm = TRUE),'\n')
+    cat(' Max (TRN)= ', max(object$response,na.rm = TRUE),'\n')
+    cat(' Variance of phenotypes (TRN)=', round(var(object$response, na.rm = TRUE),4), '\n')
+    cat(' Residual variance=', round(object$varE, 4), '\n')
 
-    n<-length(object$response)
+    n <- length(object$response)
 
-    if(any(is.na(object$response)))
-    {
-     		tst<-which(is.na(object$response))
-
-     		cat(' N-TRN=',n-length(tst), ' N-TST=',length(tst),'\n')
-
-     		cat(' Correlation TRN=',round(cor(object$response[-tst],object$predictions[-tst]),4),'\n')
-
+    if (any(is.na(object$response))) {
+     		tst <- which(is.na(object$response))
+     		cat(' N-TRN=', n - length(tst), ' N-TST=', length(tst), '\n')
+     		cat(' Correlation TRN=', round(cor(object$response[-tst], object$predictions[-tst]), 4),'\n')
    }else{
        cat(' N-TRN=',n,'  N-TST=0', '\n\n')
    }
@@ -41,36 +40,24 @@ summary.BFR <- function(object,...){
 
   for (k in 1:length(object$ETA)) {
     if (object$ETA[[k]]$model == "FIXED") {
-
-
-      if(!is.null(names(object$ETA)[k])){
+      if (!is.null(names(object$ETA)[k])) {
         cat(" Coefficientes in ETA[",k,"] (",names(object$ETA)[k],") were asigned a flat prior\n")
       }else{
         cat(" Coefficientes in ETA[",k,"] (no-name) are asigned a flat prior\n")
       }
-
-
     }else{
-      if(object$ETA[[k]]$model=="RKHS"){
-
-
-        if(!is.null(names(object$ETA)[k])){
+      if (object$ETA[[k]]$model == "RKHS") {
+        if (!is.null(names(object$ETA)[k])) {
           cat(" Coefficientes in ETA[",k,"] (",names(object$ETA)[k],") were assumed to be normally distributed with zero mean and \n covariance (or its eigendecoposition) provided by user \n")
         }else{
           cat(" Coefficientes in ETA[",k,"] (no-name) were assumed to be normally distributed with zero mean and \n covariance (or its eigendecoposition) provided by user \n")
         }
-
-
       }else{
-
-
-        if(!is.null(names(object$ETA)[k])){
+        if (!is.null(names(object$ETA)[k])) {
 				  cat(" Coefficientes in ETA[",k,"] (",names(object$ETA)[k],") modeled as in ", object$ETA[[k]]$model,"\n")
 			  }else{
 				cat(" Coefficientes in ETA[",k,"] (no-name) modeled as in ", object$ETA[[k]]$model,"\n")
 			  }
-
-
 		  }
 	  }
   }
@@ -98,7 +85,7 @@ summary.BFRCV <- function(object,...){
 #' @description Solo es una prueba
 #'
 #' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
-#'
+#' @param ... Further arguments passed to or from other methods.
 #'
 #' @export
 residuals.BFR <- function(object,...) {
@@ -111,6 +98,8 @@ residuals.BFR <- function(object,...) {
 #' @description Solo es una prueba
 #'
 #' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
+#' @param newdata \code{data.frame} Predictions
+#' @param ... Further arguments passed to or from other methods.
 #'
 #' @export
 predict.BFR <- function(object,newdata,...){
@@ -124,7 +113,9 @@ predict.BFR <- function(object,newdata,...){
 #' @description Solo es una prueba
 #'
 #' @param x \code{BFR object} Objeto BFR, resultado de ejecutar BFR
+#' @param ... Further arguments passed to or from other methods.
 #'
+#' @importFrom graphics plot abline
 #' @export
 plot.BFR <- function(x, ...){
   ### Check that object is compatible
@@ -140,7 +131,11 @@ plot.BFR <- function(x, ...){
 #' @description Solo es una prueba
 #'
 #' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
+#' @param select \code{string} Pearson or MSEP
+#' @param ordered \code{logic} TRUE or FALSE
+#' @param ... Further arguments passed to or from other methods.
 #'
+#' @importFrom graphics boxplot
 #' @export
 boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   ### Check that object is compatible

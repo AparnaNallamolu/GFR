@@ -3,7 +3,7 @@
 #' @description Lorem ip sum
 #'
 #' @param Bands (\code{matrix}) Lorem ip sum
-#' @param Wavelenghts (\code{integer}) Lorem ip sum
+#' @param Wavelengths (\code{integer}) Lorem ip sum
 #' @param nBasis (\code{integer}) Lorem ip sum
 #' @param interaction (\code{matrix}) Lorem ip sum
 #' @export

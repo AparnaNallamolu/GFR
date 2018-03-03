@@ -11,7 +11,7 @@
 #' @param method Model to apply in bands, by default 'Alternative' will be used, also could be 'Simple', 'Complex'
 #' @param basisType Basis function, by default is Fourier.Basis also could be Bspline.Basis.
 #' @param nBasis Number of basis by default only use 1 basis.
-#'
+#' @param ... Further arguments passed to or from other methods.
 #'
 #' @return
 #' @export

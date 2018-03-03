@@ -17,6 +17,7 @@
 #' More details about this function
 #'
 #' @param data (\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).
+#' @param datasetID (\code{string}) The name of the column with the identifiers of each line.
 #' @param response_type (\code{character}) It can be 'gaussian' or 'ordinal'.
 #' @param a (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying lower bounds for censored observation. By default is null.
 #' @param b (\code{numeric}, $n$) Only requiered for censored outcomes. It's a vector specifying upper bounds for censored observation. By default is null.
@@ -36,7 +37,6 @@
 #' @param set_seed (\code{integer}) A seed for replicable research.
 #' @param dec (\code{integer}) Number of decimals to show on the predictions.
 #'
-#' examples
 #'
 #' @export
 
@@ -50,7 +50,7 @@ BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=N
     design <- ETA$Design
     datasetID <- ETA$ID
   } else {
-    data <- validate.dataset(data, datasetID, order = F)
+    data <- validate.dataset(data, datasetID, orderData = F)
     design <- 'Handmade'
   }
 
@@ -58,10 +58,12 @@ BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=N
 
     switch(CrossValidation$Type,
            KFold = {
+             if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
              PT <- CV.KFold(data, K = CrossValidation$nFolds, set_seed)
              nCV <- CrossValidation$nFolds
            },
            RandomPartition = {
+             if (is.null(CrossValidation$NPartitions)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 10.')}
              PT <- CV.RandomPart(data, NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
              nCV <- CrossValidation$NPartitions
            },
@@ -69,7 +71,7 @@ BFR <- function(data = NULL, datasetID = 'Line', response_type = 'gaussian', a=N
     )
 
     if (verbose) {
-      cat("This might be time demanding, let's take sit and a cup of coffe\n")
+      cat("This might be time demanding...\n")
 
       pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
     }

@@ -971,8 +971,10 @@ loglik_ordinal = function(y, yHat, threshold){
 #(f4) Run an example with a few missing values, compare to BLR
 #       example, check: (i) residual variance, (ii) plot of effects, (iii) plot
 #        of predictions in trn, (iv) plot of prediction in tst.
+#' @importFrom stats  cor dbeta dchisq dexp dgamma dnorm model.frame model.matrix na.omit pnorm qnorm rbeta rbinom rchisq rgamma rnorm runif sd var weighted.mean
+#'
+#' @useDynLib GFR
 
-#' @useDynLib BFR
 BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
                  saveAt = "", S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE, rmExistingFiles = TRUE, groups = NULL,
                  pb=NULL, iFold=1, Folds=1) {

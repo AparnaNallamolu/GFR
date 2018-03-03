@@ -2,7 +2,7 @@
 #'
 #' @description This method consists of randomly dividing the training data set and the test data set.
 #'
-#'  @param DataSet (\code{data.frame}) The object need contain three columns in the Tidy data format:
+#' @param DataSet (\code{data.frame}) The object need contain three columns in the Tidy data format:
 #' \code{$Line} is the Line or genotype identifier, and the name of this column could change.
 #' \code{$Env} is the name of the evaluated environment (s).
 #' \code{$Response} Variable response obtained for the row corresponding to line and environment.
