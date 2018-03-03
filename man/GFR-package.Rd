@@ -9,15 +9,10 @@
 Bayesian Functional Regression
 }
 \details{
-More details about the package.
+BFR is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to... More details about the package.
 }
 \seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/frahik/GFR}
-  \item Report bugs at \url{https://github.com/frahik/GFR/issues/new}
-}
-
+\code{\link[BGLR]{BGLR}}
 }
 \author{
 \strong{Maintainer}: Francisco Javier Luna-Vazquez \email{frahik@gmail.com}

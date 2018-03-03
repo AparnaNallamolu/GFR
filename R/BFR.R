@@ -2,7 +2,9 @@
 #'
 #' Bayesian Functional Regression
 #'
-#' More details about the package.
+#' BFR is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to... More details about the package.
+#'
+#' @seealso \code{\link[BGLR]{BGLR}}
 #'
 #' @docType package
 "_PACKAGE"
@@ -12,8 +14,7 @@
 #'
 #' Bayesian Functional Regression
 #'
-#' BFR is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
-#'
+#' More details about this function
 #'
 #' @param data (\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).
 #' @param response_type (\code{character}) It can be 'gaussian' or 'ordinal'.
@@ -34,9 +35,6 @@
 #' @param CrossValidation (\code{list}) Especified list to KFold Crossvalidation use list(Type = 'KFold', nFolds = 5), and to Random Partiton Cross validation use list(Type = 'RandomPartition', nPartitions = 5, pTesting = 0.20, Traits.testing = NULL)
 #' @param set_seed (\code{integer}) A seed for replicable research.
 #' @param dec (\code{integer}) Number of decimals to show on the predictions.
-#'
-#'
-#' @seealso \code{\link[BGLR]{BGLR}}
 #'
 #' examples
 #'

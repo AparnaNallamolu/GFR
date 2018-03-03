@@ -47,16 +47,13 @@ BFR(data = NULL, datasetID = "Line", response_type = "gaussian",
 
 \item{set_seed}{(\code{integer}) A seed for replicable research.}
 
-\item{dec}{(\code{integer}) Number of decimals to show on the predictions.}
+\item{dec}{(\code{integer}) Number of decimals to show on the predictions.
+
+examples}
 }
 \description{
 Bayesian Functional Regression
 }
 \details{
-BFR is an modificated version of BGLR which implements a Gibbs sampler for a Bayesian regression model, this new version allows to
-}
-\seealso{
-\code{\link[BGLR]{BGLR}}
-
-examples
+More details about this function
 }

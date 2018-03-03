@@ -1,23 +1,24 @@
-BFR
+GFR
 ================
-Last README update: 2018-03-01
+Last README update: 2018-03-02
 
-**B**ayesian genomic **F**unctional **R**egression analysis in R -
-Development version 0.9 - rev 3
+**G**enomic **F**unctional **R**egression analysis in R - Development
+version 0.9 - rev 5
 
-[![Release](http://www.r-pkg.org/badges/version-ago/BFR
-"IBCF.MTME release")](https://cran.r-project.org/package=BFR "CRAN Page")
+[![Release](http://www.r-pkg.org/badges/version-ago/GFR
+"GFR release")](https://cran.r-project.org/package=GFR "CRAN Page")
 [![License: LGPL
 v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg
 "LGPL, Version 2.0")](https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0")
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/wip.svg
 "status")](http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public")
-[![Downloads](http://cranlogs.r-pkg.org/badges/BFR
-"IBCF.MTME cranlogs")](https://cran.r-project.org/package=BFR "CRAN Page")
+[![Downloads](http://cranlogs.r-pkg.org/badges/GFR
+"GFR cranlogs")](https://cran.r-project.org/package=GFR "CRAN Page")
 
 ## New in this dev version
 
+  - Rename from BGFRA -\> GFR -\> GFR
   - Initial development is in progress, but there has not yet been a
     stable, usable release suitable for the public; this is a
     pre-release, be careful.
@@ -26,12 +27,12 @@ Active](http://www.repostatus.org/badges/latest/wip.svg
 
 ### Installation
 
-To complete installation of dev version of BFR from GitHub, you have to
+To complete installation of dev version of GFR from GitHub, you have to
 install a few packages first.
 
 ``` r
 install.packages('devtools')
-devtools::install_github('frahik/BFR')
+devtools::install_github('frahik/GFR')
 ```
 
 ### Quick use
@@ -40,24 +41,24 @@ devtools::install_github('frahik/BFR')
 
 ``` r
 rm(list = ls())
-library(BFR)
-data("Wheat_BFR")
+library(GFR)
+data("Wheat_GFR")
 
-data <- Wheat_BFR # Load from data Wheat_BFR
-Bands <- Wheat_Bands # Load from data Wheat_BFR
-Wavelengths <- Wheat_Wavelengths # Load from data Wheat_BFR
+data <- Wheat_GFR # Load from data Wheat_GFR
+Bands <- Wheat_Bands # Load from data Wheat_GFR
+Wavelengths <- Wheat_Wavelengths # Load from data Wheat_GFR
 
-data("Maize_BFR")
-data <- Maize_BFR # Load from data Maize_BFR
-Bands <- Maize_Bands # Load from data Maize_BFR
-Wavelengths <- Maize_Wavelengths # Load from data Maize_BFR
+data("Maize_GFR")
+data <- Maize_GFR # Load from data Maize_GFR
+Bands <- Maize_Bands # Load from data Maize_GFR
+Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
 ```
 
 #### Fit model
 
 ``` r
-data("Wheat_BFR")
-data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
+data("Wheat_GFR")
+data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 
 fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
 
@@ -69,8 +70,8 @@ plot(fm)
 ### Cross-validation model with kfold
 
 ``` r
-data("Wheat_BFR")
-data <- Wheat_BFR[which(Wheat_BFR$Env == 'Drought'), ]
+data("Wheat_GFR")
+data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
 
 pm <- BFR(data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = Crossvalidation_list, verbose = F)
@@ -84,10 +85,10 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 2.5400
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.1800
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 2.7200
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.1600
     ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1100
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.9433
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.9967
 
 ``` r
 boxplot(pm)
@@ -98,11 +99,11 @@ boxplot(pm)
 ### Auto-detection of linear predictor (Only Environment)
 
 ``` r
-library(BFR)
-data("Wheat_BFR")
+library(GFR)
+data("Wheat_GFR")
 CrossV <- list(Type = 'KFold', nFolds = 3)
-ETA2 <- ETAGenerate(Wheat_BFR, datasetID = 'Line', priorType = 'BayesB', Bands = Wheat_Bands,
-                    Wavelengths = Wheat_Wavelengths, method = 'Alternative', basisType = 'Bspline.Basis', nBasis = 21)
+ETA2 <- ETAGenerate(Wheat_GFR, datasetID = 'Line', priorType = 'BayesB', Bands = Wheat_Bands,
+                    Wavelengths = Wheat_Wavelengths, method = 'Alternative2', basisType = 'Bspline.Basis', nBasis = 21)
 
 
 pm2 <- BFR(ETA = ETA2, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossValidation = CrossV, verbose = F)
@@ -122,19 +123,19 @@ summary(pm2)
     ## 10 Average_all        Irrigated        0.0072     0.1209 0.3557  0.1254
     ## 11 Average_all          Drought        0.5606     0.1066 0.3105  0.0520
     ## 12 Average_all ReducedIrrigated        0.3263     0.0938 0.1408  0.0268
-    ##      Time
-    ## 1  1.2500
-    ## 2      NA
-    ## 3      NA
-    ## 4  0.9400
-    ## 5      NA
-    ## 6      NA
-    ## 7  0.9400
-    ## 8      NA
-    ## 9      NA
-    ## 10 1.0433
-    ## 11     NA
-    ## 12     NA
+    ##    Time
+    ## 1  1.75
+    ## 2    NA
+    ## 3    NA
+    ## 4  1.22
+    ## 5    NA
+    ## 6    NA
+    ## 7  1.11
+    ## 8    NA
+    ## 9    NA
+    ## 10 1.36
+    ## 11   NA
+    ## 12   NA
 
 ``` r
 plot(pm2)
@@ -145,9 +146,9 @@ plot(pm2)
 ### Auto-detection of linear predictor (Multi-Trait & Multi-Environment)
 
 ``` r
-data("Maize_BFR")
+data("Maize_GFR")
 CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
-ETA3 <- ETAGenerate(Maize_BFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
+ETA3 <- ETAGenerate(Maize_GFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
 ETA3$Design
 ```
 
@@ -177,7 +178,7 @@ summary(pm3)
 ```
 
     ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP   Time
-    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 30.170
+    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 34.790
     ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA     NA
     ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA     NA
     ## 4            1 EBU    PH -0.0273         NA 119.1014      NA     NA
@@ -186,7 +187,7 @@ summary(pm3)
     ## 7            1 EBU Yield -0.0868         NA   4.1275      NA     NA
     ## 8            1 KAK Yield  0.0740         NA   5.5444      NA     NA
     ## 9            1 KTI Yield -0.1746         NA   5.7512      NA     NA
-    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 30.890
+    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 32.670
     ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA     NA
     ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA     NA
     ## 13           2 EBU    PH -0.0836         NA 115.2953      NA     NA
@@ -195,7 +196,7 @@ summary(pm3)
     ## 16           2 EBU Yield  0.1080         NA   5.1238      NA     NA
     ## 17           2 KAK Yield  0.0290         NA   4.1199      NA     NA
     ## 18           2 KTI Yield  0.1934         NA   4.4422      NA     NA
-    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 30.110
+    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 32.330
     ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA     NA
     ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA     NA
     ## 22           3 EBU    PH  0.0714         NA 448.5080      NA     NA
@@ -204,7 +205,7 @@ summary(pm3)
     ## 25           3 EBU Yield -0.1065         NA   6.5118      NA     NA
     ## 26           3 KAK Yield -0.0955         NA   5.1368      NA     NA
     ## 27           3 KTI Yield  0.0853         NA   6.0447      NA     NA
-    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 29.520
+    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 29.410
     ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA     NA
     ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA     NA
     ## 31           4 EBU    PH  0.1236         NA  99.8174      NA     NA
@@ -213,7 +214,7 @@ summary(pm3)
     ## 34           4 EBU Yield  0.1343         NA   5.6122      NA     NA
     ## 35           4 KAK Yield  0.0695         NA   6.0613      NA     NA
     ## 36           4 KTI Yield  0.0443         NA   5.1520      NA     NA
-    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 29.490
+    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 29.140
     ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA     NA
     ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA     NA
     ## 40           5 EBU    PH  0.0473         NA 440.4937      NA     NA
@@ -222,7 +223,7 @@ summary(pm3)
     ## 43           5 EBU Yield  0.2068         NA   3.8649      NA     NA
     ## 44           5 KAK Yield  0.0520         NA   3.9284      NA     NA
     ## 45           5 KTI Yield -0.2161         NA   3.7772      NA     NA
-    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 30.036
+    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 31.668
     ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338     NA
     ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625     NA
     ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653     NA
@@ -236,10 +237,10 @@ summary(pm3)
 
 ``` r
 CrossV <- list(Type = 'KFold', nFolds = 5)
-ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_BFR$Env)), model = 'FIXED'),
-             Line = list(X = model.matrix(~0+as.factor(Wheat_BFR$Line)), model = 'BRR'),
+ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
+             Line = list(X = model.matrix(~0+as.factor(Wheat_GFR$Line)), model = 'BRR'),
              Bands = list(X = Bspline.Basis(Wheat_Bands, Wheat_Wavelengths, nBasis = 23), model = 'BayesA'))
-pm4 <- BFR(data = Wheat_BFR, ETA = ETA4, nIter = 1000, burnIn = 300, CrossValidation = CrossV, set_seed = 10, verbose = F)
+pm4 <- BFR(data = Wheat_GFR, ETA = ETA4, nIter = 1000, burnIn = 300, CrossValidation = CrossV, set_seed = 10, verbose = F)
 summary(pm4)
 ```
 
@@ -263,22 +264,22 @@ summary(pm4)
     ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
     ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
     ##     Time
-    ## 1  0.620
+    ## 1  0.410
     ## 2     NA
     ## 3     NA
-    ## 4  0.640
+    ## 4  0.700
     ## 5     NA
     ## 6     NA
-    ## 7  0.500
+    ## 7  0.520
     ## 8     NA
     ## 9     NA
-    ## 10 0.580
+    ## 10 0.670
     ## 11    NA
     ## 12    NA
-    ## 13 0.500
+    ## 13 0.470
     ## 14    NA
     ## 15    NA
-    ## 16 0.568
+    ## 16 0.554
     ## 17    NA
     ## 18    NA
 
@@ -301,11 +302,9 @@ How to cite the package… Coming soon.
 ## Issues
 
 Feel free to report new issues in this link
-[Issues](https://github.com/frahik/IBCF.MTME/issues/new)
+[Issues](https://github.com/frahik/GFR/issues/new)
 
 ## Authors
 
   - Francisco Javier Luna-Vázquez (Author, Maintainer)
   - Osval Antonio Montesinos-López (Author)
-  - Abelardo Montesinos-López (Author)
-  - José Crossa (Author)

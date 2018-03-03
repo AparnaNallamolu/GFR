@@ -1,13 +1,13 @@
-#' @title Summary.GFR
+#' @title Summary.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{GFR object} Objeto GFR, resultado de ejecutar GFR
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-summary.GFR <- function(object,...){
+summary.BFR <- function(object,...){
 
-    if(!inherits(object, "GFR")) stop("This function only works for objects of class 'GFR'")
+    if(!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 
     tmp <- paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
@@ -80,71 +80,71 @@ summary.GFR <- function(object,...){
 
 #' @title Summary
 #'
-#' @description Summary of GFRCV object
+#' @description Summary of BFRCV object
 #'
-#' @param object \code{GFRCV object} GFRCV object, result of use the GFR() function
+#' @param object \code{BFRCV object} BFRCV object, result of use the BFR() function
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @export
-summary.GFRCV <- function(object,...){
-  if (!inherits(object, "GFRCV")) stop("This function only works for objects of class 'GFRCV'")
+summary.BFRCV <- function(object,...){
+  if (!inherits(object, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
   return(object$predictions_Summary)
 }
 
 
 
-#' @title residuals.GFR
+#' @title residuals.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{GFR object} Objeto GFR, resultado de ejecutar GFR
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #'
 #' @export
-residuals.GFR <- function(object,...) {
-    if (!inherits(object, "GFR")) stop("This function only works for objects of class 'GFR'")
+residuals.BFR <- function(object,...) {
+    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 	object$response - object$predictions
 }
 
-#' @title predict.GFR
+#' @title predict.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{GFR object} Objeto GFR, resultado de ejecutar GFR
+#' @param object \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-predict.GFR <- function(object,newdata,...){
-    if (!inherits(object, "GFR")) stop("This function only works for objects of class 'GFR'")
+predict.BFR <- function(object,newdata,...){
+    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
 	object$predictions
 }
 
 
-#' @title plot.GFR
+#' @title plot.BFR
 #'
 #' @description Solo es una prueba
 #'
-#' @param x \code{GFR object} Objeto GFR, resultado de ejecutar GFR
+#' @param x \code{BFR object} Objeto BFR, resultado de ejecutar BFR
 #'
 #' @export
-plot.GFR <- function(x, ...){
+plot.BFR <- function(x, ...){
   ### Check that object is compatible
-  if (!inherits(x, "GFR")) stop("This function only works for objects of class 'GFR'")
+  if (!inherits(x, "BFR")) stop("This function only works for objects of class 'BFR'")
 
   limits <- range(c(x$response, x$predictions), na.rm = TRUE)
   plot(x$response, x$predictions, main = "Training", xlim = limits, ylim = limits, xlab = 'Response', ylab = 'Prediction', ...);
   abline(a = 0, b = 1, lty = 3)
 }
 
-#' @title boxplot.GFRCV
+#' @title boxplot.BFRCV
 #'
 #' @description Solo es una prueba
 #'
-#' @param x \code{GFRCV object} Objeto GFRCV, resultado de ejecutar GFR() con el parametro folds > 2
+#' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
 #'
 #' @export
-boxplot.GFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
+boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   ### Check that object is compatible
-  if (!inherits(x, "GFRCV")) stop("This function only works for objects of class 'GFRCV'")
+  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
 
   results <- x$predictions_Summary
 
@@ -170,19 +170,19 @@ boxplot.GFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
 
 }
 
-#' @title Plot GFRCV graph
+#' @title Plot BFRCV graph
 #'
-#' @description Plot from GFRCV object
+#' @description Plot from BFRCV object
 #'
-#' @param x \code{GFRCV object} GFRCV object, result of use the GFR() function
-#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the GFR Object, else ('MSEP'), plot the MSEP of the GFRCV Object.
+#' @param x \code{BFRCV object} BFRCV object, result of use the BFR() function
+#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the BFR Object, else ('MSEP'), plot the MSEP of the BFRCV Object.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @importFrom graphics arrows axis plot
 #' @export
-plot.GFRCV <- function(x, select = 'Pearson', ...){
+plot.BFRCV <- function(x, select = 'Pearson', ...){
   ### Check that object is compatible
-  if (!inherits(x, "GFRCV")) stop("This function only works for objects of class 'GFRCV'")
+  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
 
   results <- x$predictions_Summary[which(x$predictions_Summary$Fold == 'Average_all'), ]
 
