@@ -4,15 +4,15 @@ date: "Last README update: `r format(Sys.Date())`"
 output: github_document
 ---
 
-**G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 5
+**G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 6
 
 [![Release][release-badge]][cran]
 [![License: LGPL v3][LGPL-badge]][LGPL]
 [![Project Status: Active][status-bagde]][status]
 [![Downloads][downloads-badge]][cran]
 
-## New in this dev version
-* Rename from BGFRA -> GFR -> GFR
+## New in this dev version 0.9
+* Rename from BGFRA -> BFR -> GFR
 * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 ## Instructions for proper implementation
