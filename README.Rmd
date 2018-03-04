@@ -1,23 +1,54 @@
----
-title: "GFR"
-date: "Last README update: `r format(Sys.Date())`"
-output: github_document
----
+<p align="center">
+  <a href="https://github.com/frahik/GFR">
+    <img src="Logo.png" alt="Genomic Functional Regression Logo" width=470 height=100 />
+  </a>
+  <h4 align="center">
+    **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 6 
+  </h4>
+  <h4 align="center">
+    [Last README update: `r format(Sys.Date())`]
+  </h4>
+  <p align="center">
+    [![Release][release-badge]][cran]
+    [![License: LGPL v3][LGPL-badge]][LGPL]
+    [![Project Status: Active][status-bagde]][status]
+    [![Downloads][downloads-badge]][cran]
+  </p>
+</p>
 
-**G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 6
 
-[![Release][release-badge]][cran]
-[![License: LGPL v3][LGPL-badge]][LGPL]
-[![Project Status: Active][status-bagde]][status]
-[![Downloads][downloads-badge]][cran]
+----------
 
-## New in this dev version 0.9
+# Table of contents
+  - [NEWS](#news)
+  - [instructions](#instructions)
+    - [Installation](#install)
+    - [Demostration examples](#demo)
+      - [Available data](#data)
+      - [Fitting a model](#fit-model)
+      - [Predictive model](#predictive-model)
+      - [Example #1 of how generate automatically a linear predictor](#auto-ETA)
+      - [Example #2 of how generate automatically a linear predictor](#auto-ETA2)
+      - [Example of how generate manually a linear predictor](#HM-ETA)
+  - [How to cite this package](#cite)
+  - [Contributions](#contributions)
+  - [Authors](#authors)
+
+<h2 id="news">
+  News of this version (0.9)
+</h2>
+
 * Rename from BGFRA -> BFR -> GFR
 * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
-## Instructions for proper implementation
+<h2 id="instructions">
+  Instructions for proper implementation
+</h2>
 
-### Installation
+
+<h3 id="install">
+  Installation
+</h3>
 
 To complete installation of dev version of GFR from GitHub, you have to install a few packages first.
 
@@ -26,11 +57,16 @@ install.packages('devtools')
 devtools::install_github('frahik/GFR')
 ```
 
-### Quick use 
+<h3 id="demo">
+  Demostration examples
+</h3>
 
-#### Load data
+<h4 id="data">
+  Available data
+</h4>
 
-```{r loadData}
+
+```{r data}
 rm(list = ls())
 library(GFR)
 data("Wheat_GFR")
@@ -45,10 +81,12 @@ Bands <- Maize_Bands # Load from data Maize_GFR
 Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
 ```
 
+<h4 id="fit-model">
+  Fitting a model
+</h4>
 
-#### Fit model
 
-```{r fitModel}
+```{r fit_model}
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 
@@ -57,9 +95,11 @@ fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
 plot(fm)
 ```
 
-### Cross-validation model with kfold
+<h4 id="predictive-model">
+  Predictive model with a K-Folds Cross-validation
+</h4>
 
-```{r CVModel}
+```{r predictive_model}
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
@@ -70,9 +110,12 @@ summary(pm)
 boxplot(pm)
 ```
 
-### Auto-detection of linear predictor (Only Environment)
+<h4 id="auto-ETA">
+  Generate automatically a linear predictor (Only Multi-Environment example)
+</h4>
 
-```{r ETAG}
+
+```{r auto_ETA}
 library(GFR)
 data("Wheat_GFR")
 CrossV <- list(Type = 'KFold', nFolds = 3)
@@ -86,8 +129,11 @@ summary(pm2)
 plot(pm2)
 ```
 
-### Auto-detection of linear predictor (Multi-Trait & Multi-Environment)
-```{r ETA_MTME}
+<h4 id="auto-ETA2">
+  Generate automatically a linear predictor (Multi-Trait & Multi-Environment example)
+</h4>
+
+```{r auto_ETA2}
 data("Maize_GFR")
 CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
 ETA3 <- ETAGenerate(Maize_GFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
@@ -100,9 +146,11 @@ summary(pm3)
 ```
 
 
+<h4 id="HM-ETA">
+  Handmade linear predictor
+</h4>
 
-### Handmade linear predictor
-```{r ETAM}
+```{r HM_ETA}
 CrossV <- list(Type = 'KFold', nFolds = 5)
 ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
              Line = list(X = model.matrix(~0+as.factor(Wheat_GFR$Line)), model = 'BRR'),
@@ -114,23 +162,38 @@ plot(pm4, select = 'MSEP')
 boxplot(pm4, select = 'MSEP')
 ```
 
-```{r, echo=F, results='hide'}
+```{r cleaner, echo=F, results='hide'}
 path <- dir()
 files <- path[which(grepl('.dat', path) == TRUE)]
 file.remove(files)
 ```
 
-## Citation
+<h2 id="cite">
+  How to cite this package
+</h2>
 
-How to cite the package...
-Coming soon.
+First option, by the article paper
 
-## Issues
+(Comming soon)
 
-Feel free to report new issues in this link [Issues](https://github.com/frahik/GFR/issues/new)
+Second option, by the manual package
+```{r}
+citation('IBCF.MTME')
+```
 
 
-## Authors
+
+<h2 id="contributions">
+  Contributions
+</h2>
+
+If you have any suggestions or feedback, I would love to hear about it. Feel free to report new issues in [this link](https://github.com/frahik/GFR/issues/new), also if you want to request a feature/report a bug, or make a pull request if you can contribute.
+
+
+<h2 id="authors">
+  Authors
+</h2>
+
 
  - Francisco Javier Luna-Vázquez (Author, Maintainer)
  - Osval Antonio Montesinos-López (Author)
