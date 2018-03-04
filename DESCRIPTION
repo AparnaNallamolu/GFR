@@ -1,6 +1,6 @@
 Package: GFR
 Title: GFR (Genomic Functional Regression)
-Version: 0.9-6
+Version: 0.9-7
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut")
@@ -28,6 +28,7 @@ Collate:
   Methods.R
   Utils.R
   Wheat_GFR.R
+  WheatI_GFR.R
 Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),
