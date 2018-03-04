@@ -6,7 +6,7 @@ output: github_document
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h4 align="center">
-    **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 6 
+    **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 7 
   </h4>
   <h4 align="center">
     [Last README update: `r format(Sys.Date())`]
@@ -68,20 +68,25 @@ devtools::install_github('frahik/GFR')
   
 </h4>
 
+Three data sets are available inside the package, to use it use `data()` function,
 
 ```{r data}
 rm(list = ls())
 library(GFR)
 data("Wheat_GFR")
+head(Wheat_GFR) # Load from data Wheat_GFR
+paste0('Dimension of the Bands matrix: ', dim(Wheat_Bands)) # Load from data Wheat_GFR
+paste0('Number of wavelenths:', length(Wheat_Wavelengths)) # Load from data Wheat_GFR
 
-data <- Wheat_GFR # Load from data Wheat_GFR
-Bands <- Wheat_Bands # Load from data Wheat_GFR
-Wavelengths <- Wheat_Wavelengths # Load from data Wheat_GFR
+data("WheatI_GFR")
+head(WheatI_GFR) # Load from data WheatI_GFR
+paste0('Dimension of the Bands matrix: ',dim(WheatI_Bands)) # Load from data WheatI_GFR
+paste0('Number of wavelenths:',length(WheatI_Wavelengths)) # Load from data WheatI_GFR
 
 data("Maize_GFR")
-data <- Maize_GFR # Load from data Maize_GFR
-Bands <- Maize_Bands # Load from data Maize_GFR
-Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
+head(Maize_GFR) # Load from data Maize_GFR
+paste0('Dimension of the Bands matrix: ',dim(Maize_Bands)) # Load from data Maize_GFR
+paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maize_GFR
 ```
 
 <h4 id="fit-model">

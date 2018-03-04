@@ -1,85 +1,55 @@
 
 <p align="center">
-
-<a href="https://github.com/frahik/GFR">
-<img src="Logo.png" alt="Genomic Functional Regression Logo"/> </a>
-
+<a href="https://github.com/frahik/GFR"> <img src="Logo.png" alt="Genomic Functional Regression Logo"/> </a>
 <h4 align="center">
-
-**G**enomic **F**unctional **R**egression analysis in R - Development
-version 0.9 - rev 6
+    **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 7 
 
 </h4>
-
 <h4 align="center">
-
-\[Last README update: 2018-03-03\]
+    [Last README update: 2018-03-04]
 
 </h4>
-
 <p align="center">
-
-[![Release](http://www.r-pkg.org/badges/version-ago/GFR
-"GFR release")](https://cran.r-project.org/package=GFR "CRAN Page")
-[![License: LGPL
-v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg
-"LGPL, Version 2.0")](https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0")
-[![Project Status:
-Active](http://www.repostatus.org/badges/latest/wip.svg
-"status")](http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public")
-[![Downloads](http://cranlogs.r-pkg.org/badges/GFR
-"GFR cranlogs")](https://cran.r-project.org/package=GFR "CRAN Page")
+    [![Release][release-badge]][cran]
+    [![License: LGPL v3][LGPL-badge]][LGPL]
+    [![Project Status: Active][status-bagde]][status]
+    [![Downloads][downloads-badge]][cran]
 
 </p>
-
 </p>
 
------
+------------------------------------------------------------------------
 
-# Table of contents
+Table of contents
+=================
 
-  - [NEWS](#news)
-  - [instructions](#instructions)
-      - [Installation](#install)
-      - [Demostration examples](#demo)
-          - [Available data](#data)
-          - [Fitting a model](#fit-model)
-          - [Predictive model](#predictive-model)
-          - [Example \#1 of how generate automatically a linear
-            predictor](#auto-ETA)
-          - [Example \#2 of how generate automatically a linear
-            predictor](#auto-ETA2)
-          - [Example of how generate manually a linear
-            predictor](#HM-ETA)
-  - [How to cite this package](#cite)
-  - [Contributions](#contributions)
-  - [Authors](#authors)
+-   [NEWS](#news)
+-   [instructions](#instructions)
+    -   [Installation](#install)
+    -   [Demostration examples](#demo)
+    -   [Available data](#data)
+    -   [Fitting a model](#fit-model)
+    -   [Predictive model](#predictive-model)
+    -   [Example \#1 of how generate automatically a linear predictor](#auto-ETA)
+    -   [Example \#2 of how generate automatically a linear predictor](#auto-ETA2)
+    -   [Example of how generate manually a linear predictor](#HM-ETA)
+-   [How to cite this package](#cite)
+-   [Contributions](#contributions)
+-   [Authors](#authors)
 
 <h2 id="news">
-
 News of this version (0.9)
-
 </h2>
-
-  - Rename from BGFRA -\> BFR -\> GFR
-  - Initial development is in progress, but there has not yet been a
-    stable, usable release suitable for the public; this is a
-    pre-release, be careful.
+-   Rename from BGFRA -&gt; BFR -&gt; GFR
+-   Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 <h2 id="instructions">
-
 Instructions for proper implementation
-
 </h2>
-
 <h3 id="install">
-
 Installation
-
 </h3>
-
-To complete installation of dev version of GFR from GitHub, you have to
-install a few packages first.
+To complete installation of dev version of GFR from GitHub, you have to install a few packages first.
 
 ``` r
 install.packages('devtools')
@@ -87,36 +57,95 @@ devtools::install_github('frahik/GFR')
 ```
 
 <h3 id="demo">
-
 Demostration examples
-
 </h3>
-
 <h4 id="data">
-
 </h4>
+Three data sets are available inside the package, to use it use `data()` function,
 
 ``` r
 rm(list = ls())
 library(GFR)
 data("Wheat_GFR")
-
-data <- Wheat_GFR # Load from data Wheat_GFR
-Bands <- Wheat_Bands # Load from data Wheat_GFR
-Wavelengths <- Wheat_Wavelengths # Load from data Wheat_GFR
-
-data("Maize_GFR")
-data <- Maize_GFR # Load from data Maize_GFR
-Bands <- Maize_Bands # Load from data Maize_GFR
-Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
+head(Wheat_GFR) # Load from data Wheat_GFR
 ```
 
+    ##   Response    Line     Env
+    ## 1 1.587324 3827768 Drought
+    ## 2 3.140629 6176013 Drought
+    ## 3 3.145934 4905617 Drought
+    ## 4 0.984776 6931494 Drought
+    ## 5 2.936291 6932344 Drought
+    ## 6 1.882823 6935856 Drought
+
+``` r
+paste0('Dimension of the Bands matrix: ', dim(Wheat_Bands)) # Load from data Wheat_GFR
+```
+
+    ## [1] "Dimension of the Bands matrix: 300"
+    ## [2] "Dimension of the Bands matrix: 250"
+
+``` r
+paste0('Number of wavelenths:', length(Wheat_Wavelengths)) # Load from data Wheat_GFR
+```
+
+    ## [1] "Number of wavelenths:250"
+
+``` r
+data("WheatI_GFR")
+head(WheatI_GFR) # Load from data WheatI_GFR
+```
+
+    ##   Line Response       Env
+    ## 1    1 6.862352 Irrigated
+    ## 2    2 6.844494 Irrigated
+    ## 3    3 6.290179 Irrigated
+    ## 4    4 7.026786 Irrigated
+    ## 5    5 6.013394 Irrigated
+    ## 6    6 6.639137 Irrigated
+
+``` r
+paste0('Dimension of the Bands matrix: ',dim(WheatI_Bands)) # Load from data WheatI_GFR
+```
+
+    ## [1] "Dimension of the Bands matrix: 976"
+    ## [2] "Dimension of the Bands matrix: 250"
+
+``` r
+paste0('Number of wavelenths:',length(WheatI_Wavelengths)) # Load from data WheatI_GFR
+```
+
+    ## [1] "Number of wavelenths:250"
+
+``` r
+data("Maize_GFR")
+head(Maize_GFR) # Load from data Maize_GFR
+```
+
+    ##        Line Env Trait Response
+    ## 1 CKDHL0002 EBU Yield     6.65
+    ## 2 CKDHL0003 EBU Yield     6.10
+    ## 3 CKDHL0004 EBU Yield     5.07
+    ## 4 CKDHL0005 EBU Yield     6.55
+    ## 5 CKDHL0007 EBU Yield     6.82
+    ## 6 CKDHL0008 EBU Yield     6.88
+
+``` r
+paste0('Dimension of the Bands matrix: ',dim(Maize_Bands)) # Load from data Maize_GFR
+```
+
+    ## [1] "Dimension of the Bands matrix: 2781"
+    ## [2] "Dimension of the Bands matrix: 48"
+
+``` r
+paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maize_GFR
+```
+
+    ## [1] "Number of wavelenths:48"
+
 <h4 id="fit-model">
-
 Fitting a model
-
 </h4>
-
 ``` r
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
@@ -126,14 +155,11 @@ fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
 plot(fm)
 ```
 
-![](README_files/figure-gfm/fit_model-1.png)<!-- -->
+![](README_files/figure-markdown_github/fit_model-1.png)
 
 <h4 id="predictive-model">
-
 Predictive model with a K-Folds Cross-validation
-
 </h4>
-
 ``` r
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
@@ -150,24 +176,20 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 3.5400
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.1400
-    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1700
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 1.2833
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.7400
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.0900
+    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.0800
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.6367
 
 ``` r
 boxplot(pm)
 ```
 
-![](README_files/figure-gfm/predictive_model-1.png)<!-- -->
+![](README_files/figure-markdown_github/predictive_model-1.png)
 
 <h4 id="auto-ETA">
-
-Generate automatically a linear predictor (Only Multi-Environment
-example)
-
+Generate automatically a linear predictor (Only Multi-Environment example)
 </h4>
-
 ``` r
 library(GFR)
 data("Wheat_GFR")
@@ -193,33 +215,29 @@ summary(pm2)
     ## 10 Average_all        Irrigated        0.0072     0.1209 0.3557  0.1254
     ## 11 Average_all          Drought        0.5606     0.1066 0.3105  0.0520
     ## 12 Average_all ReducedIrrigated        0.3263     0.0938 0.1408  0.0268
-    ##    Time
-    ## 1  1.53
-    ## 2    NA
-    ## 3    NA
-    ## 4  1.34
-    ## 5    NA
-    ## 6    NA
-    ## 7  1.66
-    ## 8    NA
-    ## 9    NA
-    ## 10 1.51
-    ## 11   NA
-    ## 12   NA
+    ##      Time
+    ## 1  1.1400
+    ## 2      NA
+    ## 3      NA
+    ## 4  1.0800
+    ## 5      NA
+    ## 6      NA
+    ## 7  1.2100
+    ## 8      NA
+    ## 9      NA
+    ## 10 1.1433
+    ## 11     NA
+    ## 12     NA
 
 ``` r
 plot(pm2)
 ```
 
-![](README_files/figure-gfm/auto_ETA-1.png)<!-- -->
+![](README_files/figure-markdown_github/auto_ETA-1.png)
 
 <h4 id="auto-ETA2">
-
-Generate automatically a linear predictor (Multi-Trait &
-Multi-Environment example)
-
+Generate automatically a linear predictor (Multi-Trait & Multi-Environment example)
 </h4>
-
 ``` r
 data("Maize_GFR")
 CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
@@ -253,7 +271,7 @@ summary(pm3)
 ```
 
     ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP   Time
-    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 33.220
+    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 30.370
     ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA     NA
     ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA     NA
     ## 4            1 EBU    PH -0.0273         NA 119.1014      NA     NA
@@ -262,7 +280,7 @@ summary(pm3)
     ## 7            1 EBU Yield -0.0868         NA   4.1275      NA     NA
     ## 8            1 KAK Yield  0.0740         NA   5.5444      NA     NA
     ## 9            1 KTI Yield -0.1746         NA   5.7512      NA     NA
-    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 32.250
+    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 32.190
     ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA     NA
     ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA     NA
     ## 13           2 EBU    PH -0.0836         NA 115.2953      NA     NA
@@ -271,7 +289,7 @@ summary(pm3)
     ## 16           2 EBU Yield  0.1080         NA   5.1238      NA     NA
     ## 17           2 KAK Yield  0.0290         NA   4.1199      NA     NA
     ## 18           2 KTI Yield  0.1934         NA   4.4422      NA     NA
-    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 32.500
+    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 30.800
     ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA     NA
     ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA     NA
     ## 22           3 EBU    PH  0.0714         NA 448.5080      NA     NA
@@ -280,7 +298,7 @@ summary(pm3)
     ## 25           3 EBU Yield -0.1065         NA   6.5118      NA     NA
     ## 26           3 KAK Yield -0.0955         NA   5.1368      NA     NA
     ## 27           3 KTI Yield  0.0853         NA   6.0447      NA     NA
-    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 30.780
+    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 30.580
     ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA     NA
     ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA     NA
     ## 31           4 EBU    PH  0.1236         NA  99.8174      NA     NA
@@ -289,7 +307,7 @@ summary(pm3)
     ## 34           4 EBU Yield  0.1343         NA   5.6122      NA     NA
     ## 35           4 KAK Yield  0.0695         NA   6.0613      NA     NA
     ## 36           4 KTI Yield  0.0443         NA   5.1520      NA     NA
-    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 30.270
+    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 31.480
     ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA     NA
     ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA     NA
     ## 40           5 EBU    PH  0.0473         NA 440.4937      NA     NA
@@ -298,7 +316,7 @@ summary(pm3)
     ## 43           5 EBU Yield  0.2068         NA   3.8649      NA     NA
     ## 44           5 KAK Yield  0.0520         NA   3.9284      NA     NA
     ## 45           5 KTI Yield -0.2161         NA   3.7772      NA     NA
-    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 31.804
+    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 31.084
     ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338     NA
     ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625     NA
     ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653     NA
@@ -309,11 +327,8 @@ summary(pm3)
     ## 54 Average_all KTI Yield -0.0135     0.0784   5.0335  0.4171     NA
 
 <h4 id="HM-ETA">
-
 Handmade linear predictor
-
 </h4>
-
 ``` r
 CrossV <- list(Type = 'KFold', nFolds = 5)
 ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
@@ -343,22 +358,22 @@ summary(pm4)
     ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
     ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
     ##     Time
-    ## 1  0.460
+    ## 1  0.410
     ## 2     NA
     ## 3     NA
-    ## 4  0.770
+    ## 4  0.560
     ## 5     NA
     ## 6     NA
-    ## 7  0.470
+    ## 7  0.440
     ## 8     NA
     ## 9     NA
-    ## 10 0.660
+    ## 10 0.610
     ## 11    NA
     ## 12    NA
-    ## 13 0.580
+    ## 13 0.500
     ## 14    NA
     ## 15    NA
-    ## 16 0.588
+    ## 16 0.504
     ## 17    NA
     ## 18    NA
 
@@ -366,20 +381,17 @@ summary(pm4)
 plot(pm4, select = 'MSEP')
 ```
 
-![](README_files/figure-gfm/HM_ETA-1.png)<!-- -->
+![](README_files/figure-markdown_github/HM_ETA-1.png)
 
 ``` r
 boxplot(pm4, select = 'MSEP')
 ```
 
-![](README_files/figure-gfm/HM_ETA-2.png)<!-- -->
+![](README_files/figure-markdown_github/HM_ETA-2.png)
 
 <h2 id="cite">
-
 How to cite this package
-
 </h2>
-
 First option, by the article paper
 
 (Comming soon)
@@ -389,22 +401,12 @@ Second option, by the manual package
 (Comming soon)
 
 <h2 id="contributions">
-
 Contributions
-
 </h2>
-
-If you have any suggestions or feedback, I would love to hear about it.
-Feel free to report new issues in [this
-link](https://github.com/frahik/GFR/issues/new), also if you want to
-request a feature/report a bug, or make a pull request if you can
-contribute.
+If you have any suggestions or feedback, I would love to hear about it. Feel free to report new issues in [this link](https://github.com/frahik/GFR/issues/new), also if you want to request a feature/report a bug, or make a pull request if you can contribute.
 
 <h2 id="authors">
-
 Authors
-
 </h2>
-
-  - Francisco Javier Luna-Vázquez (Author, Maintainer)
-  - Osval Antonio Montesinos-López (Author)
+-   Francisco Javier Luna-Vázquez (Author, Maintainer)
+-   Osval Antonio Montesinos-López (Author)
