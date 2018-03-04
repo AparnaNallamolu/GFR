@@ -25,7 +25,7 @@ Collate:
   CrossValidation.R
   ETA.R
   Maize_GFR.R
-  Methods.R
+  Generic_Methods.R
   Utils.R
   Wheat_GFR.R
   WheatI_GFR.R
