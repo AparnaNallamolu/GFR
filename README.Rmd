@@ -1,6 +1,9 @@
+---
+output: github_document
+---
 <p align="center">
   <a href="https://github.com/frahik/GFR">
-    <img src="Logo.png" alt="Genomic Functional Regression Logo" width=470 height=100 />
+    <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h4 align="center">
     **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 6 

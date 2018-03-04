@@ -1,9 +1,23 @@
-GFR
-================
-Last README update: 2018-03-03
+
+<p align="center">
+
+<a href="https://github.com/frahik/GFR">
+<img src="Logo.png" alt="Genomic Functional Regression Logo"/> </a>
+
+<h4 align="center">
 
 **G**enomic **F**unctional **R**egression analysis in R - Development
 version 0.9 - rev 6
+
+</h4>
+
+<h4 align="center">
+
+\[Last README update: 2018-03-03\]
+
+</h4>
+
+<p align="center">
 
 [![Release](http://www.r-pkg.org/badges/version-ago/GFR
 "GFR release")](https://cran.r-project.org/package=GFR "CRAN Page")
@@ -16,16 +30,53 @@ Active](http://www.repostatus.org/badges/latest/wip.svg
 [![Downloads](http://cranlogs.r-pkg.org/badges/GFR
 "GFR cranlogs")](https://cran.r-project.org/package=GFR "CRAN Page")
 
-## New in this dev version 0.9
+</p>
+
+</p>
+
+-----
+
+# Table of contents
+
+  - [NEWS](#news)
+  - [instructions](#instructions)
+      - [Installation](#install)
+      - [Demostration examples](#demo)
+          - [Available data](#data)
+          - [Fitting a model](#fit-model)
+          - [Predictive model](#predictive-model)
+          - [Example \#1 of how generate automatically a linear
+            predictor](#auto-ETA)
+          - [Example \#2 of how generate automatically a linear
+            predictor](#auto-ETA2)
+          - [Example of how generate manually a linear
+            predictor](#HM-ETA)
+  - [How to cite this package](#cite)
+  - [Contributions](#contributions)
+  - [Authors](#authors)
+
+<h2 id="news">
+
+News of this version (0.9)
+
+</h2>
 
   - Rename from BGFRA -\> BFR -\> GFR
   - Initial development is in progress, but there has not yet been a
     stable, usable release suitable for the public; this is a
     pre-release, be careful.
 
-## Instructions for proper implementation
+<h2 id="instructions">
 
-### Installation
+Instructions for proper implementation
+
+</h2>
+
+<h3 id="install">
+
+Installation
+
+</h3>
 
 To complete installation of dev version of GFR from GitHub, you have to
 install a few packages first.
@@ -35,9 +86,17 @@ install.packages('devtools')
 devtools::install_github('frahik/GFR')
 ```
 
-### Quick use
+<h3 id="demo">
 
-#### Load data
+Demostration examples
+
+</h3>
+
+<h4 id="data">
+
+Available data
+
+</h4>
 
 ``` r
 rm(list = ls())
@@ -54,7 +113,11 @@ Bands <- Maize_Bands # Load from data Maize_GFR
 Wavelengths <- Maize_Wavelengths # Load from data Maize_GFR
 ```
 
-#### Fit model
+<h4 id="fit-model">
+
+Fitting a model
+
+</h4>
 
 ``` r
 data("Wheat_GFR")
@@ -65,9 +128,13 @@ fm <- BFR(data, nIter = 1000, burnIn = 300, verbose = F)
 plot(fm)
 ```
 
-![](README_files/figure-gfm/fitModel-1.png)<!-- -->
+![](README_files/figure-gfm/fit_model-1.png)<!-- -->
 
-### Cross-validation model with kfold
+<h4 id="predictive-model">
+
+Predictive model with a K-Folds Cross-validation
+
+</h4>
 
 ``` r
 data("Wheat_GFR")
@@ -85,18 +152,23 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.9300
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.1100
-    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1000
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.7133
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 2.4400
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.1900
+    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1100
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.9133
 
 ``` r
 boxplot(pm)
 ```
 
-![](README_files/figure-gfm/CVModel-1.png)<!-- -->
+![](README_files/figure-gfm/predictive_model-1.png)<!-- -->
 
-### Auto-detection of linear predictor (Only Environment)
+<h4 id="auto-ETA">
+
+Generate automatically a linear predictor (Only Multi-Environment
+example)
+
+</h4>
 
 ``` r
 library(GFR)
@@ -123,27 +195,32 @@ summary(pm2)
     ## 10 Average_all        Irrigated        0.0072     0.1209 0.3557  0.1254
     ## 11 Average_all          Drought        0.5606     0.1066 0.3105  0.0520
     ## 12 Average_all ReducedIrrigated        0.3263     0.0938 0.1408  0.0268
-    ##    Time
-    ## 1  2.03
-    ## 2    NA
-    ## 3    NA
-    ## 4  1.44
-    ## 5    NA
-    ## 6    NA
-    ## 7  1.63
-    ## 8    NA
-    ## 9    NA
-    ## 10 1.70
-    ## 11   NA
-    ## 12   NA
+    ##      Time
+    ## 1  1.4500
+    ## 2      NA
+    ## 3      NA
+    ## 4  1.2300
+    ## 5      NA
+    ## 6      NA
+    ## 7  1.3000
+    ## 8      NA
+    ## 9      NA
+    ## 10 1.3267
+    ## 11     NA
+    ## 12     NA
 
 ``` r
 plot(pm2)
 ```
 
-![](README_files/figure-gfm/ETAG-1.png)<!-- -->
+![](README_files/figure-gfm/auto_ETA-1.png)<!-- -->
 
-### Auto-detection of linear predictor (Multi-Trait & Multi-Environment)
+<h4 id="auto-ETA2">
+
+Generate automatically a linear predictor (Multi-Trait &
+Multi-Environment example)
+
+</h4>
 
 ``` r
 data("Maize_GFR")
@@ -177,63 +254,67 @@ pm3 <- BFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossVal
 summary(pm3)
 ```
 
-    ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP  Time
-    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 32.70
-    ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA    NA
-    ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA    NA
-    ## 4            1 EBU    PH -0.0273         NA 119.1014      NA    NA
-    ## 5            1 KAK    PH  0.4455         NA 164.6014      NA    NA
-    ## 6            1 KTI    PH -0.0057         NA 334.2636      NA    NA
-    ## 7            1 EBU Yield -0.0868         NA   4.1275      NA    NA
-    ## 8            1 KAK Yield  0.0740         NA   5.5444      NA    NA
-    ## 9            1 KTI Yield -0.1746         NA   5.7512      NA    NA
-    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 29.29
-    ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA    NA
-    ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA    NA
-    ## 13           2 EBU    PH -0.0836         NA 115.2953      NA    NA
-    ## 14           2 KAK    PH  0.3305         NA 126.0612      NA    NA
-    ## 15           2 KTI    PH  0.4105         NA 223.1208      NA    NA
-    ## 16           2 EBU Yield  0.1080         NA   5.1238      NA    NA
-    ## 17           2 KAK Yield  0.0290         NA   4.1199      NA    NA
-    ## 18           2 KTI Yield  0.1934         NA   4.4422      NA    NA
-    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 28.91
-    ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA    NA
-    ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA    NA
-    ## 22           3 EBU    PH  0.0714         NA 448.5080      NA    NA
-    ## 23           3 KAK    PH  0.3937         NA 116.4316      NA    NA
-    ## 24           3 KTI    PH  0.1872         NA 306.2555      NA    NA
-    ## 25           3 EBU Yield -0.1065         NA   6.5118      NA    NA
-    ## 26           3 KAK Yield -0.0955         NA   5.1368      NA    NA
-    ## 27           3 KTI Yield  0.0853         NA   6.0447      NA    NA
-    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 28.09
-    ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA    NA
-    ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA    NA
-    ## 31           4 EBU    PH  0.1236         NA  99.8174      NA    NA
-    ## 32           4 KAK    PH  0.4150         NA 133.2677      NA    NA
-    ## 33           4 KTI    PH  0.4061         NA 170.5294      NA    NA
-    ## 34           4 EBU Yield  0.1343         NA   5.6122      NA    NA
-    ## 35           4 KAK Yield  0.0695         NA   6.0613      NA    NA
-    ## 36           4 KTI Yield  0.0443         NA   5.1520      NA    NA
-    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 28.91
-    ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA    NA
-    ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA    NA
-    ## 40           5 EBU    PH  0.0473         NA 440.4937      NA    NA
-    ## 41           5 KAK    PH  0.3156         NA 111.7260      NA    NA
-    ## 42           5 KTI    PH  0.1162         NA 269.9482      NA    NA
-    ## 43           5 EBU Yield  0.2068         NA   3.8649      NA    NA
-    ## 44           5 KAK Yield  0.0520         NA   3.9284      NA    NA
-    ## 45           5 KTI Yield -0.2161         NA   3.7772      NA    NA
-    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 29.58
-    ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338    NA
-    ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625    NA
-    ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653    NA
-    ## 50 Average_all KAK    PH  0.3800     0.0248 130.4176  9.3290    NA
-    ## 51 Average_all KTI    PH  0.2229     0.0818 260.8235 29.2535    NA
-    ## 52 Average_all EBU Yield  0.0512     0.0625   5.0481  0.4855    NA
-    ## 53 Average_all KAK Yield  0.0258     0.0313   4.9582  0.4096    NA
-    ## 54 Average_all KTI Yield -0.0135     0.0784   5.0335  0.4171    NA
+    ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP   Time
+    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 30.410
+    ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA     NA
+    ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA     NA
+    ## 4            1 EBU    PH -0.0273         NA 119.1014      NA     NA
+    ## 5            1 KAK    PH  0.4455         NA 164.6014      NA     NA
+    ## 6            1 KTI    PH -0.0057         NA 334.2636      NA     NA
+    ## 7            1 EBU Yield -0.0868         NA   4.1275      NA     NA
+    ## 8            1 KAK Yield  0.0740         NA   5.5444      NA     NA
+    ## 9            1 KTI Yield -0.1746         NA   5.7512      NA     NA
+    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 30.370
+    ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA     NA
+    ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA     NA
+    ## 13           2 EBU    PH -0.0836         NA 115.2953      NA     NA
+    ## 14           2 KAK    PH  0.3305         NA 126.0612      NA     NA
+    ## 15           2 KTI    PH  0.4105         NA 223.1208      NA     NA
+    ## 16           2 EBU Yield  0.1080         NA   5.1238      NA     NA
+    ## 17           2 KAK Yield  0.0290         NA   4.1199      NA     NA
+    ## 18           2 KTI Yield  0.1934         NA   4.4422      NA     NA
+    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 30.690
+    ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA     NA
+    ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA     NA
+    ## 22           3 EBU    PH  0.0714         NA 448.5080      NA     NA
+    ## 23           3 KAK    PH  0.3937         NA 116.4316      NA     NA
+    ## 24           3 KTI    PH  0.1872         NA 306.2555      NA     NA
+    ## 25           3 EBU Yield -0.1065         NA   6.5118      NA     NA
+    ## 26           3 KAK Yield -0.0955         NA   5.1368      NA     NA
+    ## 27           3 KTI Yield  0.0853         NA   6.0447      NA     NA
+    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 31.510
+    ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA     NA
+    ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA     NA
+    ## 31           4 EBU    PH  0.1236         NA  99.8174      NA     NA
+    ## 32           4 KAK    PH  0.4150         NA 133.2677      NA     NA
+    ## 33           4 KTI    PH  0.4061         NA 170.5294      NA     NA
+    ## 34           4 EBU Yield  0.1343         NA   5.6122      NA     NA
+    ## 35           4 KAK Yield  0.0695         NA   6.0613      NA     NA
+    ## 36           4 KTI Yield  0.0443         NA   5.1520      NA     NA
+    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 31.300
+    ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA     NA
+    ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA     NA
+    ## 40           5 EBU    PH  0.0473         NA 440.4937      NA     NA
+    ## 41           5 KAK    PH  0.3156         NA 111.7260      NA     NA
+    ## 42           5 KTI    PH  0.1162         NA 269.9482      NA     NA
+    ## 43           5 EBU Yield  0.2068         NA   3.8649      NA     NA
+    ## 44           5 KAK Yield  0.0520         NA   3.9284      NA     NA
+    ## 45           5 KTI Yield -0.2161         NA   3.7772      NA     NA
+    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 30.856
+    ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338     NA
+    ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625     NA
+    ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653     NA
+    ## 50 Average_all KAK    PH  0.3800     0.0248 130.4176  9.3290     NA
+    ## 51 Average_all KTI    PH  0.2229     0.0818 260.8235 29.2535     NA
+    ## 52 Average_all EBU Yield  0.0512     0.0625   5.0481  0.4855     NA
+    ## 53 Average_all KAK Yield  0.0258     0.0313   4.9582  0.4096     NA
+    ## 54 Average_all KTI Yield -0.0135     0.0784   5.0335  0.4171     NA
 
-### Handmade linear predictor
+<h4 id="HM-ETA">
+
+Handmade linear predictor
+
+</h4>
 
 ``` r
 CrossV <- list(Type = 'KFold', nFolds = 5)
@@ -264,22 +345,22 @@ summary(pm4)
     ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
     ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
     ##     Time
-    ## 1  0.610
+    ## 1  0.520
     ## 2     NA
     ## 3     NA
-    ## 4  0.460
+    ## 4  0.480
     ## 5     NA
     ## 6     NA
-    ## 7  0.520
+    ## 7  0.660
     ## 8     NA
     ## 9     NA
-    ## 10 0.540
+    ## 10 0.590
     ## 11    NA
     ## 12    NA
-    ## 13 0.480
+    ## 13 0.520
     ## 14    NA
     ## 15    NA
-    ## 16 0.522
+    ## 16 0.554
     ## 17    NA
     ## 18    NA
 
@@ -287,24 +368,67 @@ summary(pm4)
 plot(pm4, select = 'MSEP')
 ```
 
-![](README_files/figure-gfm/ETAM-1.png)<!-- -->
+![](README_files/figure-gfm/HM_ETA-1.png)<!-- -->
 
 ``` r
 boxplot(pm4, select = 'MSEP')
 ```
 
-![](README_files/figure-gfm/ETAM-2.png)<!-- -->
+![](README_files/figure-gfm/HM_ETA-2.png)<!-- -->
 
-## Citation
+<h2 id="cite">
 
-How to cite the package… Coming soon.
+How to cite this package
 
-## Issues
+</h2>
 
-Feel free to report new issues in this link
-[Issues](https://github.com/frahik/GFR/issues/new)
+First option, by the article paper
 
-## Authors
+(Comming soon)
+
+Second option, by the manual package
+
+``` r
+citation('IBCF.MTME')
+```
+
+    ## 
+    ## To cite package 'IBCF.MTME' in publications use:
+    ## 
+    ##   Francisco Javier Luna-Vazquez, Osval Antonio Montesinos-Lopez,
+    ##   Abelardo Montesinos-Lopez and Jose Crossa (2018). IBCF.MTME:
+    ##   Item Based Collaborative Filtering for Multi-Trait and
+    ##   Multi-Environment Data. R package version 1.2-5.
+    ##   https://CRAN.R-project.org/package=IBCF.MTME
+    ## 
+    ## A BibTeX entry for LaTeX users is
+    ## 
+    ##   @Manual{,
+    ##     title = {IBCF.MTME: Item Based Collaborative Filtering for Multi-Trait and
+    ## Multi-Environment Data},
+    ##     author = {Francisco Javier Luna-Vazquez and Osval Antonio Montesinos-Lopez and Abelardo Montesinos-Lopez and Jose Crossa},
+    ##     year = {2018},
+    ##     note = {R package version 1.2-5},
+    ##     url = {https://CRAN.R-project.org/package=IBCF.MTME},
+    ##   }
+
+<h2 id="contributions">
+
+Contributions
+
+</h2>
+
+If you have any suggestions or feedback, I would love to hear about it.
+Feel free to report new issues in [this
+link](https://github.com/frahik/GFR/issues/new), also if you want to
+request a feature/report a bug, or make a pull request if you can
+contribute.
+
+<h2 id="authors">
+
+Authors
+
+</h2>
 
   - Francisco Javier Luna-Vázquez (Author, Maintainer)
   - Osval Antonio Montesinos-López (Author)
