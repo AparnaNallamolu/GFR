@@ -65,7 +65,7 @@ devtools::install_github('frahik/GFR')
 </h3>
 
 <h4 id="data">
-  Available data
+  
 </h4>
 
 
@@ -180,9 +180,8 @@ First option, by the article paper
 (Comming soon)
 
 Second option, by the manual package
-```{r}
-citation('IBCF.MTME')
-```
+
+(Comming soon)
 
 
 

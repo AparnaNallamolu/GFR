@@ -94,8 +94,6 @@ Demostration examples
 
 <h4 id="data">
 
-Available data
-
 </h4>
 
 ``` r
@@ -152,10 +150,10 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 2.4400
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.1900
-    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1100
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.9133
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 3.5400
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.1400
+    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.1700
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 1.2833
 
 ``` r
 boxplot(pm)
@@ -195,19 +193,19 @@ summary(pm2)
     ## 10 Average_all        Irrigated        0.0072     0.1209 0.3557  0.1254
     ## 11 Average_all          Drought        0.5606     0.1066 0.3105  0.0520
     ## 12 Average_all ReducedIrrigated        0.3263     0.0938 0.1408  0.0268
-    ##      Time
-    ## 1  1.4500
-    ## 2      NA
-    ## 3      NA
-    ## 4  1.2300
-    ## 5      NA
-    ## 6      NA
-    ## 7  1.3000
-    ## 8      NA
-    ## 9      NA
-    ## 10 1.3267
-    ## 11     NA
-    ## 12     NA
+    ##    Time
+    ## 1  1.53
+    ## 2    NA
+    ## 3    NA
+    ## 4  1.34
+    ## 5    NA
+    ## 6    NA
+    ## 7  1.66
+    ## 8    NA
+    ## 9    NA
+    ## 10 1.51
+    ## 11   NA
+    ## 12   NA
 
 ``` r
 plot(pm2)
@@ -255,7 +253,7 @@ summary(pm3)
 ```
 
     ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP   Time
-    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 30.410
+    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 33.220
     ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA     NA
     ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA     NA
     ## 4            1 EBU    PH -0.0273         NA 119.1014      NA     NA
@@ -264,7 +262,7 @@ summary(pm3)
     ## 7            1 EBU Yield -0.0868         NA   4.1275      NA     NA
     ## 8            1 KAK Yield  0.0740         NA   5.5444      NA     NA
     ## 9            1 KTI Yield -0.1746         NA   5.7512      NA     NA
-    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 30.370
+    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 32.250
     ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA     NA
     ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA     NA
     ## 13           2 EBU    PH -0.0836         NA 115.2953      NA     NA
@@ -273,7 +271,7 @@ summary(pm3)
     ## 16           2 EBU Yield  0.1080         NA   5.1238      NA     NA
     ## 17           2 KAK Yield  0.0290         NA   4.1199      NA     NA
     ## 18           2 KTI Yield  0.1934         NA   4.4422      NA     NA
-    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 30.690
+    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 32.500
     ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA     NA
     ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA     NA
     ## 22           3 EBU    PH  0.0714         NA 448.5080      NA     NA
@@ -282,7 +280,7 @@ summary(pm3)
     ## 25           3 EBU Yield -0.1065         NA   6.5118      NA     NA
     ## 26           3 KAK Yield -0.0955         NA   5.1368      NA     NA
     ## 27           3 KTI Yield  0.0853         NA   6.0447      NA     NA
-    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 31.510
+    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 30.780
     ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA     NA
     ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA     NA
     ## 31           4 EBU    PH  0.1236         NA  99.8174      NA     NA
@@ -291,7 +289,7 @@ summary(pm3)
     ## 34           4 EBU Yield  0.1343         NA   5.6122      NA     NA
     ## 35           4 KAK Yield  0.0695         NA   6.0613      NA     NA
     ## 36           4 KTI Yield  0.0443         NA   5.1520      NA     NA
-    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 31.300
+    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 30.270
     ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA     NA
     ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA     NA
     ## 40           5 EBU    PH  0.0473         NA 440.4937      NA     NA
@@ -300,7 +298,7 @@ summary(pm3)
     ## 43           5 EBU Yield  0.2068         NA   3.8649      NA     NA
     ## 44           5 KAK Yield  0.0520         NA   3.9284      NA     NA
     ## 45           5 KTI Yield -0.2161         NA   3.7772      NA     NA
-    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 30.856
+    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 31.804
     ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338     NA
     ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625     NA
     ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653     NA
@@ -345,22 +343,22 @@ summary(pm4)
     ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
     ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
     ##     Time
-    ## 1  0.520
+    ## 1  0.460
     ## 2     NA
     ## 3     NA
-    ## 4  0.480
+    ## 4  0.770
     ## 5     NA
     ## 6     NA
-    ## 7  0.660
+    ## 7  0.470
     ## 8     NA
     ## 9     NA
-    ## 10 0.590
+    ## 10 0.660
     ## 11    NA
     ## 12    NA
-    ## 13 0.520
+    ## 13 0.580
     ## 14    NA
     ## 15    NA
-    ## 16 0.554
+    ## 16 0.588
     ## 17    NA
     ## 18    NA
 
@@ -388,29 +386,7 @@ First option, by the article paper
 
 Second option, by the manual package
 
-``` r
-citation('IBCF.MTME')
-```
-
-    ## 
-    ## To cite package 'IBCF.MTME' in publications use:
-    ## 
-    ##   Francisco Javier Luna-Vazquez, Osval Antonio Montesinos-Lopez,
-    ##   Abelardo Montesinos-Lopez and Jose Crossa (2018). IBCF.MTME:
-    ##   Item Based Collaborative Filtering for Multi-Trait and
-    ##   Multi-Environment Data. R package version 1.2-5.
-    ##   https://CRAN.R-project.org/package=IBCF.MTME
-    ## 
-    ## A BibTeX entry for LaTeX users is
-    ## 
-    ##   @Manual{,
-    ##     title = {IBCF.MTME: Item Based Collaborative Filtering for Multi-Trait and
-    ## Multi-Environment Data},
-    ##     author = {Francisco Javier Luna-Vazquez and Osval Antonio Montesinos-Lopez and Abelardo Montesinos-Lopez and Jose Crossa},
-    ##     year = {2018},
-    ##     note = {R package version 1.2-5},
-    ##     url = {https://CRAN.R-project.org/package=IBCF.MTME},
-    ##   }
+(Comming soon)
 
 <h2 id="contributions">
 
