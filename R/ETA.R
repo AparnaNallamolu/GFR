@@ -5,6 +5,7 @@
 #' @param dataset TidyFormat
 #' @param datasetID column with the identifiers.
 #' @param GenomicMatrix lalalalal
+#' @param REML Logical, By default is NULL, If is TRUE, the priorType is ommited else If is FALSE, the priorType is ommited and.
 #' @param priorType Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'
 #' @param Bands Bands
 #' @param Wavelengths Wavelenths
@@ -17,11 +18,12 @@
 #' @export
 #'
 #' @examples
-ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, priorType = 'FIXED', Bands = NULL, Wavelengths = NULL,
+ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, REML= NULL, priorType = 'FIXED', Bands = NULL, Wavelengths = NULL,
                         method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...) {
   dataset <- validate.dataset(dataset, datasetID)
-  Design <- checkDesign(dataset, Bands)
+  Design <- checkDesign(dataset, Bands, REML)
   priorType <- validate.prior(priorType)
+  REML <- validateParadigm(REML)
 
   if (!is.null(GenomicMatrix)) {
     GenomicMatrix <- validate.GenomicMatrix(GenomicMatrix, dataset[, datasetID])
@@ -32,39 +34,45 @@ ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, prior
   }
 
   switch(Design,
-         'Single' = {
+         'Bayes-Single' = {
            ETA <- NULL
-         }, 'SingleBands' = {
+         }, 'Bayes-SingleBands' = {
            ETA <- list(Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), model = priorType))
-         }, 'Env' = {
-           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
+         }, 'Bayes-Env' = {
+           Env_prior <- ifelse(length(unique(dataset$Env)) < 10, "FIXED", priorType)
+           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = Env_prior),
                        Line = list(X = XL, model = priorType),
                        LinexEnv = list(X = model.matrix(~0+XL:as.factor(dataset$Env)), model = priorType))
-         }, 'EnvBands' = {
-           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
+         }, 'Bayes-EnvBands' = {
+           Env_prior <- ifelse(length(unique(dataset$Env)) < 10, "FIXED", priorType)
+           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = Env_prior),
                        Line = list(X = XL, model = priorType),
                        LinexEnv = list(X = model.matrix(~0+XL:as.factor(dataset$Env)), model = priorType),
                        Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
                        # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Env, ...), model = priorType))
-         }, 'Trait' = {
-           ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
+         }, 'Bayes-Trait' = {
+           Trait_prior <- ifelse(length(unique(dataset$Trait)) < 10, "FIXED", priorType)
+           ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = Trait_prior),
                        Line = list(X = XL, model = priorType),
                        LinexTrait = list(X = model.matrix(~0+XL:as.factor(dataset$Trait)), model = priorType))
-         }, 'TraitBands' = {
-           ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
+         }, 'Bayes-TraitBands' = {
+           Trait_prior <- ifelse(length(unique(dataset$Trait)) < 10, "FIXED", priorType)
+           ETA <- list(Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = Trait_prior),
                        Line = list(X = XL, model = priorType),
                        LinexTrait = list(X = model.matrix(~0+XL:as.factor(dataset$Trait)), model = priorType),
                        Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
                        # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Trait, ...), model = priorType))
-         }, 'Multi' = {
-           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
-                       Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
+         }, 'Bayes-Multi' = {
+           Env_prior <- ifelse(length(unique(dataset$Env)) < 10, "FIXED", priorType)
+           Trait_prior <- ifelse(length(unique(dataset$Trait)) < 10, "FIXED", priorType)
+           ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = Env_prior),
+                       Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = Trait_prior),
                        Line = list(X = XL, model = priorType),
                        LinexEnv = list(X = model.matrix(~0+XL:as.factor(dataset$Env)), model = priorType),
                        LinexTrait = list(X = model.matrix(~0+XL:as.factor(dataset$Trait)), model = priorType),
                        EnvxTrait = list(X = model.matrix(~0+as.factor(dataset$Env):as.factor(dataset$Trait)), model = priorType),
                        EnvxTraitxLine = list(X = model.matrix(~0+as.factor(dataset$Env):as.factor(dataset$Trait):XL), model = priorType))
-         }, 'MultiBands' = {
+         }, 'Bayes-MultiBands' = {
            ETA <- list(Env = list(X = model.matrix(~0+as.factor(dataset$Env)), model = priorType),
                        Trait = list(X = model.matrix(~0+as.factor(dataset$Trait)), model = priorType),
                        Line = list(X = XL, model = priorType),
@@ -75,6 +83,91 @@ ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, prior
                        Bands = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis), model = priorType, ...))
                        # BandsxEnv = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Env, ...), model = priorType),
                        # BandsxTrait = list(X = bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, interaction = dataset$Trait, ...), model = priorType))
+         }, 'Frequentist-Single' = {
+           ETA <- NULL
+         }, 'Frequentist-SingleBands' = {
+           ZBands <- model.matrix(~0+rownames(Bands))
+           colnames(ZBands) <- rownames(Bands)
+           Bands <- as.matrix(Bands)
+           GBands <- Bands %*% t(Bands) / ncol(Bands)
+
+           ETA <- list(Bands = list(Z = ZBands, K = GBands))
+         }, 'Frequentist-Env' = {
+           X <- model.matrix(~0+as.factor(dataset$Env))
+
+           ZLines <- model.matrix(~0+as.factor(dataset$Line))
+           ZLinEnv <- model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Env))
+
+           if (!is.null(GenomicMatrix)) {
+             GLinEnv <- kronecker(X = XL, Y = diag(length(unique(dataset$Env))))
+
+             ETA <- list(X, Line = list(Z = ZLines, K = XL),
+                         LinexEnv = list(Z = ZLinEnv, K = GLinEnv))
+           } else {
+            ETA <- list(X, Line = list(Z = ZLines),
+                         LinexEnv = list(Z = ZLinEnv))
+           }
+         }, 'Frequentist-EnvBands' = {
+           X <- model.matrix(~0+as.factor(dataset$Env))
+
+           ZLines <- model.matrix(~0+as.factor(dataset$Line))
+           ZLinEnv <- model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Env))
+           ZBands <- model.matrix(~0+rownames(Wheat_Bands))
+           colnames(ZBands) <- rownames(Bands)
+           Bands <- as.matrix(Bands)
+           GBands <- Bands %*% t(Bands) / ncol(Bands)
+
+           if (!is.null(GenomicMatrix)) {
+             GLinEnv <- kronecker(X = XL, Y = diag(length(unique(dataset$Env))))
+             ETA <- list(X, Line = list(Z = ZLines, K = XL),
+                         LinexEnv = list(Z = ZLinEnv, K = GLinEnv),
+                         Bands = list(Z = ZBands, K = GBands))
+           } else {
+             ETA <- list(X, Line = list(Z = ZLines),
+                         LinexEnv = list(Z = ZLinEnv),
+                         Bands = list(Z = ZBands, K = GBands))
+           }
+
+
+         }, 'Frequentist-Trait' = {
+           X <- model.matrix(~0+as.factor(dataset$Trait))
+
+           ZLines <- model.matrix(~0+as.factor(dataset$Line))
+           ZLinTrait <- model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Trait))
+
+           if (!is.null(GenomicMatrix)) {
+             GLinTrait <- kronecker(X = XL, Y = diag(length(unique(dataset$Trait))))
+             ETA <- list(Line = list(Z = ZLines, K = XL),
+                         LinexTrait = list(Z = ZLinTrait, K = GLinTrait))
+           } else {
+             ETA <- list(X, Line = list(Z = ZLines),
+                         LinexTrait = list(Z = ZLinEnv))
+           }
+
+         }, 'Frequentist-TraitBands' = {
+           X <- model.matrix(~0+as.factor(dataset$Trait))
+
+           ZLines <- model.matrix(~0+as.factor(dataset$Line))
+           ZLinTrait <- model.matrix(~0+as.factor(dataset$Line):as.factor(dataset$Trait))
+           ZBands <- model.matrix(~0+rownames(Wheat_Bands))
+           colnames(ZBands) <- rownames(Bands)
+           Bands <- as.matrix(Bands)
+           GBands <- Bands %*% t(Bands) / ncol(Bands)
+
+           if (!is.null(GenomicMatrix)) {
+             GLinTrait <- kronecker(X = XL, Y = diag(length(unique(dataset$Trait))))
+             ETA <- list(X, Line = list(Z = ZLines, K = XL),
+                         LinexTrait = list(Z = ZLinTrait, K = GLinTrait),
+                         Bands = list(Z = ZBands, K = GBands))
+           } else {
+             ETA <- list(X, Line = list(Z = ZLines),
+                         LinexTrait = list(Z = ZLinEnv),
+                         Bands = list(Z = ZBands, K = GBands))
+           }
+         }, 'Frequentist-Multi' = {
+
+         }, 'Frequentist-MultiBands' = {
+
          }, stop('Error in dataset or Bands provided, a bad design detected.')
   )
   out <- list(ETA = ETA, #Linear predictor
@@ -92,6 +185,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, prior
 validate.prior <- function(prior) {
   if (prior == 'RHKS') {prior <- 'BRR'}
   validPriors <- c('BRR', 'BayesA', 'BayesB', 'BayesC', 'BL')
+
   if (prior %in% validPriors) {
     return(prior)
   }
@@ -144,34 +238,75 @@ validate.dataset <- function(dataset, datasetID, orderData=T) {
   return(dataset)
 }
 
-checkDesign <- function(dataset, Bands = NULL) {
+validateParadigm <- function(REML) {
+  changeInterpretation <- !is.null(REML)
+  message("The statistical paradigm was changed from Bayes to Frequentist, so priorType parameter is ommited.")
+}
+
+checkDesign <- function(dataset, Bands = NULL, REML = NULL) {
   nEnv <- length(unique(dataset$Env))
   nTrait <- length(unique(dataset$Trait))
   bandsExist <- !is.null(Bands)
+  changeInterpretation <- !is.null(REML)
+  if (changeInterpretation) {
+    return(checkDesign.Frequentist(nEnv, nTrait, bandsExist))
+  } else {
+    return(checkDesign.Bayes(nEnv, nTrait, bandsExist))
+  }
+}
 
+checkDesign.Bayes <- function(nEnv, nTrait, bandsExist){
   if (nEnv == 1 & nTrait == 1) {
     if (bandsExist) {
-      return('SingleBands')
+      return('Bayes-SingleBands')
     } else {
-      return('Single')
+      return('Bayes-Single')
     }
   } else if (nEnv > 1 & nTrait == 1) {
     if (bandsExist) {
-      return('EnvBands')
+      return('Bayes-EnvBands')
     } else {
-      return('Env')
+      return('Bayes-Env')
     }
   } else if (nEnv == 1 & nTrait > 1) {
     if (bandsExist) {
-      return('TraitBands')
+      return('Bayes-TraitBands')
     } else {
-      return('Trait')
+      return('Bayes-Trait')
     }
   } else {
     if (bandsExist) {
-      return('MultiBands')
+      return('Bayes-MultiBands')
     } else {
-      return('Multi')
+      return('Bayes-Multi')
+    }
+  }
+}
+
+checkDesign.Frequentist <- function(nEnv, nTrait, bandsExist){
+  if (nEnv == 1 & nTrait == 1) {
+    if (bandsExist) {
+      return('Frequentist-SingleBands')
+    } else {
+      return('Frequentist-Single')
+    }
+  } else if (nEnv > 1 & nTrait == 1) {
+    if (bandsExist) {
+      return('Frequentist-EnvBands')
+    } else {
+      return('Frequentist-Env')
+    }
+  } else if (nEnv == 1 & nTrait > 1) {
+    if (bandsExist) {
+      return('Frequentist-TraitBands')
+    } else {
+      return('Frequentist-Trait')
+    }
+  } else {
+    if (bandsExist) {
+      return('Frequentist-MultiBands')
+    } else {
+      return('Frequentist-Multi')
     }
   }
 }
