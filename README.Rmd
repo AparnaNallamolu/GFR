@@ -213,6 +213,9 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
 </h2>
 
 
- - Francisco Javier Luna-Vázquez (Author, Maintainer)
- - Osval Antonio Montesinos-López (Author)
+    * Francisco Javier Luna-Vázquez (Author, Maintainer)
+    * Osval Antonio Montesinos-López (Author)
+    * Abelardo Montesinos-López (Author)
+    * José Crossa (Author)
+    * Gustavo de los campos (Author)
 

@@ -9,7 +9,7 @@
 <a href="https://www.gnu.org/licenses/lgpl-3.0"> <img src="https://img.shields.io/badge/License-LGPL%20v3-blue.svg" alt="LGPL, Version 3.0"> </a> <a href="http://www.repostatus.org/#wip"> <img src="http://www.repostatus.org/badges/latest/wip.svg" alt="Status of the Repo:  Initial development is in progress, but there has not yet been a stable, usable release suitable for the public"> </a> <a href=""> <img src="http://cranlogs.r-pkg.org/badges/GFR" alt="Dowloads from the CRAN"> </a> <a href="https://cran.r-project.org/package=GFR"> <img src="http://www.r-pkg.org/badges/version-ago/GFR" alt="CRAN"> </a>
 </p>
 <h4 align="center">
-    [Last README update: 2018-03-04]
+    [Last README update: 2018-03-05]
 
 </h4>
 </p>
@@ -173,10 +173,10 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.7710
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.0990
-    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.0570
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.6423
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.0400
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.0600
+    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.0300
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.3767
 
 ``` r
 boxplot(pm)
@@ -212,19 +212,19 @@ summary(pm2)
     ## 10 Average_all        Irrigated        0.0072     0.1209 0.3557  0.1254
     ## 11 Average_all          Drought        0.5606     0.1066 0.3105  0.0520
     ## 12 Average_all ReducedIrrigated        0.3263     0.0938 0.1408  0.0268
-    ##      Time
-    ## 1  1.0020
-    ## 2      NA
-    ## 3      NA
-    ## 4  0.7960
-    ## 5      NA
-    ## 6      NA
-    ## 7  0.8670
-    ## 8      NA
-    ## 9      NA
-    ## 10 0.8883
-    ## 11     NA
-    ## 12     NA
+    ##    Time
+    ## 1  0.61
+    ## 2    NA
+    ## 3    NA
+    ## 4  0.50
+    ## 5    NA
+    ## 6    NA
+    ## 7  0.48
+    ## 8    NA
+    ## 9    NA
+    ## 10 0.53
+    ## 11   NA
+    ## 12   NA
 
 ``` r
 plot(pm2)
@@ -267,61 +267,61 @@ pm3 <- BFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossVal
 summary(pm3)
 ```
 
-    ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP    Time
-    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 32.3770
-    ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA      NA
-    ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA      NA
-    ## 4            1 EBU    PH -0.0273         NA 119.1014      NA      NA
-    ## 5            1 KAK    PH  0.4455         NA 164.6014      NA      NA
-    ## 6            1 KTI    PH -0.0057         NA 334.2636      NA      NA
-    ## 7            1 EBU Yield -0.0868         NA   4.1275      NA      NA
-    ## 8            1 KAK Yield  0.0740         NA   5.5444      NA      NA
-    ## 9            1 KTI Yield -0.1746         NA   5.7512      NA      NA
-    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 30.9330
-    ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA      NA
-    ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA      NA
-    ## 13           2 EBU    PH -0.0836         NA 115.2953      NA      NA
-    ## 14           2 KAK    PH  0.3305         NA 126.0612      NA      NA
-    ## 15           2 KTI    PH  0.4105         NA 223.1208      NA      NA
-    ## 16           2 EBU Yield  0.1080         NA   5.1238      NA      NA
-    ## 17           2 KAK Yield  0.0290         NA   4.1199      NA      NA
-    ## 18           2 KTI Yield  0.1934         NA   4.4422      NA      NA
-    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 30.5710
-    ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA      NA
-    ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA      NA
-    ## 22           3 EBU    PH  0.0714         NA 448.5080      NA      NA
-    ## 23           3 KAK    PH  0.3937         NA 116.4316      NA      NA
-    ## 24           3 KTI    PH  0.1872         NA 306.2555      NA      NA
-    ## 25           3 EBU Yield -0.1065         NA   6.5118      NA      NA
-    ## 26           3 KAK Yield -0.0955         NA   5.1368      NA      NA
-    ## 27           3 KTI Yield  0.0853         NA   6.0447      NA      NA
-    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 31.0320
-    ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA      NA
-    ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA      NA
-    ## 31           4 EBU    PH  0.1236         NA  99.8174      NA      NA
-    ## 32           4 KAK    PH  0.4150         NA 133.2677      NA      NA
-    ## 33           4 KTI    PH  0.4061         NA 170.5294      NA      NA
-    ## 34           4 EBU Yield  0.1343         NA   5.6122      NA      NA
-    ## 35           4 KAK Yield  0.0695         NA   6.0613      NA      NA
-    ## 36           4 KTI Yield  0.0443         NA   5.1520      NA      NA
-    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 31.8530
-    ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA      NA
-    ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA      NA
-    ## 40           5 EBU    PH  0.0473         NA 440.4937      NA      NA
-    ## 41           5 KAK    PH  0.3156         NA 111.7260      NA      NA
-    ## 42           5 KTI    PH  0.1162         NA 269.9482      NA      NA
-    ## 43           5 EBU Yield  0.2068         NA   3.8649      NA      NA
-    ## 44           5 KAK Yield  0.0520         NA   3.9284      NA      NA
-    ## 45           5 KTI Yield -0.2161         NA   3.7772      NA      NA
-    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 31.3532
-    ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338      NA
-    ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625      NA
-    ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653      NA
-    ## 50 Average_all KAK    PH  0.3800     0.0248 130.4176  9.3290      NA
-    ## 51 Average_all KTI    PH  0.2229     0.0818 260.8235 29.2535      NA
-    ## 52 Average_all EBU Yield  0.0512     0.0625   5.0481  0.4855      NA
-    ## 53 Average_all KAK Yield  0.0258     0.0313   4.9582  0.4096      NA
-    ## 54 Average_all KTI Yield -0.0135     0.0784   5.0335  0.4171      NA
+    ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP   Time
+    ## 1            1 EBU   ASI  0.1110         NA   3.4388      NA 20.110
+    ## 2            1 KAK   ASI -0.0961         NA   6.2387      NA     NA
+    ## 3            1 KTI   ASI  0.1799         NA   3.9410      NA     NA
+    ## 4            1 EBU    PH -0.0273         NA 119.1014      NA     NA
+    ## 5            1 KAK    PH  0.4455         NA 164.6014      NA     NA
+    ## 6            1 KTI    PH -0.0057         NA 334.2636      NA     NA
+    ## 7            1 EBU Yield -0.0868         NA   4.1275      NA     NA
+    ## 8            1 KAK Yield  0.0740         NA   5.5444      NA     NA
+    ## 9            1 KTI Yield -0.1746         NA   5.7512      NA     NA
+    ## 10           2 EBU   ASI  0.1197         NA   4.4065      NA 19.580
+    ## 11           2 KAK   ASI  0.0573         NA   4.3010      NA     NA
+    ## 12           2 KTI   ASI -0.1506         NA   4.9604      NA     NA
+    ## 13           2 EBU    PH -0.0836         NA 115.2953      NA     NA
+    ## 14           2 KAK    PH  0.3305         NA 126.0612      NA     NA
+    ## 15           2 KTI    PH  0.4105         NA 223.1208      NA     NA
+    ## 16           2 EBU Yield  0.1080         NA   5.1238      NA     NA
+    ## 17           2 KAK Yield  0.0290         NA   4.1199      NA     NA
+    ## 18           2 KTI Yield  0.1934         NA   4.4422      NA     NA
+    ## 19           3 EBU   ASI  0.0402         NA   5.5519      NA 19.480
+    ## 20           3 KAK   ASI  0.0556         NA   5.8688      NA     NA
+    ## 21           3 KTI   ASI  0.1785         NA   5.2720      NA     NA
+    ## 22           3 EBU    PH  0.0714         NA 448.5080      NA     NA
+    ## 23           3 KAK    PH  0.3937         NA 116.4316      NA     NA
+    ## 24           3 KTI    PH  0.1872         NA 306.2555      NA     NA
+    ## 25           3 EBU Yield -0.1065         NA   6.5118      NA     NA
+    ## 26           3 KAK Yield -0.0955         NA   5.1368      NA     NA
+    ## 27           3 KTI Yield  0.0853         NA   6.0447      NA     NA
+    ## 28           4 EBU   ASI  0.1468         NA   4.8340      NA 19.280
+    ## 29           4 KAK   ASI -0.0307         NA   6.4775      NA     NA
+    ## 30           4 KTI   ASI  0.0407         NA   4.8319      NA     NA
+    ## 31           4 EBU    PH  0.1236         NA  99.8174      NA     NA
+    ## 32           4 KAK    PH  0.4150         NA 133.2677      NA     NA
+    ## 33           4 KTI    PH  0.4061         NA 170.5294      NA     NA
+    ## 34           4 EBU Yield  0.1343         NA   5.6122      NA     NA
+    ## 35           4 KAK Yield  0.0695         NA   6.0613      NA     NA
+    ## 36           4 KTI Yield  0.0443         NA   5.1520      NA     NA
+    ## 37           5 EBU   ASI  0.1177         NA   3.5642      NA 19.330
+    ## 38           5 KAK   ASI -0.0261         NA   3.8439      NA     NA
+    ## 39           5 KTI   ASI -0.0813         NA   3.3151      NA     NA
+    ## 40           5 EBU    PH  0.0473         NA 440.4937      NA     NA
+    ## 41           5 KAK    PH  0.3156         NA 111.7260      NA     NA
+    ## 42           5 KTI    PH  0.1162         NA 269.9482      NA     NA
+    ## 43           5 EBU Yield  0.2068         NA   3.8649      NA     NA
+    ## 44           5 KAK Yield  0.0520         NA   3.9284      NA     NA
+    ## 45           5 KTI Yield -0.2161         NA   3.7772      NA     NA
+    ## 46 Average_all EBU   ASI  0.1071     0.0178   4.3591  0.3956 19.556
+    ## 47 Average_all KAK   ASI -0.0080     0.0291   5.3460  0.5338     NA
+    ## 48 Average_all KTI   ASI  0.0334     0.0669   4.4641  0.3625     NA
+    ## 49 Average_all EBU    PH  0.0263     0.0367 244.6432 81.6653     NA
+    ## 50 Average_all KAK    PH  0.3800     0.0248 130.4176  9.3290     NA
+    ## 51 Average_all KTI    PH  0.2229     0.0818 260.8235 29.2535     NA
+    ## 52 Average_all EBU Yield  0.0512     0.0625   5.0481  0.4855     NA
+    ## 53 Average_all KAK Yield  0.0258     0.0313   4.9582  0.4096     NA
+    ## 54 Average_all KTI Yield -0.0135     0.0784   5.0335  0.4171     NA
 
 <h4 id="HM-ETA">
 Handmade linear predictor
@@ -354,25 +354,25 @@ summary(pm4)
     ## 16 Average_all        Irrigated        0.0617     0.1426 0.3682  0.0811
     ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
     ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
-    ##      Time
-    ## 1  0.2920
-    ## 2      NA
-    ## 3      NA
-    ## 4  0.4400
-    ## 5      NA
-    ## 6      NA
-    ## 7  0.3130
-    ## 8      NA
-    ## 9      NA
-    ## 10 0.3280
-    ## 11     NA
-    ## 12     NA
-    ## 13 0.3430
-    ## 14     NA
-    ## 15     NA
-    ## 16 0.3432
-    ## 17     NA
-    ## 18     NA
+    ##     Time
+    ## 1  0.170
+    ## 2     NA
+    ## 3     NA
+    ## 4  0.240
+    ## 5     NA
+    ## 6     NA
+    ## 7  0.200
+    ## 8     NA
+    ## 9     NA
+    ## 10 0.190
+    ## 11    NA
+    ## 12    NA
+    ## 13 0.190
+    ## 14    NA
+    ## 15    NA
+    ## 16 0.198
+    ## 17    NA
+    ## 18    NA
 
 ``` r
 plot(pm4, select = 'MSEP')
@@ -405,5 +405,8 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
 <h2 id="authors">
 Authors
 </h2>
--   Francisco Javier Luna-Vázquez (Author, Maintainer)
--   Osval Antonio Montesinos-López (Author)
+    * Francisco Javier Luna-Vázquez (Author, Maintainer)
+    * Osval Antonio Montesinos-López (Author)
+    * Abelardo Montesinos-López (Author)
+    * José Crossa (Author)
+    * Gustavo de los campos (Author)
