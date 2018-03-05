@@ -3,8 +3,10 @@ Title: GFR (Genomic Functional Regression)
 Version: 0.9-7
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
-             person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut")
-             )
+             person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut"),
+             person("Abelardo", "Montesinos-Lopez", role = "aut"),
+             person("Jose", "Crossa", role = "aut"),
+             person("Gustavo", "De los campos", role = "aut"))
 Maintainer: Francisco Javier Luna-Vazquez <frahik@gmail.com>
 Description: Needs a good description
 Depends: 
@@ -21,9 +23,12 @@ Collate:
   Basis_Bspline.R
   Basis_Fourier.R
   BFR.R
-  Core.R
+  BFRInterface.R
+  BayesianCore.R
   CrossValidation.R
   ETA.R
+  FFR.R
+  FrequentistCore.R
   Maize_GFR.R
   Generic_Methods.R
   Utils.R
@@ -33,6 +38,8 @@ Imports:
   progress (>= 1.1.2),
   fda (>= 2.4.7),
   Rcpp,
+  matrixcalc,
+  MASS,
   truncnorm
 Suggests:
   testthat,
