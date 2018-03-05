@@ -1,3 +1,39 @@
+#' cleanDat function
+#'
+#' Easy way to delete dat files
+#'
+#' @param forceClean By default is FALSE, else, the function not requiere the confirmation by the user to delete de .dat files.
+#'
+#' @return
+#' logical vector, of the files deleted.
+#'
+#'
+#' @export
+cleanDat <- function(forceClean = F){
+  path <- dir()
+  files <- path[which(grepl('.dat', path) == TRUE)]
+  if(length(files)!=0){
+    if(forceClean){
+      Status <- file.remove(files)
+      names(Status) <- files
+      return(Status)
+    }
+    message("Are you sure that you want to delete this files?: y/n ")
+    cat(files, sep = '\t')
+    response <- scan(what = character(length = 1),n = 1,quiet = TRUE)
+    if(response == 'y'){
+      Status <- file.remove(files)
+      names(Status) <- files
+      return(Status)
+    } else {
+      message("The deletion was cancelled by the user.")
+    }
+  } else{
+    message("No .dat files found in this directory")
+  }
+}
+
+
 Cor_Env <- function(Tab, Time){
   Envs <- unique(Tab$Env)
   Traits <- unique(Tab$Trait)
