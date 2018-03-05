@@ -5,22 +5,31 @@ output: github_document
   <a href="https://github.com/frahik/GFR">
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
-  <h4 align="center">
-    **G**enomic **F**unctional **R**egression analysis in R - Development version 0.9 - rev 7 
+  <h3 align="center">
+    Genomic Functional Regression analysis in R | Development version 0.9 - rev 7 
   </h4>
+  
+  <p align="center">
+  <a href="https://www.gnu.org/licenses/lgpl-3.0">
+    <img src="https://img.shields.io/badge/License-LGPL%20v3-blue.svg" alt="LGPL, Version 3.0">
+  </a> <a href="http://www.repostatus.org/#wip">
+    <img src="http://www.repostatus.org/badges/latest/wip.svg" alt="Status of the Repo:  Initial development is in progress, but there has not yet been a stable, usable release suitable for the public">
+  </a> <a href="">
+    <img src="http://cranlogs.r-pkg.org/badges/GFR" alt="Dowloads from the CRAN">
+  </a> <a href="https://cran.r-project.org/package=GFR">
+    <img src="http://www.r-pkg.org/badges/version-ago/GFR" alt="CRAN">
+  </a>
+  </p>
+
   <h4 align="center">
     [Last README update: `r format(Sys.Date())`]
   </h4>
-  <p align="center">
-    [![Release][release-badge]][cran]
-    [![License: LGPL v3][LGPL-badge]][LGPL]
-    [![Project Status: Active][status-bagde]][status]
-    [![Downloads][downloads-badge]][cran]
-  </p>
+  
 </p>
 
 
 ----------
+
 
 # Table of contents
   - [NEWS](#news)
@@ -205,11 +214,3 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
  - Francisco Javier Luna-Vázquez (Author, Maintainer)
  - Osval Antonio Montesinos-López (Author)
 
-
-[LGPL-badge]: https://img.shields.io/badge/License-LGPL%20v3-blue.svg "LGPL, Version 2.0"
-[status-bagde]: http://www.repostatus.org/badges/latest/wip.svg "status"
-[downloads-badge]: http://cranlogs.r-pkg.org/badges/GFR "GFR cranlogs"
-[release-badge]: http://www.r-pkg.org/badges/version-ago/GFR "GFR release"
-[cran]: https://cran.r-project.org/package=GFR "CRAN Page"
-[LGPL]: https://www.gnu.org/licenses/lgpl-3.0 "LGPL, Version 2.0"
-[status]: http://www.repostatus.org/#wip "status - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public"
