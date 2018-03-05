@@ -50,8 +50,8 @@ output: github_document
   News of this version (0.9)
 </h2>
 
-* Rename from BGFRA -> BFR -> GFR
-* Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
+ * Rename from BGFRA -> BFR -> GFR
+ * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 <h2 id="instructions">
   Instructions for proper implementation
@@ -74,7 +74,7 @@ devtools::install_github('frahik/GFR')
 </h3>
 
 <h4 id="data">
-  
+  Availabe data
 </h4>
 
 Three data sets are available inside the package, to use it use `data()` function,
@@ -104,6 +104,7 @@ paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maiz
 
 
 ```{r fit_model}
+
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 
@@ -117,6 +118,7 @@ plot(fm)
 </h4>
 
 ```{r predictive_model}
+
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
@@ -131,8 +133,8 @@ boxplot(pm)
   Generate automatically a linear predictor (Only Multi-Environment example)
 </h4>
 
-
 ```{r auto_ETA}
+
 library(GFR)
 data("Wheat_GFR")
 CrossV <- list(Type = 'KFold', nFolds = 3)
