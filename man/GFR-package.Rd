@@ -20,6 +20,9 @@ BFR is an modificated version of BGLR which implements a Gibbs sampler for a Bay
 Authors:
 \itemize{
   \item Osval Antonio Montesinos-Lopez \email{oamontes1@ucol.mx}
+  \item Abelardo Montesinos-Lopez
+  \item Jose Crossa
+  \item Gustavo De los campos
 }
 
 }

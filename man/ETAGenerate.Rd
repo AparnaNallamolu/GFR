@@ -5,7 +5,7 @@
 \title{ETAGenerate}
 \usage{
 ETAGenerate(dataset, datasetID = "Line", GenomicMatrix = NULL,
-  priorType = "FIXED", Bands = NULL, Wavelengths = NULL,
+  REML = NULL, priorType = "FIXED", Bands = NULL, Wavelengths = NULL,
   method = "Simple", basisType = "Fourier.Basis", nBasis = 1, ...)
 }
 \arguments{
@@ -14,6 +14,8 @@ ETAGenerate(dataset, datasetID = "Line", GenomicMatrix = NULL,
 \item{datasetID}{column with the identifiers.}
 
 \item{GenomicMatrix}{lalalalal}
+
+\item{REML}{Logical, By default is NULL, If is TRUE, the priorType is ommited else If is FALSE, the priorType is ommited and.}
 
 \item{priorType}{Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'}
 
