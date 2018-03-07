@@ -25,7 +25,6 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
     switch(CrossValidation$Type,
            KFold = {
              if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
-             PT <- CV.KFold(data, K = CrossValidation$nFolds, set_seed)
              nCV <- CrossValidation$nFolds
            },
 
@@ -56,10 +55,11 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
       Pos_NA <- PT$CrossValidation_list[[paste0('partition',i)]]
       response_NA[Pos_NA] <- NA
       time.init <- proc.time()[3]
-      fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                 verbose = F, rmExistingFiles, groups)
+      fm <- mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
+                 tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
+                 forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
+                 REML = REML, init.equal = init.equal)
 
-      #fm <- BGLR(response_NA, ETA, verbose=F)
       switch(response_type,
              gaussian = {
                predicted <- fm$predictions
@@ -95,7 +95,7 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
       Design = design
     )
 
-    class(out) <- 'BFRCV'
+    class(out) <- 'FFRCV'
     return(out)
   }else{
     return(mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
