@@ -178,14 +178,16 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
       Ytilde[Pos_NA,] <- rep(NA, ncol(response))
 
       Y_pred <- matrix(NA, nrow = nrow(response), ncol = nt)
-      Beta_PC <- matrix(NA, nrow = nI, ncol = nt)
-      SDBeta_PC <- matrix(NA, nrow = nI, ncol = nt)
-      Sigma1_PC <- matrix(0, nrow = nt, ncol = nt)
-      Sigma2_PC <- matrix(0, nrow = nt, ncol = nt)
-      SigmaError_PC <- matrix(0, nrow = nt, ncol = nt)
-      SD1_PC <- matrix(0, nrow = nt, ncol = nt)
-      SD2_PC <- matrix(0, nrow = nt, ncol = nt)
-      SDError_PC <- matrix(0, nrow = nt, ncol = nt)
+      Beta_PC <- matrix(NA, nrow = nI+1, ncol = nt)
+      SDBeta_PC <- matrix(NA, nrow = nI+1, ncol = nt)
+      Sigma1_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      Sigma2_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      Sigma3_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      SigmaError_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      SD1_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      SD2_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      SD3_PC <- matrix(0, nrow = nt+1, ncol = nt)
+      SDError_PC <- matrix(0, nrow = nt+1, ncol = nt)
 
       for (i in seq_len(nt)) {
         y_i <- Ytilde[, i]
@@ -202,37 +204,83 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
         SD1_PC[i, i] <- fm$ETA[[2]]$SD.varU
         Sigma2_PC[i, i] <- fm$ETA[[3]]$varU
         SD2_PC[i, i] <- fm$ETA[[3]]$SD.varU
+        # Sigma3_PC[i, i] <- fm$ETA[[4]]$varU
+        # SD3_PC[i, i] <- fm$ETA[[4]]$SD.varU
         SigmaError_PC[i, i] <- fm$varE
         SDError_PC[i, i] <- fm$SD.varE
 
-        switch(response_type,
-               gaussian = {
-                 predicted <- fm$predictions
-                 # data$Predictions[Pos_NA] <- predicted[Pos_NA]
-                 Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-                                   y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
-                 Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
-               },
-               stop(paste0('The response_type: ', response_type, " is't implemented for SVD multivariate method"))
-        )
+        # switch(response_type,
+        #        gaussian = {
+        #          predicted <- fm$predictions
+        #          # data$Predictions[Pos_NA] <- predicted[Pos_NA]
+        #          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
+        #                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
+        #          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
+        #        },
+        #        stop(paste0('The response_type: ', response_type, " is't implemented for SVD multivariate method"))
+        # )
       }
 
       Y_pred_Final <- Y_pred %*% tV
 
-      if (verbose) {
-        pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
-        cat('Done.\n')
+
+      Y_all = cbind(as.matrix(data[,-c(1,2)]), Y_pred_Final, data$Env)
+      Y_all_tst = Y_all[Pos_NA, ]
+      Y_all_tst
+      Data_pred = data.frame(matrix(NA, ncol = 3, nrow = nt * nI))
+      Traits = noquote(colnames(data[,-c(1,2)]))
+      Env = unique(data$Env)
+      Etiquetas = expand.grid(Trait = Traits, Env = Env)
+
+      Data_pred[, 1] = paste(Etiquetas$Trait, Etiquetas$Env, sep = "_")
+      for (j in 1:nI) {
+        #for (r in 1:nI){
+        Env_i = Y_all_tst[Y_all_tst[, 2 * nt + 1] == j, ]
+        Cor_all_i = cor(Env_i[, -(2 * nt + 1)])
+        cor_U = diag(Cor_all_i[1:(nt), (nt + 1):(2 * nt)])
+        PL = numeric()
+        for (k in 1:nt) {
+          PL = c(PL, mean((Env_i[, k] - Env_i[, nt + k]) ^ 2))
+        }
+        Pos_L = PL
+        for (s in 1:nt) {
+          index = nt * (j - 1) + nt
+          Data_pred[(((index - nt) + 1):index), 2] = cor_U
+          Data_pred[(((index - nt) + 1):index), 3] = c(Pos_L)
+        }
       }
+      Data_pred
+      colnames(Data_pred) = c("Group", "Cor", "MSEP")
+
+      indexN = 9 * (i - 1) + 9
+      Criteria[(((indexN - 9) + 1):indexN),] = Data_pred
     }
 
+    Criteria
+    GG = noquote(Data_pred[, 1])
+    for (i in 1:length(GG)) {
+      Criteria.Env_o = Criteria[Criteria[, 1] == GG[i], ]
+      Env.ALL[i, ] = c(
+        GG[i],
+        mean(Criteria.Env_o[, 2], na.rm = TRUE),
+        (sd(Criteria.Env_o[, 2], na.rm = TRUE) / sqrt(20)),
+        mean(Criteria.Env_o[, 3], na.rm = TRUE),
+        (sd(Criteria.Env_o[, 3], na.rm = TRUE) / sqrt(20))
+      )
 
+    }
     # Env.ALL <- tidyr::separate(Env.ALL, 'Trait_Env', c("Trait", "Env"), sep = "_")
 
+    if (verbose) {
+      pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
+      cat('Done.\n')
+    }
+
     out <- list(
-      predictions_Summary = Tab_Pred,
+      predictions_Summary = Env.ALL,
       CrossValidation_list = PT$CrossValidation_list,
       response = data[, -c(1,2)],
-      predictions = Y_pred,
+      predictions = Y_pred_Final,
       Design = design,
       Beta_est = betas_est,
       SDBeta_est = SDbetas_est,

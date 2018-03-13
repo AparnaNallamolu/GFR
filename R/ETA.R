@@ -21,9 +21,9 @@
 #' @examples
 ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional', GenomicMatrix = NULL, REML= NULL, priorType = 'BRR', Bands = NULL, Wavelengths = NULL,
                         method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...) {
-  dataset <- validate.dataset(dataset, datasetID)
+  dataset <- validate.dataset(dataset, datasetID, TRUE, Multivariate)
   Design <- checkDesign(dataset, Bands, REML)
-  priorType <- validate.prior(priorType)
+  priorType <- validate.prior(priorType, Multivariate)
   REML <- validateParadigm(REML)
   # Bands <- validateBands(Bands, Wavelengths)
   # Wavelengths <- validateWavelengths()
@@ -32,12 +32,13 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
   Trait_prior <- ifelse(length(unique(dataset$Trait)) < 10, "FIXED", priorType)
 
   if (!is.null(GenomicMatrix)) {
-    GenomicMatrix <- validate.GenomicMatrix(GenomicMatrix, dataset[, datasetID])
     L <- t(chol(GenomicMatrix))
     XL <- model.matrix(~0+as.factor(dataset[, datasetID])) %*% L
     if (Multivariate == 'SVD') {
       XL <- kronecker(X = GenomicMatrix, Y = diag(length(unique(dataset$Env))))
     }
+    rownames(XL) <- dataset[, datasetID]
+    XL <- validate.GenomicMatrix(XL, dataset[, datasetID])
     Line_prior <- 'RKHS'
     LineK <- TRUE
   } else {
@@ -82,7 +83,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
             ETA <- list(Env = ETAList(dataset$Env, Env_prior),
                         # Trait = list(X = model.matrix(~0+as.factor(data_Long$Trait)), model = Trait_prior),
                         Line = ETAList(XL, Line_prior, TRUE, LineK),
-                        LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env))
+                        LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env, likeKernel = TRUE, withK = T))
                         # LinexTrait = list(X = model.matrix(~0+XL:as.factor(data_Long$Trait)), model = priorType),
                         # EnvxTrait = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait)), model = priorType),
                         # EnvxTraitxLine = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait):XL), model = priorType))
@@ -103,8 +104,8 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
              ETA <- list(Env = ETAList(dataset$Env, Env_prior),
                          # Trait = list(X = model.matrix(~0+as.factor(data_Long$Trait)), model = Trait_prior),
                          Line = ETAList(XL, priorType, TRUE, LineK),
-                         LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env),
-                         Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE))
+                         LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env, likeKernel = TRUE, withK = T),
+                         Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE, likeKernel = TRUE, withK = T))
                          # LinexTrait = list(X = model.matrix(~0+XL:as.factor(data_Long$Trait)), model = priorType),
                          # EnvxTrait = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait)), model = priorType),
                          # EnvxTraitxLine = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait):XL), model = priorType))
@@ -137,7 +138,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
 
          }, 'Frequentist-MultiBands' = {
 
-         }, stop('Error in dataset or Bands provided, a bad design detected.')
+         }, stop('Error in dataset or Bands provided, a bad design detected.', call. = FALSE)
   )
   out <- list(ETA = ETA, #Linear predictor
               dataset = dataset, #Fixed Dataset
@@ -151,29 +152,36 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
   return(out)
 }
 
-validate.prior <- function(prior) {
-  if (prior == 'RHKS') {prior <- 'BRR'}
-  validPriors <- c('BRR', 'BayesA', 'BayesB', 'BayesC', 'BL')
+validate.prior <- function(prior, Multivariate) {
+  validPriors <- c('BRR', 'BayesA', 'BayesB', 'BayesC', 'BL', 'RHKS', 'FIXED')
 
   if (prior %in% validPriors) {
+    if (Multivariate == 'SVD') {
+      return('RKHS')
+    }
     return(prior)
   }
-  stop('ERROR: The prior provided (', prior, ') is not available, check for misspelling or use a valid prior.')
+  stop('ERROR: The prior provided (', prior, ') is not available, check for misspelling or use a valid prior.', call. = FALSE)
 }
 
 validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
   if (is.null(rownames(GenomicMatrix))) {
-    stop("Row names of GenomicMatrix are not provided, use rownames() function to asign the names.")
+    stop("Row names of GenomicMatrix are not provided, use rownames() function to asign the names.", call. = FALSE)
   }
 
   GenomicDimension <- dim(GenomicMatrix)
   check1 <- GenomicDimension[1] == GenomicDimension[2]
   check2 <- GenomicDimension[1] == length(Lines)
+  # if (!check1) {
+  #   GenomicMatrix <- GenomicMatrix %*% t(GenomicMatrix)
+  #   check1 <- GenomicDimension[1] == GenomicDimension[2]
+  # }
+
   if (check1 && check2) {
     GenomicMatrix <- GenomicMatrix[Lines, ]
     return(GenomicMatrix)
   } else {
-    stop('Error with the GenomicMatrix dimensions')
+    stop('Error with the GenomicMatrix dimensions', call. = F)
   }
 
 }
@@ -192,7 +200,7 @@ validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = '
   }
 
   if (is.null(dataset$Response)) {
-    stop("No '$Response' provided in dataset")
+    stop("No '$Response' provided in dataset", call. = FALSE)
   }
 
   dataset[, datasetID] <- tryCatch({
@@ -200,16 +208,20 @@ validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = '
   }, warning = function(w) {
     warning('Warning with the dataset')
   }, error = function(e) {
-    stop("No identifier provided in dataset, use datesetID parameter to select the column of identifiers")
+    stop("No identifier provided in dataset, use datesetID parameter to select the column of identifiers", call. = FALSE)
   })
-
-  if (orderData) {
-    dataset <- dataset[order(dataset$Trait, dataset$Env),]
-  }
 
   if (Multivariate == 'SVD') {
     dataset <- tidyr::spread(dataset, 'Trait', 'Response')
   }
+
+  if (orderData) {
+    if (length(unique(dataset$Trait)) > 1) {
+      dataset <- dataset[order(dataset$Trait, dataset$Env),]
+    }
+    dataset <- dataset[order(dataset$Env),]
+  }
+
   return(dataset)
 }
 
@@ -319,11 +331,11 @@ bandsModel <- function(type, Bands, Wavelengths, basisType, nBasis, period = dif
            }
            return(data.matrix(Bands) %*% Phi)
          },
-         stop('Error: method ', type, ' no exist.')
+         stop('Error: method ', type, ' no exist.', call. = FALSE)
   )
 }
 
-ETAList <- function(variable, priorType = 'BRR', no.model = FALSE, withK = FALSE, interaction1 = NULL, interaction2 = NULL) {
+ETAList <- function(variable, priorType = 'BRR', no.model = FALSE, withK = FALSE, likeKernel = FALSE, interaction1 = NULL, interaction2 = NULL) {
   if (no.model) {
     out <- list(X = variable, model = priorType) ## Witout model.matrix function
   } else if (!is.null(interaction2)) {
@@ -335,8 +347,12 @@ ETAList <- function(variable, priorType = 'BRR', no.model = FALSE, withK = FALSE
   }
 
   if (withK) {
+    if (likeKernel) {
+      out[['X']] <- out[['X']] %*% t(out[['X']])# / ncol(out[['X']])
+    }
     names(out)[1] <- 'K' #Rename X by K to kernel use.
   }
+  return(out)
 }
 
 ZList <- function(variable, K = NULL, no.model = FALSE, interaction1 = NULL, interaction2 = NULL, withK = FALSE){
@@ -357,4 +373,5 @@ ZList <- function(variable, K = NULL, no.model = FALSE, interaction1 = NULL, int
     colnames(Z.m) <- rownames(variable)
     out <- list(Z = model.matrix(~0+variable), K = K) # Without interaction case
   }
+  return(out)
 }

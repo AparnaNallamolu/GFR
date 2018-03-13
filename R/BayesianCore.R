@@ -25,7 +25,7 @@ set.X <- function(LT){
     }
   }
   if (flag)
-    stop("Unable to build incidence matrix, wrong formula or data\n")
+    stop("Unable to build incidence matrix, wrong formula or data\n", call. = FALSE)
   return(X)
 }
 
