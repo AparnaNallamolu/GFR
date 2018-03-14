@@ -29,6 +29,7 @@ Collate:
   ETA.R
   FFR.R
   FrequentistCore.R
+  Information.R
   Maize_GFR.R
   Generic_Methods.R
   Utils.R
