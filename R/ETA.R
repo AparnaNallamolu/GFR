@@ -138,7 +138,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
 
          }, 'Frequentist-MultiBands' = {
 
-         }, stop('Error in dataset or Bands provided, a bad design detected.', call. = FALSE)
+         }, Error('Error in dataset or Bands provided, a bad design detected.')
   )
   out <- list(ETA = ETA, #Linear predictor
               dataset = dataset, #Fixed Dataset
@@ -161,12 +161,12 @@ validate.prior <- function(prior, Multivariate) {
     }
     return(prior)
   }
-  stop('ERROR: The prior provided (', prior, ') is not available, check for misspelling or use a valid prior.', call. = FALSE)
+  Error('The prior provided (', prior, ') is not available, check for misspelling or use a valid prior.')
 }
 
 validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
   if (is.null(rownames(GenomicMatrix))) {
-    stop("Row names of GenomicMatrix are not provided, use rownames() function to asign the names.", call. = FALSE)
+    Error("Row names of GenomicMatrix are not provided, use rownames() function to asign the names.")
   }
 
   GenomicDimension <- dim(GenomicMatrix)
@@ -181,7 +181,7 @@ validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
     GenomicMatrix <- GenomicMatrix[Lines, ]
     return(GenomicMatrix)
   } else {
-    stop('Error with the GenomicMatrix dimensions', call. = F)
+    Error('Error with the GenomicMatrix dimensions')
   }
 
 }
@@ -200,15 +200,15 @@ validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = '
   }
 
   if (is.null(dataset$Response)) {
-    stop("No '$Response' provided in dataset", call. = FALSE)
+    Error("No '$Response' provided in dataset")
   }
 
   dataset[, datasetID] <- tryCatch({
      as.factor(dataset[, datasetID])
   }, warning = function(w) {
-    warning('Warning with the dataset')
+    Warning('Warning with the dataset')
   }, error = function(e) {
-    stop("No identifier provided in dataset, use datesetID parameter to select the column of identifiers", call. = FALSE)
+    Error("No identifier provided in dataset, use datesetID parameter to select the column of identifiers")
   })
 
   if (Multivariate == 'SVD') {
@@ -228,7 +228,7 @@ validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = '
 validateParadigm <- function(REML) {
   changeInterpretation <- !is.null(REML)
   if (changeInterpretation) {
-    message("The statistical paradigm was changed from Bayes to Frequentist, so priorType parameter is ommited.")
+    Message("The statistical paradigm was changed from Bayes to Frequentist, so priorType parameter is ommited.")
   }
   return(REML)
 }
@@ -331,7 +331,7 @@ bandsModel <- function(type, Bands, Wavelengths, basisType, nBasis, period = dif
            }
            return(data.matrix(Bands) %*% Phi)
          },
-         stop('Error: method ', type, ' no exist.', call. = FALSE)
+         Error('Error: method ', type, ' no exist.')
   )
 }
 

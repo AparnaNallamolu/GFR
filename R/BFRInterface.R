@@ -8,7 +8,7 @@
 runInterface <- function() {
   appDir <- system.file("shiny-examples", "BFRInterface", package = "BFR")
   if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `BFR`.", call. = FALSE)
+    Error("Could not find the app directory. Try re-installing `BFR`.")
   }
 
   shiny::runApp(appDir, display.mode = "normal")

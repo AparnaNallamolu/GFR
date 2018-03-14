@@ -5,13 +5,13 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
                  REML = TRUE, init.equal = TRUE){
 
   if (!is.list(Z) || !is.list(Z[[1]])) {
-    stop( "Please provide the Z parameter as a 2 level list structure.", call. = FALSE)
+    Error( "Please provide the Z parameter as a 2 level list structure.")
   }
   ## control for Z-K names
   zzzkkk <- unlist(lapply(Z,function(x){length(names(x))}))
   badRE <- which(zzzkkk == 0) # BAD RE WITH NO NAMES
   if (length(badRE) > 0) {
-    stop("Please when specifying a random effect use the names.", call. = FALSE)
+    Error("Please when specifying a random effect use the names.")
   }
   #########*****************************
   ## make sure user don't provide the same names for random effects
@@ -34,9 +34,9 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
   dall <- unlist(c(dZ,dim(as.matrix(Y))[1]))
   if (length(which(!duplicated(dall))) > 1) {
     if (is.null(X)) {
-      stop("Matrices Y and Z's should have the same number of individuals. \nPlease check the dimensions of your matrices.", call. = FALSE)
+      Error("Matrices Y and Z's should have the same number of individuals. \nPlease check the dimensions of your matrices.")
     }else{
-      stop("Matrices Y, X and Z's should have the same number of individuals. \nPlease check the dimensions of your matrices.", call. = FALSE)
+      Error("Matrices Y, X and Z's should have the same number of individuals. \nPlease check the dimensions of your matrices.")
     }
   }
 
@@ -50,7 +50,7 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
 
   if (!is.null(X)) {
     if (is.list(X)) {
-      stop("Multivariate models only accept one incidence matrix for fixed effects (X). Please modifiy your X argument.", call. = FALSE)
+      Error("Multivariate models only accept one incidence matrix for fixed effects (X). Please modifiy your X argument.")
     }
   }
 
@@ -68,13 +68,13 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
                    kk <- diag(dim(Z[[s]][[1]])[2])
                    attributes(kk)$diagon <- TRUE
                    Z[[s]] <- list(Z = Z[[s]][[1]],K = kk)
-                 }, stop('Bad name in Z list.'))
+                 }, Error('Bad name in Z list.'))
         }else{#----the 's' random effect has two matrices----
           dido <- lapply(Z[[s]], dim) # dimensions of Z and K
           if (dido$Z[2] == dido$K[1] && dido$Z[2] == dido$K[2]) {
             Z = list(Z = Z)
           } else {
-            stop(paste("In the", s ,"th random effect that you have provided."), call. = FALSE)
+            Error(paste("In the", s ,"th random effect that you have provided."))
           }
         }#---------------------------------------------------------------------------
       } #for each random effect end =================================================
@@ -89,14 +89,14 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
                  kk <- diag(dim(Z[[s]][[1]])[2])
                  attributes(kk)$diagon <- TRUE
                  Z[[s]] <- list(Z = Z[[s]][[1]],K = kk)
-               }, stop('Bad name in Z list.'))
+               }, Error('Bad name in Z list.'))
       } else {# there's 2 matrices in Z
         dido <- lapply(Z, dim) # dimensions of Z and K
         # condition, column size on Z matches with a square matrix K
         if (dido$Z[2] == dido$K[1] && dido$Z[2] == dido$K[2]) {
           Z = list(Z = Z)
         } else {
-          stop(paste("In the random effect that you have provided."), call. = FALSE)
+          Error(paste("In the random effect that you have provided."))
         }
       }
     }
@@ -110,9 +110,9 @@ mmer <- function(Y, X = NULL, Z = NULL, R = NULL, method = "NR", init = NULL, it
                       EIGEND = EIGEND, forced = forced, IMP = IMP, restrained = restrained, REML = REML,
                       init.equal = init.equal)
          }, EMMA = {
-           if (length(Z) > 1) { stop("EMMA method only works for one random effect other than error.\n Please select NR or AI methods.", call. = FALSE)}
+           if (length(Z) > 1) { Error("EMMA method only works for one random effect other than error.\n Please select NR or AI methods.")}
            RES <- MEMMA(Y = Y, X = X, ZETA = Z, tolpar = tolpar, tolparinv = tolparinv, check.model = check.model, verbose = verbose)
-         }, stop("Method not available", call. = FALSE))
+         }, Error("Method not available"))
 
   class(RES) <- c("FFR")
   return(RES)
@@ -155,7 +155,7 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
         ZETA <- list(ZETA)
       }
     } else {
-      stop(cat("\nThe random effects need to be provided in a list format, please see examples"), call. = FALSE)
+      Error(cat("\nThe random effects need to be provided in a list format, please see examples"))
     }
     ZETA <- lapply(ZETA, function(x){
       if (length(x) == 1) {
@@ -165,8 +165,7 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
         }else if (provided == "K") {
           y <- list(Z = diag(length(y)), K = x[[1]])
         }else{
-          cat("Names of matrices provided can only be 'Z' or 'K', the names you provided don't match the arguments required")
-          stop(call. = FALSE)
+          Error("Names of matrices provided can only be 'Z' or 'K', the names you provided don't match the arguments required")
         }
       }else{
         y <- x
@@ -177,7 +176,7 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
   ###########################
   if (EIGEND) {
     IMP <- TRUE
-    cat("EIGEND feature activated. Eigen decomposition of K will be performed\n")
+    Message("EIGEND feature activated. Eigen decomposition of K will be performed\n")
     Vmat.type <- "sparseMatrix" # if K will be sparse then V will be sparse
   } else {
     Vmat.type <- "dgeMatrix"
@@ -237,13 +236,13 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
     tUsi <- solve(tUs) # inverse
     # controls
     if(length(which(!dias)) > 1){
-      stop("Eigen decomposition only works for one dense relationship matrix.", call. = FALSE)
+      Error("Eigen decomposition only works for one dense relationship matrix.")
     }
     if(which(dias != TRUE) != 1){ # FALSE should be the 1st position
-      stop("The random effect corresponding to the relationship matrix needs to be in the first position.", call. = FALSE)
+      Error("The random effect corresponding to the relationship matrix needs to be in the first position.")
     }
     if(dim(X)[1]!=dim(Us)[1]){
-      stop("Eigen decomposition only works for square models (non-replicated experiments).", call. = FALSE)
+      Error("Eigen decomposition only works for square models (non-replicated experiments).")
     }
     # transformX
     X <- tUs %*% X
@@ -730,7 +729,7 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
   take <- qr$pivot[1:qr$rank]
   rankdeficient <- ncol(X.or) - length(take)
   if(rankdeficient > 0){
-    warning(paste("fixed-effect model matrix is rank deficient so dropping", rankdeficient*ts, "columns / coefficients"), call. = FALSE)
+    warning(paste("fixed-effect model matrix is rank deficient so dropping", rankdeficient*ts, "columns / coefficients"))
     if(ncol(X.or)>1){ # if other than intercept
       X.or <- as.matrix(X.or[,take]) # added to make sure is finished when no full rank
     }
@@ -804,7 +803,7 @@ MEMMA <- function (Y, X=NULL, ZETA=NULL, tolpar = 1e-06, tolparinv = 1e-06, chec
         }else if(provided == "K"){
           y <- list(Z=diag(length(y)), K = x[[1]])
         }else{
-          stop("Names of matrices provided can only be 'Z' or 'K', the names you provided don't match the arguments required", call. = FALSE)
+          Error("Names of matrices provided can only be 'Z' or 'K', the names you provided don't match the arguments required")
         }
       } else {
         y <- x
@@ -815,7 +814,7 @@ MEMMA <- function (Y, X=NULL, ZETA=NULL, tolpar = 1e-06, tolparinv = 1e-06, chec
 
   havetobe <- apply(Y,2,is.numeric)
   if(length(which(havetobe)) != dim(Y)[2]){
-    stop("The response variables need to be numeric\n", call.=FALSE)
+    Error("The response variables need to be numeric\n", call.=FALSE)
   }
   Y <- apply(Y,2, function(x){vv<-which(is.na(x)); if(length(vv)>0){x[vv]<-mean(x,na.rm=TRUE)};return(x)})
 
@@ -963,7 +962,7 @@ imputev <- function(x, method="median"){
     }
   }else{
     if(method=="mean"){
-      stop("Method 'mean' is not available for non-numeric vectors.",call. = FALSE)
+      Error("Method 'mean' is not available for non-numeric vectors.")
     }else if(method=="median"){
       tt <- table(x)
       x[which(is.na(x))] <-  names(tt)[which(tt==max(tt))]

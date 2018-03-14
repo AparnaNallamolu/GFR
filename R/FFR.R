@@ -33,11 +33,11 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
              PT <- CV.RandomPart(data, NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
              nCV <- CrossValidation$NPartitions
            },
-           stop(paste0('ERROR: The Cross Validation  ', CrossValidation$Type, " is't implemented"))
+           Error(paste0('ERROR: The Cross Validation  ', CrossValidation$Type, " is't implemented"))
     )
 
     if (verbose) {
-      cat("This might be time demanding...\n")
+      Message("This might be time demanding...")
 
       pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
     }
@@ -76,7 +76,7 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
                                  y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
                Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, Time = proc.time()[3] - time.init))
              },
-             stop(paste0('The response_type: ', response_type, " is't implemented"))
+             Error(paste0('The response_type: ', response_type, " is't implemented"))
       )
     }
 

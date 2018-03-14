@@ -18,7 +18,7 @@ cleanDat <- function(forceClean = F){
       names(Status) <- files
       return(Status)
     }
-    message("Are you sure that you want to delete this files?: y/n ")
+    Message("Are you sure that you want to delete this files?: y/n ")
     cat(files, sep = '\t')
     response <- scan(what = character(length = 1),n = 1,quiet = TRUE)
     if(response == 'y'){
@@ -26,10 +26,10 @@ cleanDat <- function(forceClean = F){
       names(Status) <- files
       return(Status)
     } else {
-      message("The deletion was cancelled by the user.")
+      Message("The deletion was cancelled by the user.")
     }
   } else{
-    message("No .dat files found in this directory")
+    Message("No .dat files found in this directory")
   }
 }
 
