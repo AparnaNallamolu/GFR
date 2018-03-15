@@ -69,7 +69,7 @@ Cor_Env_Ordinal <- function(Tab, Time){
     prop.tabl <- prop.table(tabl)
     Cor <- sum(diag(prop.tabl))
     Res$Pearson[i] <- Cor
-    Res$MSEP[i] <- 0
+    Res$MSEP[i] <- NA
     Res$Fold[i] <- Tab$Fold[i]
   }
   return(Res)
