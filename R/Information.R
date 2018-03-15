@@ -3,9 +3,9 @@ Error <- function(message, ...) {
 }
 
 Message <- function(message, ...) {
-  message('[i] ', message, ..., '\n', call. = FALSE)
+  message('[i] ', message, ..., '\n')
 }
 
 Warning <- function(message, ...) {
-  warning('[!] ',message, ..., '\n', call. = FALSE)
+  warning('[!] ',message, ..., '\n')
 }
