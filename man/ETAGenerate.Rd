@@ -4,14 +4,17 @@
 \alias{ETAGenerate}
 \title{ETAGenerate}
 \usage{
-ETAGenerate(dataset, datasetID = "Line", GenomicMatrix = NULL,
-  REML = NULL, priorType = "FIXED", Bands = NULL, Wavelengths = NULL,
-  method = "Simple", basisType = "Fourier.Basis", nBasis = 1, ...)
+ETAGenerate(dataset, datasetID = "Line", Multivariate = "Traditional",
+  GenomicMatrix = NULL, REML = NULL, priorType = "BRR", Bands = NULL,
+  Wavelengths = NULL, method = "Simple", basisType = "Fourier.Basis",
+  nBasis = 1, ...)
 }
 \arguments{
 \item{dataset}{TidyFormat}
 
 \item{datasetID}{column with the identifiers.}
+
+\item{Multivariate}{By default, when de dataset includes more than one Environment and more than one Trait (MTME) the solution is adjusted by the method traditional, also is possible adjust the MTME by "SVD" <doi: >}
 
 \item{GenomicMatrix}{lalalalal}
 

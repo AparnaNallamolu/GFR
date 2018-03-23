@@ -4,16 +4,19 @@
 \alias{BFR}
 \title{BFR}
 \usage{
-BFR(data = NULL, datasetID = "Line", response_type = "gaussian",
-  a = NULL, b = NULL, ETA = NULL, nIter = 1500, burnIn = 500,
-  thin = 5, saveAt = "", S0 = NULL, df0 = 5, R2 = 0.5,
-  weights = NULL, verbose = TRUE, rmExistingFiles = TRUE, groups = NULL,
-  CrossValidation = NULL, set_seed = NULL, dec = 4)
+BFR(data = NULL, datasetID = "Line", Multivariate = "Traditional",
+  response_type = "gaussian", a = NULL, b = NULL, ETA = NULL,
+  nIter = 1500, burnIn = 500, thin = 5, saveAt = "", S0 = NULL,
+  df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE,
+  rmExistingFiles = TRUE, groups = NULL, CrossValidation = NULL,
+  set_seed = NULL, dec = 4)
 }
 \arguments{
 \item{data}{(\code{data.frame}) the data with the $n$ $Response, also needs $Line and $Env for Cross Validation defined on it (NAs allowed).}
 
 \item{datasetID}{(\code{string}) The name of the column with the identifiers of each line.}
+
+\item{Multivariate}{By default, when de dataset includes more than one Environment and more than one Trait (MTME) the solution is adjusted by the method traditional, also is possible adjust the MTME by "SVD" <doi: >}
 
 \item{response_type}{(\code{character}) It can be 'gaussian' or 'ordinal'.}
 
