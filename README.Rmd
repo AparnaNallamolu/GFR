@@ -6,7 +6,7 @@ output: github_document
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h3 align="center">
-    Genomic Functional Regression analysis in R | Development version 0.9 - rev 7 
+    Genomic Functional Regression analysis in R | Development version 0.9 - rev 10
   </h4>
   
   <p align="center">
@@ -33,7 +33,7 @@ output: github_document
 
 # Table of contents
   - [NEWS](#news)
-  - [instructions](#instructions)
+  - [Instructions](#instructions)
     - [Installation](#install)
     - [Demostration examples](#demo)
       - [Web version](#shinyapp)
@@ -51,9 +51,14 @@ output: github_document
   News of this version (0.9)
 </h2>
 
-     * The package now inclues a shiny app.
-     * Rename from BGFRA -> BFR -> GFR
-     * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
+Revision 10
+
+ - The package now inclues a shiny app.
+
+Past revisions
+
+ - Rename from BGFRA -> BFR -> GFR
+ - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 <h2 id="instructions">
   Instructions for proper implementation
@@ -115,6 +120,7 @@ paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maiz
   Fitting a model
 </h4>
 
+To more simple way to fit a model is with one environment and one trait data,
 
 ```{r fit_model}
 data("Wheat_GFR")
@@ -128,6 +134,8 @@ plot(fm)
 <h4 id="predictive-model">
   Predictive model with a K-Folds Cross-validation
 </h4>
+
+To do a predictive model with a cross-validation, only we need to provide a list object with the type and the number of crossvalidation to do, in the package is available two cross-validatin types, in the following code, we see the CV K-Folds,
 
 ```{r predictive_model}
 data("Wheat_GFR")
@@ -144,6 +152,7 @@ boxplot(pm)
   Generate automatically a linear predictor (Only Multi-Environment example)
 </h4>
 
+For more advanced predictions, we also provide a eta generator, for the estimations, this function automatically prepare the data and do a lot of validations, this is the recomended way to do a proper analysis,
 
 ```{r auto_ETA}
 library(GFR)
@@ -163,6 +172,8 @@ plot(pm2)
   Generate automatically a linear predictor (Multi-Trait & Multi-Environment example)
 </h4>
 
+Also, you can add some special terms, but be carefull,
+
 ```{r auto_ETA2}
 data("Maize_GFR")
 CrossV <- list(Type = 'RandomPartition', NPartitions = 3, PTesting = .25)
@@ -180,6 +191,8 @@ summary(pm3)
   Handmade linear predictor
 </h4>
 
+If you are a expert and know what are you doing, you can generate the ETA manually,
+
 ```{r HM_ETA}
 CrossV <- list(Type = 'KFold', nFolds = 3)
 ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
@@ -192,11 +205,15 @@ plot(pm4, select = 'MSEP')
 boxplot(pm4, select = 'MSEP')
 ```
 
-```{r cleaner, echo=F, results='hide'}
-path <- dir()
-files <- path[which(grepl('.dat', path) == TRUE)]
-file.remove(files)
+<h4 id="autoclean">
+  Clean the working directory
+</h4>
+
+If you don't need anymore the files that the `BFR()` function creates, you can clean the directory with the following function provided in the package, 
+```{r cleaner}
+cleanDat(forceClean = TRUE)
 ```
+
 
 <h2 id="cite">
   How to cite this package
@@ -224,8 +241,8 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
 </h2>
 
   
-    * Francisco Javier Luna-Vázquez (Author, Maintainer)
-    * Osval Antonio Montesinos-López (Author)
-    * Abelardo Montesinos-López (Author)
-    * José Crossa (Author)
-    * Gustavo de los campos (Author)
+  - Francisco Javier Luna-Vázquez (Author, Maintainer)
+  - Osval Antonio Montesinos-López (Author)
+  - Abelardo Montesinos-López (Author)
+  - José Crossa (Author)
+  - Gustavo de los campos (Author)

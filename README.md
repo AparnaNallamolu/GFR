@@ -2,7 +2,7 @@
 <p align="center">
 <a href="https://github.com/frahik/GFR"> <img src="Logo.png" alt="Genomic Functional Regression Logo"/> </a>
 <h3 align="center">
-    Genomic Functional Regression analysis in R | Development version 0.9 - rev 7 
+    Genomic Functional Regression analysis in R | Development version 0.9 - rev 10
 
 </h4>
 <p align="center">
@@ -20,7 +20,7 @@ Table of contents
 =================
 
 -   [NEWS](#news)
--   [instructions](#instructions)
+-   [Instructions](#instructions)
     -   [Installation](#install)
     -   [Demostration examples](#demo)
     -   [Web version](#shinyapp)
@@ -37,9 +37,14 @@ Table of contents
 <h2 id="news">
 News of this version (0.9)
 </h2>
-     * The package now inclues a shiny app.
-     * Rename from BGFRA -> BFR -> GFR
-     * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
+Revision 10
+
+-   The package now inclues a shiny app.
+
+Past revisions
+
+-   Rename from BGFRA -&gt; BFR -&gt; GFR
+-   Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 <h2 id="instructions">
 Instructions for proper implementation
@@ -155,6 +160,8 @@ paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maiz
 <h4 id="fit-model">
 Fitting a model
 </h4>
+To more simple way to fit a model is with one environment and one trait data,
+
 ``` r
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
@@ -169,6 +176,8 @@ plot(fm)
 <h4 id="predictive-model">
 Predictive model with a K-Folds Cross-validation
 </h4>
+To do a predictive model with a cross-validation, only we need to provide a list object with the type and the number of crossvalidation to do, in the package is available two cross-validatin types, in the following code, we see the CV K-Folds,
+
 ``` r
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
@@ -185,10 +194,10 @@ summary(pm)
 ```
 
     ##          Fold     Env Trait Pearson SE_Pearson   MSEP SE_MSEP   Time
-    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.1860
-    ## 2           2 Drought            NA         NA 0.6432      NA 0.0720
-    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.0630
-    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.4403
+    ## 1           1 Drought        0.1775         NA 0.2653      NA 1.3880
+    ## 2           2 Drought            NA         NA 0.6432      NA 0.1060
+    ## 3           3 Drought       -0.0001         NA 0.4550      NA 0.0650
+    ## 4 Average_all Drought        0.0887     0.0725 0.4545  0.1091 0.5197
 
 ``` r
 boxplot(pm)
@@ -199,6 +208,8 @@ boxplot(pm)
 <h4 id="auto-ETA">
 Generate automatically a linear predictor (Only Multi-Environment example)
 </h4>
+For more advanced predictions, we also provide a eta generator, for the estimations, this function automatically prepare the data and do a lot of validations, this is the recomended way to do a proper analysis,
+
 ``` r
 library(GFR)
 data("Wheat_GFR")
@@ -225,16 +236,16 @@ summary(pm2)
     ## 11 Average_all          Drought        0.5505     0.0945 0.3185  0.0512
     ## 12 Average_all ReducedIrrigated        0.1890     0.0772 0.1529  0.0170
     ##      Time
-    ## 1  0.8960
+    ## 1  1.2160
     ## 2      NA
     ## 3      NA
-    ## 4  0.9730
+    ## 4  1.1540
     ## 5      NA
     ## 6      NA
-    ## 7  0.8650
+    ## 7  1.0790
     ## 8      NA
     ## 9      NA
-    ## 10 0.9113
+    ## 10 1.1497
     ## 11     NA
     ## 12     NA
 
@@ -247,9 +258,11 @@ plot(pm2)
 <h4 id="auto-ETA2">
 Generate automatically a linear predictor (Multi-Trait & Multi-Environment example)
 </h4>
+Also, you can add some special terms, but be carefull,
+
 ``` r
 data("Maize_GFR")
-CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
+CrossV <- list(Type = 'RandomPartition', NPartitions = 3, PTesting = .25)
 ETA3 <- ETAGenerate(Maize_GFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
 ETA3$Design
 ```
@@ -279,67 +292,51 @@ pm3 <- BFR(ETA = ETA3, data, nIter = 1000, burnIn = 300, set_seed = 10, CrossVal
 summary(pm3)
 ```
 
-    ##           Fold Env Trait Pearson SE_Pearson     MSEP SE_MSEP    Time
-    ## 1            1 EBU   ASI  0.0818         NA   5.5920      NA 33.6520
-    ## 2            1 KAK   ASI  0.0897         NA   5.4972      NA      NA
-    ## 3            1 KTI   ASI  0.1983         NA   5.9503      NA      NA
-    ## 4            1 EBU    PH -0.0014         NA 123.3057      NA      NA
-    ## 5            1 KAK    PH  0.4269         NA 166.8797      NA      NA
-    ## 6            1 KTI    PH  0.0419         NA 326.3063      NA      NA
-    ## 7            1 EBU Yield -0.0793         NA   6.8618      NA      NA
-    ## 8            1 KAK Yield -0.0218         NA   5.6789      NA      NA
-    ## 9            1 KTI Yield -0.0608         NA   7.5300      NA      NA
-    ## 10           2 EBU   ASI  0.0245         NA   4.6165      NA 32.3570
-    ## 11           2 KAK   ASI -0.0066         NA   6.1229      NA      NA
-    ## 12           2 KTI   ASI -0.0722         NA   4.5063      NA      NA
-    ## 13           2 EBU    PH  0.0469         NA 102.8028      NA      NA
-    ## 14           2 KAK    PH  0.4357         NA 114.6915      NA      NA
-    ## 15           2 KTI    PH  0.4313         NA 221.3545      NA      NA
-    ## 16           2 EBU Yield  0.1116         NA   4.3112      NA      NA
-    ## 17           2 KAK Yield  0.3214         NA   4.8599      NA      NA
-    ## 18           2 KTI Yield  0.1596         NA   4.3757      NA      NA
-    ## 19           3 EBU   ASI -0.1242         NA   5.0020      NA 32.6330
-    ## 20           3 KAK   ASI  0.0759         NA   5.5440      NA      NA
-    ## 21           3 KTI   ASI  0.1949         NA   4.8371      NA      NA
-    ## 22           3 EBU    PH  0.0229         NA 458.4495      NA      NA
-    ## 23           3 KAK    PH  0.3700         NA 118.9567      NA      NA
-    ## 24           3 KTI    PH  0.1867         NA 308.4166      NA      NA
-    ## 25           3 EBU Yield -0.0659         NA   6.0567      NA      NA
-    ## 26           3 KAK Yield -0.0231         NA   5.1622      NA      NA
-    ## 27           3 KTI Yield  0.0842         NA   5.5449      NA      NA
-    ## 28           4 EBU   ASI -0.0486         NA   6.8234      NA 33.1740
-    ## 29           4 KAK   ASI  0.0863         NA   6.7819      NA      NA
-    ## 30           4 KTI   ASI  0.1523         NA   4.3941      NA      NA
-    ## 31           4 EBU    PH  0.1030         NA 103.2326      NA      NA
-    ## 32           4 KAK    PH  0.3981         NA 135.7808      NA      NA
-    ## 33           4 KTI    PH  0.5067         NA 159.8392      NA      NA
-    ## 34           4 EBU Yield  0.0057         NA   6.6224      NA      NA
-    ## 35           4 KAK Yield  0.0940         NA   6.6943      NA      NA
-    ## 36           4 KTI Yield  0.1374         NA   5.0233      NA      NA
-    ## 37           5 EBU   ASI  0.2135         NA   5.0522      NA 33.9270
-    ## 38           5 KAK   ASI -0.0246         NA   7.6460      NA      NA
-    ## 39           5 KTI   ASI -0.1267         NA   5.3158      NA      NA
-    ## 40           5 EBU    PH  0.0844         NA 431.1487      NA      NA
-    ## 41           5 KAK    PH  0.2942         NA 114.0388      NA      NA
-    ## 42           5 KTI    PH  0.0787         NA 276.4580      NA      NA
-    ## 43           5 EBU Yield  0.2978         NA   4.6376      NA      NA
-    ## 44           5 KAK Yield  0.0654         NA   7.0154      NA      NA
-    ## 45           5 KTI Yield -0.0740         NA   5.5507      NA      NA
-    ## 46 Average_all EBU   ASI  0.0294     0.0576   5.4172  0.3844 33.1486
-    ## 47 Average_all KAK   ASI  0.0441     0.0247   6.3184  0.4056      NA
-    ## 48 Average_all KTI   ASI  0.0693     0.0699   5.0007  0.2864      NA
-    ## 49 Average_all EBU    PH  0.0512     0.0192 243.7879 82.2594      NA
-    ## 50 Average_all KAK    PH  0.3850     0.0255 130.0695 10.0114      NA
-    ## 51 Average_all KTI    PH  0.2491     0.0937 258.4749 30.4348      NA
-    ## 52 Average_all EBU Yield  0.0540     0.0697   5.6979  0.5189      NA
-    ## 53 Average_all KAK Yield  0.0872     0.0630   5.8821  0.4212      NA
-    ## 54 Average_all KTI Yield  0.0493     0.0492   5.6049  0.5273      NA
+    ##           Fold Env Trait Pearson SE_Pearson     MSEP  SE_MSEP   Time
+    ## 1            1 EBU   ASI  0.1668         NA   4.2592       NA 34.388
+    ## 2            1 KAK   ASI -0.1026         NA   5.7702       NA     NA
+    ## 3            1 KTI   ASI  0.0722         NA   5.1299       NA     NA
+    ## 4            1 EBU    PH  0.0043         NA 120.0482       NA     NA
+    ## 5            1 KAK    PH  0.4246         NA 167.1178       NA     NA
+    ## 6            1 KTI    PH -0.0221         NA 336.7745       NA     NA
+    ## 7            1 EBU Yield  0.1243         NA   4.3735       NA     NA
+    ## 8            1 KAK Yield  0.0511         NA   5.7813       NA     NA
+    ## 9            1 KTI Yield -0.1640         NA   6.7589       NA     NA
+    ## 10           2 EBU   ASI  0.2678         NA   3.5201       NA 35.222
+    ## 11           2 KAK   ASI  0.2889         NA   3.4843       NA     NA
+    ## 12           2 KTI   ASI -0.0751         NA   5.1514       NA     NA
+    ## 13           2 EBU    PH -0.0604         NA 112.8466       NA     NA
+    ## 14           2 KAK    PH  0.3229         NA 127.8429       NA     NA
+    ## 15           2 KTI    PH  0.5081         NA 209.1478       NA     NA
+    ## 16           2 EBU Yield  0.1364         NA   3.5517       NA     NA
+    ## 17           2 KAK Yield  0.1087         NA   3.6162       NA     NA
+    ## 18           2 KTI Yield  0.1264         NA   5.3792       NA     NA
+    ## 19           3 EBU   ASI  0.0354         NA   4.4649       NA 35.315
+    ## 20           3 KAK   ASI -0.0533         NA   6.7697       NA     NA
+    ## 21           3 KTI   ASI  0.0124         NA   4.1109       NA     NA
+    ## 22           3 EBU    PH  0.0076         NA 462.8990       NA     NA
+    ## 23           3 KAK    PH  0.4136         NA 113.8976       NA     NA
+    ## 24           3 KTI    PH  0.2040         NA 307.4324       NA     NA
+    ## 25           3 EBU Yield -0.0118         NA   5.4778       NA     NA
+    ## 26           3 KAK Yield  0.0097         NA   5.4797       NA     NA
+    ## 27           3 KTI Yield  0.1427         NA   4.3796       NA     NA
+    ## 28 Average_all EBU   ASI  0.1567     0.0673   4.0814   0.2869 34.975
+    ## 29 Average_all KAK   ASI  0.0443     0.1231   5.3414   0.9723     NA
+    ## 30 Average_all KTI   ASI  0.0032     0.0428   4.7974   0.3433     NA
+    ## 31 Average_all EBU    PH -0.0162     0.0221 231.9313 115.5026     NA
+    ## 32 Average_all KAK    PH  0.3871     0.0322 136.2861  15.9328     NA
+    ## 33 Average_all KTI    PH  0.2300     0.1536 284.4516  38.5929     NA
+    ## 34 Average_all EBU Yield  0.0830     0.0475   4.4677   0.5580     NA
+    ## 35 Average_all KAK Yield  0.0565     0.0287   4.9590   0.6771     NA
+    ## 36 Average_all KTI Yield  0.0350     0.0996   5.5059   0.6898     NA
 
 <h4 id="HM-ETA">
 Handmade linear predictor
 </h4>
+If you are a expert and know what are you doing, you can generate the ETA manually,
+
 ``` r
-CrossV <- list(Type = 'KFold', nFolds = 5)
+CrossV <- list(Type = 'KFold', nFolds = 3)
 ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
              Line = list(X = model.matrix(~0+as.factor(Wheat_GFR$Line)), model = 'BRR'),
              Bands = list(X = Bspline.Basis(Wheat_Bands, Wheat_Wavelengths, nBasis = 23), model = 'BayesA'))
@@ -348,43 +345,31 @@ summary(pm4)
 ```
 
     ##           Fold              Env Trait Pearson SE_Pearson   MSEP SE_MSEP
-    ## 1            1        Irrigated        0.3035         NA 0.1476      NA
-    ## 2            1          Drought        0.2644         NA 0.4583      NA
-    ## 3            1 ReducedIrrigated        0.5706         NA 0.0730      NA
-    ## 4            2 ReducedIrrigated        0.4185         NA 0.1796      NA
-    ## 5            2          Drought        0.6301         NA 0.1445      NA
-    ## 6            2        Irrigated        0.1378         NA 0.4288      NA
-    ## 7            3 ReducedIrrigated        0.1951         NA 0.2130      NA
-    ## 8            3          Drought        0.6930         NA 0.3071      NA
-    ## 9            3        Irrigated        0.4047         NA 0.2105      NA
-    ## 10           4 ReducedIrrigated        0.6902         NA 0.0841      NA
-    ## 11           4        Irrigated       -0.3249         NA 0.4834      NA
-    ## 12           4          Drought        0.8480         NA 0.1537      NA
-    ## 13           5        Irrigated       -0.2126         NA 0.5707      NA
-    ## 14           5 ReducedIrrigated        0.3979         NA 0.1157      NA
-    ## 15           5          Drought        0.7617         NA 0.2453      NA
-    ## 16 Average_all        Irrigated        0.0617     0.1426 0.3682  0.0811
-    ## 17 Average_all          Drought        0.6394     0.1005 0.2618  0.0576
-    ## 18 Average_all ReducedIrrigated        0.4545     0.0839 0.1331  0.0273
+    ## 1            1        Irrigated        0.0829         NA 0.1649      NA
+    ## 2            1          Drought        0.2781         NA 0.3881      NA
+    ## 3            1 ReducedIrrigated        0.5140         NA 0.0760      NA
+    ## 4            2 ReducedIrrigated        0.3857         NA 0.1803      NA
+    ## 5            2          Drought        0.7182         NA 0.2142      NA
+    ## 6            2        Irrigated        0.1544         NA 0.3431      NA
+    ## 7            3          Drought        0.5427         NA 0.3707      NA
+    ## 8            3 ReducedIrrigated        0.2257         NA 0.1787      NA
+    ## 9            3        Irrigated       -0.4164         NA 0.7249      NA
+    ## 10 Average_all        Irrigated       -0.0597     0.1795 0.4110  0.1652
+    ## 11 Average_all          Drought        0.5130     0.1279 0.3243  0.0553
+    ## 12 Average_all ReducedIrrigated        0.3751     0.0834 0.1450  0.0345
     ##      Time
-    ## 1  0.3070
+    ## 1  2.1230
     ## 2      NA
     ## 3      NA
-    ## 4  0.4590
+    ## 4  0.7560
     ## 5      NA
     ## 6      NA
-    ## 7  0.3530
+    ## 7  0.5780
     ## 8      NA
     ## 9      NA
-    ## 10 0.3660
+    ## 10 1.1523
     ## 11     NA
     ## 12     NA
-    ## 13 0.3760
-    ## 14     NA
-    ## 15     NA
-    ## 16 0.3722
-    ## 17     NA
-    ## 18     NA
 
 ``` r
 plot(pm4, select = 'MSEP')
@@ -397,6 +382,30 @@ boxplot(pm4, select = 'MSEP')
 ```
 
 ![](README_files/figure-markdown_github/HM_ETA-2.png)
+
+<h4 id="autoclean">
+Clean the working directory
+</h4>
+If you don't need anymore the files that the `BFR()` function creates, you can clean the directory with the following function provided in the package,
+
+``` r
+cleanDat(forceClean = TRUE)
+```
+
+    ##     ETA_Bands_parBayesB.dat   ETA_Bands_ScaleBayesA.dat 
+    ##                        TRUE                        TRUE 
+    ##          ETA_Bands_varB.dat               ETA_Env_b.dat 
+    ##                        TRUE                        TRUE 
+    ##      ETA_EnvxTrait_varB.dat ETA_EnvxTraitxLine_varB.dat 
+    ##                        TRUE                        TRUE 
+    ##      ETA_Line_parBayesB.dat           ETA_Line_varB.dat 
+    ##                        TRUE                        TRUE 
+    ##  ETA_LinexEnv_parBayesB.dat       ETA_LinexEnv_varB.dat 
+    ##                        TRUE                        TRUE 
+    ##     ETA_LinexTrait_varB.dat             ETA_Trait_b.dat 
+    ##                        TRUE                        TRUE 
+    ##                      mu.dat                    varE.dat 
+    ##                        TRUE                        TRUE
 
 <h2 id="cite">
 How to cite this package
@@ -417,8 +426,8 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
 <h2 id="authors">
 Authors
 </h2>
-    * Francisco Javier Luna-Vázquez (Author, Maintainer)
-    * Osval Antonio Montesinos-López (Author)
-    * Abelardo Montesinos-López (Author)
-    * José Crossa (Author)
-    * Gustavo de los campos (Author)
+-   Francisco Javier Luna-Vázquez (Author, Maintainer)
+-   Osval Antonio Montesinos-López (Author)
+-   Abelardo Montesinos-López (Author)
+-   José Crossa (Author)
+-   Gustavo de los campos (Author)
