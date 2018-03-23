@@ -55,7 +55,7 @@ Cor_Env <- function(Tab, Time){
   return(Res)
 }
 
-Cor_Env_Ordinal <- function(Tab, Time){
+Cor_Env_Ordinal <- function(Tab, Time, nFolds){
   Envs <- unique(Tab$Env)
   Traits <- unique(Tab$Trait)
   com <- expand.grid(Envs, Traits)
@@ -69,7 +69,7 @@ Cor_Env_Ordinal <- function(Tab, Time){
     prop.tabl <- prop.table(tabl)
     Cor <- sum(diag(prop.tabl))
     Res$Pearson[i] <- Cor
-    Res$MSEP[i] <- NA
+    Res$MSEP[i] <- sqrt(Cor * (1 - Cor) / nFolds)
     Res$Fold[i] <- Tab$Fold[i]
   }
   return(Res)

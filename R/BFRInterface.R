@@ -6,9 +6,9 @@
 #'
 #' @export
 runInterface <- function() {
-  appDir <- system.file("shiny-examples", "BFRInterface", package = "BFR")
+  appDir <- system.file("shiny", "GFRInterface", package = "GFR")
   if (appDir == "") {
-    Error("Could not find the app directory. Try re-installing `BFR`.")
+    Error("Could not find the app directory. Try re-installing `GFR`.")
   }
 
   shiny::runApp(appDir, display.mode = "normal")
