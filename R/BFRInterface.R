@@ -8,7 +8,7 @@
 runInterface <- function() {
   appDir <- system.file("shiny", "GFRInterface", package = "GFR")
   if (appDir == "") {
-    Error("Could not find the app directory. Try re-installing `GFR`.")
+    stop("Could not find the app directory. Try re-installing `GFR` package.", call. = FALSE)
   }
 
   shiny::runApp(appDir, display.mode = "normal")
