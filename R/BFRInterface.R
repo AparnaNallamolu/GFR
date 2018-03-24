@@ -8,7 +8,7 @@
 runBFRInterface <- function() {
   appDir <- system.file("shiny", "BFRInterface", package = "GFR")
   if (appDir == "") {
-    Error("Could not find the app directory. Try re-installing `GFR`.")
+    stop("Could not find the app directory. Try re-installing `GFR` package.", call. = FALSE)
   }
 
   shiny::runApp(appDir, display.mode = "normal")
@@ -25,7 +25,7 @@ runBFRInterface <- function() {
 runFFRInterface <- function() {
   appDir <- system.file("shiny", "FFRInterface", package = "GFR")
   if (appDir == "") {
-    Error("Could not find the app directory. Try re-installing `GFR`.")
+    stop("Could not find the app directory. Try re-installing `GFR` package.", call. = FALSE)
   }
 
   shiny::runApp(appDir, display.mode = "normal")
