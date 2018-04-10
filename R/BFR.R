@@ -47,9 +47,9 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
                   set_seed = NULL, dec = 4) {
   if (inherits(ETA, 'ETA')) {
     data <- ETA$data
-    ETA <- ETA$ETA
     design <- ETA$Design
     datasetID <- ETA$ID
+    ETA <- ETA$ETA
   } else {
     data <- validate.dataset(data, datasetID, orderData = F, Multivariate = Multivariate)
     design <- 'Handmade'
@@ -61,7 +61,7 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
     switch(CrossValidation$Type,
            KFold = {
              if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
-             PT <- CV.KFold(data, K = CrossValidation$nFolds, set_seed)
+             PT <- CV.KFold(data, DataSetID = datasetID, K = CrossValidation$nFolds, set_seed)
              nCV <- CrossValidation$nFolds
            },
            RandomPartition = {
