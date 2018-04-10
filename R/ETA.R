@@ -34,9 +34,7 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
   if (!is.null(GenomicMatrix)) {
     L <- t(chol(GenomicMatrix))
     XL <- model.matrix(~0+as.factor(dataset[, datasetID])) %*% L
-    if (Multivariate == 'SVD') {
-      XL <- kronecker(X = GenomicMatrix, Y = diag(length(unique(dataset$Env))))
-    }
+    XL <- kronecker(X = GenomicMatrix, Y = diag(length(unique(dataset$Env))))
     rownames(XL) <- dataset[, datasetID]
     XL <- validate.GenomicMatrix(XL, dataset[, datasetID])
     Line_prior <- 'RKHS'
@@ -172,13 +170,14 @@ validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
   GenomicDimension <- dim(GenomicMatrix)
   check1 <- GenomicDimension[1] == GenomicDimension[2]
   check2 <- GenomicDimension[1] == length(Lines)
+
   # if (!check1) {
   #   GenomicMatrix <- GenomicMatrix %*% t(GenomicMatrix)
   #   check1 <- GenomicDimension[1] == GenomicDimension[2]
   # }
 
   if (check1 && check2) {
-    GenomicMatrix <- GenomicMatrix[Lines, ]
+    GenomicMatrix <- GenomicMatrix[Lines, Lines]
     return(GenomicMatrix)
   } else {
     Error('Error with the GenomicMatrix dimensions')
