@@ -4,7 +4,7 @@
 \alias{CV.KFold}
 \title{Cross-Validation with K Folds}
 \usage{
-CV.KFold(DataSet, K = 5, set_seed = NULL)
+CV.KFold(DataSet, DataSetID = "Line", K = 5, set_seed = NULL)
 }
 \arguments{
 \item{DataSet}{(\code{data.frame}) The object need contain three columns in the Tidy data format:
