@@ -6,12 +6,13 @@
 #' \code{$Line} is the Line or genotype identifier, and the name of this column could change.
 #' \code{$Env} is the name of the evaluated environment (s).
 #' \code{$Response} Variable response obtained for the row corresponding to line and environment.
+#' @param DataSetID (\code{string}) The ID of the lines.
 #' @param K (\code{integer}) Number of groups to the cross-validation.
 #' @param set_seed (\code{integer}) Number of seed for replicable research.
 #'
 #' @export
 #'
-CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
+CV.KFold <- function(DataSet, DataSetID = 'Line', K = 5, set_seed = NULL) {
   if (!is.null(set_seed)) {
     set.seed(set_seed)
   }
@@ -31,12 +32,12 @@ CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
     ))
   }
 
-  UL <- unique(DataSet$Line)
+  UL <- unique(DataSet[, DataSetID])
   #Number of sites where each line appear
   n_UL <- length(UL)
-  nSLA <- rep(NA, n_UL)
+  # nSLA <- rep(NA, n_UL)
 
-  nEAL <- table(DataSet[, c('Line')])#Number of Sites that appear  each line
+  nEAL <- table(DataSet[, DataSetID])#Number of Sites that appear  each line
   L_nE <- data.frame(Line = names(nEAL), nE = c(nEAL))
 
   #A list of Positions in data set dat_F that will conform the groups
@@ -46,7 +47,7 @@ CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
   #Lines that will appear in all groups because
   # only appear in only one Site
   Pos1 <- which(L_nE$nE == 1)
-  Pos_1_dat_F <- match(L_nE$Line[Pos1], DataSet$Line)
+  Pos_1_dat_F <- match(L_nE[Pos1, DataSetID], DataSet[, DataSetID])
   #dat_F[Pos_1_dat_F,]
 
   #Tama?o de cada partici?n sin considerar las lineas
@@ -68,10 +69,10 @@ CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
     dat_F_k <- DataSet[-Pos_1_dat_F,]
   }
   #Lineas ?nicas restantes
-  UL_k <- unique(dat_F_k$Line)
+  UL_k <- unique(dat_F_k[, DataSetID])
   Pos_R_k <- rep(NA, length(UL_k))
   for (j in 1:length(UL_k)) {
-    Pos_j_k <-  which(DataSet$Line == UL_k[j])
+    Pos_j_k <-  which(DataSet[, DataSetID] == UL_k[j])
     Pos_R_k[j] <- sample(Pos_j_k, 1)
   }
   Pos_R_k <- Pos_R_k
@@ -86,17 +87,17 @@ CV.KFold <- function(DataSet, K = 5, set_seed=NULL) {
     #Assigned positions
     Pos_k_a_R <- unique(unlist(g_list[1:(k - 1)]))
     dat_F_k <- DataSet[-Pos_k_a_R,]
-    UL_k <- unique(dat_F_k$Line)
+    UL_k <- unique(dat_F_k[, DataSetID])
     #A las lineas que no aparecen en el grupo k-1, se remueve un
     # site donde aparencen para garantizar que ?stas aparezcan
     # en al menos un site
-    UL_k <- UL_k[(UL_k %in% DataSet[Pos_k_a_R,]$Line) == FALSE]
+    UL_k <- UL_k[(UL_k %in% DataSet[Pos_k_a_R,DataSetID]) == FALSE]
     if (length(UL_k) > 0) {
       #Posiciones de lineas a mantener fuera del grupo k
       Pos_R_k <- rep(NA, length(UL_k))
 
       for (j in 1:length(UL_k)) {
-        Pos_j_k <-  which((DataSet$Line == UL_k[j]))
+        Pos_j_k <-  which((DataSet[, DataSetID] == UL_k[j]))
         if (length(Pos_j_k) > 1) {
           Pos_R_k[j] <- sample(Pos_j_k, 1)
         }
