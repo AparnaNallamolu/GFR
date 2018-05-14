@@ -100,14 +100,9 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
                          Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE))
            } else if (Multivariate == 'SVD') {
              ETA <- list(Env = ETAList(dataset$Env, Env_prior),
-                         # Trait = list(X = model.matrix(~0+as.factor(data_Long$Trait)), model = Trait_prior),
                          Line = ETAList(XL, priorType, TRUE, LineK),
                          LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env, likeKernel = TRUE, withK = T),
                          Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE, likeKernel = TRUE, withK = T))
-                         # LinexTrait = list(X = model.matrix(~0+XL:as.factor(data_Long$Trait)), model = priorType),
-                         # EnvxTrait = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait)), model = priorType),
-                         # EnvxTraitxLine = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait):XL), model = priorType))
-
            }
          }, 'Frequentist-Single' = {
            ETA <- NULL

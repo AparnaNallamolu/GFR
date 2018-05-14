@@ -69,20 +69,10 @@ Cor_Env_Ordinal <- function(Tab, Time, nFolds){
     prop.tabl <- prop.table(tabl)
     Cor <- sum(diag(prop.tabl))
     Res$Pearson[i] <- Cor
-    Res$MSEP[i] <- sqrt(Cor * (1 - Cor) / nFolds)
+    Res$MSEP[i] <- mean((Tab_i$y_p - Tab_i$y_o)**2, na.rm = T)
     Res$Fold[i] <- Tab$Fold[i]
   }
   return(Res)
-}
-
-saveFile <- function(Data, fname, rmExistingFiles=TRUE) {
-  if (rmExistingFiles) {
-    unlink(fname)
-  }else{
-      fname <- strsplit(fname,".", fixed = T)[[1]]
-      fname <- append(fname,date(),after = length(fname) - 1)
-  }
-  save(Data, file = paste(fname, collapse = '.'))
 }
 
 add_mean_amb <- function(Tab_Pred, dec = 4){

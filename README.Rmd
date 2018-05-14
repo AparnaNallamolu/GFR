@@ -6,7 +6,7 @@ output: github_document
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h3 align="center">
-    Genomic Functional Regression analysis in R | Development version 0.9 - rev 10
+    Genomic Functional Regression analysis in R | Development version 0.9 - rev 12
   </h4>
   
   <p align="center">
@@ -50,6 +50,10 @@ output: github_document
 <h2 id="news">
   News of this version (0.9)
 </h2>
+
+Revision 12
+
+ - The package includes a better BFR shiny app (use `runBFRInterface()` ).
 
 Revision 10
 

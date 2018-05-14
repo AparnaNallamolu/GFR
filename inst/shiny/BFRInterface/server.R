@@ -73,8 +73,4 @@ function(input, output, session) {
     output$plotres <- renderPlot({boxplot(pm)
       })
   })
-
-
-
-
 }
