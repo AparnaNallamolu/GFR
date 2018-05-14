@@ -1,6 +1,6 @@
 Package: GFR
 Title: GFR (Genomic Functional Regression)
-Version: 0.9-11
+Version: 0.9-12
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut"),
@@ -23,13 +23,13 @@ Collate:
   Basis_Bspline.R
   Basis_Fourier.R
   BFR.R
-  BFRInterface.R
   BayesianCore.R
   CrossValidation.R
   ETA.R
   FFR.R
   FrequentistCore.R
   Information.R
+  Interface.R
   Maize_GFR.R
   Generic_Methods.R
   Utils.R
