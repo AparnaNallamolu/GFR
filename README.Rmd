@@ -6,7 +6,7 @@ output: github_document
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h3 align="center">
-    Genomic Functional Regression analysis in R | Development version 0.9 - rev 12
+    Genomic Functional Regression analysis in R | Development version `r packageVersion('GFR')` 
   </h4>
   
   <p align="center">
@@ -48,8 +48,11 @@ output: github_document
   - [Authors](#authors)
 
 <h2 id="news">
-  News of this version (0.9)
+  News of this version (`r packageVersion('GFR')`)
 </h2>
+
+Revision 13
+ - The BFR function now can obtain the PCC (Percentage of Correct Classification) to the Ordinal or binary data (`BFR(..., response_type = 'ordinal')`).
 
 Revision 12
 
@@ -222,6 +225,7 @@ cleanDat(forceClean = TRUE)
 <h2 id="cite">
   How to cite this package
 </h2>
+
 
 First option, by the article paper
 
