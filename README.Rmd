@@ -52,7 +52,9 @@ output: github_document
 </h2>
 
 Revision 13
+
  - The BFR function now can obtain the PCC (Percentage of Correct Classification) to the Ordinal or binary data (`BFR(..., response_type = 'ordinal')`).
+ - `forceClean` parameter from `cleanDat()` has changed to `noConfirm`.
 
 Revision 12
 
@@ -218,7 +220,7 @@ boxplot(pm4, select = 'MSEP')
 
 If you don't need anymore the files that the `BFR()` function creates, you can clean the directory with the following function provided in the package, 
 ```{r cleaner}
-cleanDat(forceClean = TRUE)
+cleanDat(noConfirm = TRUE)
 ```
 
 
@@ -249,8 +251,8 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
 </h2>
 
   
-  - Francisco Javier Luna-Vázquez (Author, Maintainer)
-  - Osval Antonio Montesinos-López (Author)
-  - Abelardo Montesinos-López (Author)
-  - José Crossa (Author)
-  - Gustavo de los campos (Author)
+ - Francisco Javier Luna-Vázquez (Author, Maintainer)
+ - Osval Antonio Montesinos-López (Author)
+ - Abelardo Montesinos-López (Author)
+ - José Crossa (Author)
+ - Gustavo de los campos (Author)
