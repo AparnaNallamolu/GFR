@@ -114,8 +114,11 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
           Error(paste0('The response_type: ', response_type, " is't implemented"))
       )
     }
-
-    Tab_Pred <- add_mean_amb(Tab_Pred, dec)
+    if (response_type == 'gaussian') {
+      Tab_Pred <- add_mean_amb(Tab_Pred, dec)
+    } else {
+      Tab_Pred <- add_mean_amb_Ordinal(Tab_Pred, dec)
+    }
 
     if (verbose) {
       pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
@@ -153,7 +156,6 @@ BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", 
       pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
     }
 
-    # data_Long$Predictions <- NA
     Criteria <- data.frame(matrix(0, ncol = 3, nrow = 9 * nCV))  #Cada columna
     Env.ALL <- data.frame(matrix(NA, nrow = 9, ncol = 5))
     ## Init cross validation
