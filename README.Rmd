@@ -78,7 +78,7 @@ Past revisions
   Installation
 </h3>
 
-To complete installation of dev version of GFR from GitHub, you have to install a few packages first.
+To complete installation of dev version of GFR from GitHub, you have to install [Rtools Software](https://cran.r-project.org/bin/windows/Rtools/) and a few packages first.
 
 ```{r installation, eval = FALSE}
 install.packages('devtools')
