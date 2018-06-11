@@ -10,7 +10,7 @@
 #'
 Bspline.Basis <- function(Bands, Wavelengths = NULL, nBasis = 1, interaction = NULL){
   if (is.null(Wavelengths)) {
-    stop("Wavelengths names was not provided")
+    Error('Wavelengths names was not provided, use Wavelengths parameter to provided it')
   }
 
   bspl <- fda::create.bspline.basis(range(c(Wavelengths)), nbasis = nBasis, breaks = NULL, norder = 4)

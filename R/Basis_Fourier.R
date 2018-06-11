@@ -10,7 +10,7 @@
 #'
 Fourier.Basis <- function(Bands, Wavelengths = NULL, nBasis = 1, interaction = NULL){
   if (is.null(Wavelengths)) {
-    stop("Wavelengths names was not provided")
+    Error('Wavelengths names was not provided, use Wavelengths parameter to provided it')
   }
 
   bspF <- fda::create.fourier.basis(range(c(Wavelengths)), nbasis = nBasis, period = diff(range(c(Wavelengths))))

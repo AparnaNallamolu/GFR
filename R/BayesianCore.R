@@ -25,7 +25,8 @@ set.X <- function(LT){
     }
   }
   if (flag)
-    stop("Unable to build incidence matrix, wrong formula or data\n")
+    Error('Unable to build incidence matrix, wrong formula or data')
+
   return(X)
 }
 
@@ -41,11 +42,11 @@ setLT.Fixed <- function(LT, n, j, y, weights, nLT, saveAt, rmExistingFiles, grou
   LT$colNames <- colnames(LT$X)
 
   if (any(is.na(LT$X))) {
-    stop(paste0(" LP ", j, " has NAs in X"))
+    Error(paste0(" LP ", j, " has NAs in X"))
   }
 
   if (nrow(LT$X) != n){
-    stop(paste0(" Number of rows of LP ", j, "  not equal to the number of phenotypes."))
+    Error(paste0(" Number of rows of LP ", j, "  not equal to the number of phenotypes."))
   }
 
   #weight inputs if necessary
@@ -99,11 +100,11 @@ setLT.BRR <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, gr
   LT$colNames <- colnames(LT$X)
 
   if (any(is.na(LT$X))) {
-    stop(paste0(" LP ", j, " has NAs in X"))
+    Error(paste0(" LP ", j, " has NAs in X"))
   }
 
   if (nrow(LT$X) != n){
-    stop(paste0( " Number of rows of LP ", j, "  not equal to the number of phenotypes."))
+    Error(paste0( " Number of rows of LP ", j, "  not equal to the number of phenotypes."))
   }
 
   #Weight inputs if necessary
@@ -126,7 +127,7 @@ setLT.BRR <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, gr
     LT$df0 <- 5
 
     if (verbose){
-      cat(paste0(" Degree of freedom of LP ", j, "  set to default value (", LT$df0, ").\n"))
+      Message(paste0(" Degree of freedom of LP ", j, "  set to default value (", LT$df0, ").\n"))
     }
   }
 
@@ -138,13 +139,13 @@ setLT.BRR <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, gr
   #Default scale parameter for the prior assigned to the variance of marker effects
   if (is.null(LT$S0)) {
     if (LT$df0 <= 0)
-      stop("df0>0 in BRR in order to set S0\n")
+      Error("df0>0 in BRR in order to set S0")
 
     LT$MSx <- sum(LT$x2) / n - sumMeanXSq
     LT$S0 <- ((var(y, na.rm = TRUE) * LT$R2) / (LT$MSx)) * (LT$df0 + 2)
 
     if (verbose)  {
-      cat(paste0( " Scale parameter of LP ", j, "  set to default value (", LT$S0, ") .\n"))
+      Message(paste0( " Scale parameter of LP ", j, "  set to default value (", LT$S0, ") .\n"))
     }
   }
 
@@ -170,8 +171,8 @@ setLT.BRR <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, gr
 
 
   if (LT$lower_tri) {
-    cat(paste("You have provided a lower triangular matrix for LP ", j, "\n"))
-    cat("Checking dimmensions...\n")
+    Message(paste("You have provided a lower triangular matrix for LP ", j))
+    cat("Checking dimmensions...")
     if (ncol(LT$X) == nrow(LT$X)) {
       cat("Ok.")
       LT$X <- LT$X[lower.tri(LT$X, diag = TRUE)]
@@ -216,10 +217,10 @@ setLT.BRR_sets <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFile
   LT$colNames <- colnames(LT$X)
 
   if (is.null(LT$sets))
-    stop("Argument sets (a vector grouping effects into sets) is required in BRR_sets\n")
+    Error("Argument sets (a vector grouping effects into sets) is required in BRR_sets")
 
   if (length(LT$sets) != LT$p) {
-    stop(" The length of sets must be equal to the number of predictors\n")
+    Error("The length of sets must be equal to the number of predictors")
   }
 
   LT$sets <- as.integer(factor(LT$sets, ordered = TRUE, levels = unique(LT$sets)))
@@ -227,15 +228,15 @@ setLT.BRR_sets <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFile
   LT$n_sets <- length(unique(LT$sets))
 
   if (LT$n_sets >= LT$p) {
-    stop("The number of sets is greater or equal than the number of effects!\n")
+    Error("The number of sets is greater or equal than the number of effects!")
   }
 
   if (any(is.na(LT$X))) {
-    stop(paste0(" LP ", j, " has NAs in X"))
+    Error(paste0(" LP ", j, " has NAs in X"))
   }
 
   if (nrow(LT$X) != n) {
-    stop(paste0(" Number of rows of LP ", j, "  not equal to the number of phenotypes."))
+    Error(paste0(" Number of rows of LP ", j, "  not equal to the number of phenotypes."))
   }
 
   #Weight inputs if necessary
@@ -247,7 +248,7 @@ setLT.BRR_sets <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFile
   if (is.null(LT$df0)) {
     LT$df0 <- 5
     if (verbose) {
-      cat(paste0( " Degree of freedom of LP ", j, "  set to default value (",  LT$df0, ").\n"))
+      Message(paste0( " Degree of freedom of LP ", j, "  set to default value (",  LT$df0, ").\n"))
     }
   }
 
@@ -257,12 +258,12 @@ setLT.BRR_sets <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFile
 
   if (is.null(LT$S0)){
     if (LT$df0 <= 0)
-      stop("df0 must be greater than 0 \n")
+      Error("df0 must be greater than 0 \n")
 
     LT$MSx <- sum(LT$x2) / n - sumMeanXSq
     LT$S0 <- ((var(y, na.rm = TRUE) * LT$R2) / (LT$MSx)) * (LT$df0 + 2)
     if (verbose) {
-      cat(paste0(" Scale parameter of LP ", j, "  set to default value (", LT$S0, ") .\n"))
+      Message(paste0(" Scale parameter of LP ", j, "  set to default value (", LT$S0, ") .\n"))
     }
   }
 
@@ -325,11 +326,11 @@ setLT.BL <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, ver
   LT$colNames <- colnames(LT$X)
 
   if (any(is.na(LT$X))) {
-    stop(paste0("LP ", j, " has NAs in X"))
+    Error(paste0("LP ", j, " has NAs in X"))
   }
 
   if (nrow(LT$X) != n) {
-    stop(paste0(" Number of rows of LP ",  j, "  not equal to the number of phenotypes."))
+    Error(paste0(" Number of rows of LP ",  j, "  not equal to the number of phenotypes."))
   }
 
   #Wheight inputs if necessary
@@ -347,18 +348,18 @@ setLT.BL <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, ver
   # Setting default value of lambda
   if (!is.null(LT$lambda)) {
     if (LT$lambda < 0) {
-      stop(" lambda should be positive\n")
+      Error(" lambda should be positive\n")
     }
   }
   if (is.null(LT$lambda)) {
     LT$lambda2 <- 2 * (1 - R2) / (LT$R2) * LT$MSx
     LT$lambda <- sqrt(LT$lambda2)
     if (verbose) {
-      cat(paste0(" Initial value of lambda in LP ", j, " was set to default value (", LT$lambda, ")\n"))
+      Message(paste0(" Initial value of lambda in LP ", j, " was set to default value (", LT$lambda, ")\n"))
     }
   } else{
     if (LT$lambda < 0)
-      stop(" lambda should be positive\n")
+      Error(" lambda should be positive\n")
 
     LT$lambda2 <- LT$lambda^2
   }
@@ -367,24 +368,24 @@ setLT.BL <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, ver
   if (is.null(LT$type)){
     LT$type <- "gamma"
     if (verbose){
-      cat(paste0("  By default, the prior density of lambda^2 in the LP ", j, "  was set to gamma.\n"))
+      Message(paste0("  By default, the prior density of lambda^2 in the LP ", j, "  was set to gamma.\n"))
     }
   } else{
     if (!LT$type %in% c("gamma", "beta", "FIXED"))
-      stop(" The prior for lambda^2 should be gamma, beta or a point of mass (i.e., fixed lambda).\n")
+      Error(" The prior for lambda^2 should be gamma, beta or a point of mass (i.e., fixed lambda).\n")
   }
   if (LT$type == "gamma"){
     if (is.null(LT$shape)){
       LT$shape <- 1.1
       if (verbose){
-        cat(paste0("  shape parameter in LP ", j, " was missing and was set to ", LT$shape, "\n"))
+        Message(paste0("  shape parameter in LP ", j, " was missing and was set to ", LT$shape, "\n"))
       }
     }
 
     if (is.null(LT$rate)){
       LT$rate <- (LT$shape - 1) / LT$lambda2
       if (verbose){
-        cat(paste0("  rate parameter in LP ", j, " was missing and was set to ", LT$rate, "\n"))
+        Message(paste0("  rate parameter in LP ", j, " was missing and was set to ", LT$rate, "\n"))
       }
     }
   }
@@ -393,14 +394,14 @@ setLT.BL <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, ver
     if (is.null(LT$probIn)){
       LT$probIn <- 0.5
       if (verbose){
-        cat(paste0("  probIn in LP ", j, " was missing and was set to ", LT$probIn, "\n"))
+        Message(paste0("  probIn in LP ", j, " was missing and was set to ", LT$probIn, "\n"))
       }
     }
 
     if (is.null(LT$counts)){
       LT$counts <- 2
       if (verbose){
-        cat(paste0("  Counts in LP ", j, " was missing and was set to ", LT$counts, "\n"))
+        Message(paste0("  Counts in LP ", j, " was missing and was set to ", LT$counts, "\n"))
       }
     }
 
@@ -412,7 +413,7 @@ setLT.BL <- function(LT, y, n, j, weights, nLT, R2, saveAt, rmExistingFiles, ver
     if (is.null(LT$max)){
       LT$max <- 10 * LT$lambda
       if (verbose) {
-        cat(paste0("  max parameter in LP ", j, " was missing and was set to ", LT$max, "\n"))
+        Message(paste0("  max parameter in LP ", j, " was missing and was set to ", LT$max, "\n"))
       }
     }
   }
@@ -469,15 +470,15 @@ setLT.RKHS <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles, v
   #Checking inputs
   if (is.null(LT$V)){
     if (is.null(LT$K))
-      stop(paste0(" Kernel for linear term ", j, " was not provided, specify it with list(K=?,model='RKHS'), where ? is the kernel matrix\n"))
+      Error(paste0(" Kernel for linear term ", j, " was not provided, specify it with list(K=?,model='RKHS'), where ? is the kernel matrix\n"))
 
     LT$K <- as.matrix(LT$K)
 
     if (class(LT$K) != "matrix")
-      stop(paste(" Kernel for linear term ", j, " should be a matrix, the kernel provided is of class ", class(LT$K), "\n"))
+      Error(paste(" Kernel for linear term ", j, " should be a matrix, the kernel provided is of class ", class(LT$K), "\n"))
 
     if (nrow(LT$K) != ncol(LT$K))
-      stop(paste0(" Kernel for linear term ", j, " is not a square matrix\n"))
+      Error(paste0(" Kernel for linear term ", j, " is not a square matrix\n"))
 
     #This code was rewritten to speed up computations
     #T = diag(weights)
@@ -498,7 +499,7 @@ setLT.RKHS <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles, v
     rm(tmp)
   } else{
     if (any(weights != 1)){
-      cat(paste(" Warning, in LT ", j, " Eigen decomposition was provided, and the model involves weights. Note: You should have weighted the kernel before computing eigen(K).\n"))
+      Message(paste(" Warning, in LT ", j, " Eigen decomposition was provided, and the model involves weights. Note: You should have weighted the kernel before computing eigen(K).\n"))
     }
   }
 
@@ -507,7 +508,7 @@ setLT.RKHS <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles, v
   if (is.null(LT$tolD)){
     LT$tolD <- 1e-10
     if (verbose){
-      cat(paste("  Default value of minimum eigenvalue in LP ", j, " was set to ", LT$tolD, "\n"))
+      Message(paste("  Default value of minimum eigenvalue in LP ", j, " was set to ", LT$tolD, "\n"))
     }
   }
 
@@ -521,7 +522,7 @@ setLT.RKHS <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles, v
   if (is.null(LT$df0)){
     LT$df0 <- 5
     if (verbose){
-      cat(paste("  default value of df0 in LP ", j, " was missing and was set to ", LT$df0, "\n"))
+      Message(paste("  default value of df0 in LP ", j, " was missing and was set to ", LT$df0, "\n"))
     }
   }
 
@@ -531,13 +532,13 @@ setLT.RKHS <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles, v
 
   if (is.null(LT$S0)){
     if (LT$df0 <= 0)
-      stop("df0>0 in RKHS in order to set S0\n")
+      Error("df0>0 in RKHS in order to set S0\n")
 
 
     LT$S0 <- ((var(y, na.rm = TRUE) * LT$R2) / (mean(LT$d))) * (LT$df0 + 2)
 
     if (verbose){
-      cat(paste0("  default value of S0 in LP ", j, " was missing and was set to ", LT$S0, "\n"))
+      Message(paste0("  default value of S0 in LP ", j, " was missing and was set to ", LT$S0, "\n"))
     }
   }
 
@@ -600,16 +601,16 @@ setLT.BayesBandC <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFi
 
 
   if (any(is.na(LT$X))) {
-    stop(paste("LP ", j, " has NAs in X", sep = ""))
+    Error(paste("LP ", j, " has NAs in X", sep = ""))
   }
   if (nrow(LT$X) != n) {
-    stop(paste0("   Number of rows of LP ", j, "  not equal to the number of phenotypes."))
+    Error(paste0("   Number of rows of LP ", j, "  not equal to the number of phenotypes."))
   }
 
   if (is.null(LT$R2)){
     LT$R2 <- R2 / nLT
     if (verbose){
-      cat(paste0("  R2 in LP ", j, " was missing and was set to ", LT$R2, "\n"))
+      Message(paste0("  R2 in LP ", j, " was missing and was set to ", LT$R2, "\n"))
     }
   }
 
@@ -618,7 +619,7 @@ setLT.BayesBandC <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFi
   if (is.null(LT$df0)){
     LT$df0 <- 5
     if (verbose){
-      cat(paste0("  DF in LP ", j, " was missing and was set to ", LT$df0, "\n"))
+      Message(paste0("  DF in LP ", j, " was missing and was set to ", LT$df0, "\n"))
     }
   }
 
@@ -627,7 +628,7 @@ setLT.BayesBandC <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFi
   if (is.null(LT$probIn)){
     LT$probIn <- 0.5
     if (verbose){
-      cat(paste0("  probIn in LP ", j, " was missing and was set to ", LT$probIn, "\n"))
+      Message(paste0("  probIn in LP ", j, " was missing and was set to ", LT$probIn, "\n"))
     }
   }
 
@@ -636,7 +637,7 @@ setLT.BayesBandC <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFi
   if (is.null(LT$counts)){
     LT$counts <- 10
     if (verbose) {
-      cat(paste("  Counts in LP ",  j, " was missing and was set to ", LT$counts, "\n"))
+      Message(paste("  Counts in LP ",  j, " was missing and was set to ", LT$counts, "\n"))
     }
   }
 
@@ -647,11 +648,11 @@ setLT.BayesBandC <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFi
   #marker effects
   if (is.null(LT$S0)){
     if (LT$df0 <= 0)
-      stop(paste0("df0>0 in ", model, " in order to set S0\n"))
+      Error(paste0("df0>0 in ", model, " in order to set S0\n"))
 
     LT$S0 <- var(y, na.rm = TRUE) * LT$R2 / (LT$MSx) * (LT$df0 + 2) / LT$probIn
     if (verbose){
-      cat(paste0(" Scale parameter in LP ", j, " was missing and was set to ", LT$S0, "\n"))
+      Message(paste0(" Scale parameter in LP ", j, " was missing and was set to ", LT$S0, "\n"))
     }
   }
 
@@ -748,23 +749,23 @@ setLT.BayesA <- function(LT, y, n, j, weights, saveAt, R2, nLT, rmExistingFiles,
   if (is.null(LT$df0)){
     LT$df0 <- 5
     if (verbose){
-      cat(paste0("  DF in LP ", j, " was missing and was set to ", LT$df0, ".\n"))
+      Message(paste0("  DF in LP ", j, " was missing and was set to ", LT$df0, ".\n"))
     }
   }
   if (is.null(LT$R2)){
     LT$R2 <- R2 / nLT
     if (verbose){
-      cat(paste0("  R2 in LP ", j, " was missing and was set to ", LT$R2, "\n"))
+      Message(paste0("  R2 in LP ", j, " was missing and was set to ", LT$R2, "\n"))
     }
   }
 
   #Defuault scale parameter for the prior assigned to the variance of markers
   if (is.null(LT$S0)){
     if (LT$df0 <= 0)
-      stop("df0>0 in BayesA in order to set S0\n")
+      Error("df0>0 in BayesA in order to set S0\n")
     LT$S0 <- var(y, na.rm = TRUE) * LT$R2 / (LT$MSx) * (LT$df0 + 2)
     if (verbose){
-      cat(paste0(" Scale parameter in LP ", j, " was missing and was set to ", LT$S0, "\n"))
+      Message(paste0(" Scale parameter in LP ", j, " was missing and was set to ", LT$S0, "\n"))
     }
   }
 
@@ -906,9 +907,9 @@ extract <- function(z, y, j)
 
 rinvGauss <- function(n, nu, lambda){
   if (any(nu <= 0))
-    stop("nu must be positive")
+    Error("nu must be positive")
   if (any(lambda <= 0))
-    stop("lambda must be positive")
+    Error("lambda must be positive")
   if (length(n) > 1)
     n <- length(n)
   if (length(nu) > 1 && length(nu) != n)
@@ -980,7 +981,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
                  pb=NULL, iFold=1, Folds=1) {
   IDs <- names(y)
   if (!(response_type %in% c("gaussian", "ordinal")))
-    stop(" Only gaussian and ordinal responses are allowed\n")
+    Error(" Only gaussian and ordinal responses are allowed\n")
 
   if (saveAt == "") {
     saveAt = paste(getwd(), "/", sep = "")
@@ -1004,7 +1005,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
     ggg <- as.integer(groups - 1)
     #In C we begin to count in 0
     if (sum(countGroups) != n)
-      stop("length of groups and y differs, NA's not allowed in groups\n")
+      Error("length of groups and y differs, NA's not allowed in groups\n")
 
   }
 
@@ -1013,7 +1014,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
     lev <- levels(y)
     nclass <- length(lev)
     if (nclass == n)
-      stop("The number of classes in y must be smaller than the number of observations\n")
+      Error("The number of classes in y must be smaller than the number of observations\n")
 
     y <- as.integer(y)
     z <- y
@@ -1044,9 +1045,9 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
     if ((!is.null(a)) | (!is.null(b))){
       Censored <- TRUE
       if ((length(a) != n) | (length(b) != n))
-        stop(" y, a and b must have the same dimension\n")
+        Error(" y, a and b must have the same dimension\n")
       if (any(weights != 1))
-        stop(" Weights are only implemented for Gausian uncensored responses\n")
+        Error(" Weights are only implemented for Gausian uncensored responses\n")
     }
     mu <- weighted.mean(x = y, w = weights, na.rm = TRUE)
   }
@@ -1058,22 +1059,22 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
     unlink(fname)
   }
   else {
-    cat(" Note: samples will be appended to existing files. \n")
+    Message(" Note: samples will be appended to existing files. \n")
   }
 
   fileOutMu <- file(description = fname, open = "w")
 
   if (response_type == "ordinal") {
     if (verbose) {
-      cat(" Prior for residual is not necessary, if you provided it, it will be ignored\n")
+      Message(" Prior for residual is not necessary, if you provided it, it will be ignored\n")
     }
     if (any(weights != 1))
-      stop(" Weights are not supported \n")
+      Error(" Weights are not supported \n")
 
     countsZ <- table(z)
 
     if (nclass <= 1)
-      stop(paste0(" Data vector y has only ", nclass, " differente values, it should have at least 2 different values\n"))
+      Error(paste0(" Data vector y has only ", nclass, " differente values, it should have at least 2 different values\n"))
     threshold <- qnorm(p = c(0, cumsum(as.vector(countsZ) / n)))
 
     y <- rtrun(mu = 0, sigma = 1, a = threshold[z], b = threshold[(z + 1)])
@@ -1147,12 +1148,12 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
       }
 
       if (!(ETA[[i]]$model %in% c("FIXED","BRR","BL","BayesA","BayesB","BayesC","RKHS","BRR_sets"))){
-        stop(paste0(" Error in ETA[[",i,"]]"," model ",ETA[[i]]$model," not implemented (note: evaluation is case sensitive)."))
+        Error(paste0(" Error in ETA[[",i,"]]"," model ",ETA[[i]]$model," not implemented (note: evaluation is case sensitive)."))
       }
 
       if (!is.null(groups)){
         if (!(ETA[[i]]$model %in%  c("BRR", "FIXED", "BayesB", "BayesC")))
-          stop( paste0(" Error in ETA[[",i,"]]"," model ",ETA[[i]]$model," not implemented for groups\n"))
+          Error( paste0(" Error in ETA[[",i,"]]"," model ",ETA[[i]]$model," not implemented for groups\n"))
       }
 
 
@@ -1284,7 +1285,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
   }
 
   pb <- progress::progress_bar$new(format = "Fitting the model [:bar] Time remaining: :eta",
-                                   total = nIter, clear = FALSE)
+                                   total = nIter/20L, clear = FALSE, )
 
   # Gibbs sampler
   #time = proc.time()[3]
@@ -2090,7 +2091,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
       }
     }#end of saving samples and computing running means
 
-    if (verbose) {
+    if (verbose && i%%20L==0L) {
         pb$tick()
       }
   }#end of Gibbs sampler

@@ -12,4 +12,5 @@ The package includes a data set based on a portion of the data used in the study
 }
 \author{
 Montesinos-Lopez, O. A.
+http://sandsynligvis.dk/articles/18/codebook.html
 }

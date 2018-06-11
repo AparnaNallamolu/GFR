@@ -6,7 +6,7 @@ output: github_document
     <img src="Logo.png" alt="Genomic Functional Regression Logo"/>
   </a>
   <h3 align="center">
-    Genomic Functional Regression analysis in R | Development version 0.9 - rev 7 
+    Genomic Functional Regression analysis in R | Development version `r packageVersion('GFR')` 
   </h4>
   
   <p align="center">
@@ -33,9 +33,10 @@ output: github_document
 
 # Table of contents
   - [NEWS](#news)
-  - [instructions](#instructions)
+  - [Instructions](#instructions)
     - [Installation](#install)
     - [Demostration examples](#demo)
+      - [Web version](#shinyapp)
       - [Available data](#data)
       - [Fitting a model](#fit-model)
       - [Predictive model](#predictive-model)
@@ -47,11 +48,26 @@ output: github_document
   - [Authors](#authors)
 
 <h2 id="news">
-  News of this version (0.9)
+  News of this version (`r packageVersion('GFR')`)
 </h2>
 
- * Rename from BGFRA -> BFR -> GFR
- * Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
+Revision 13
+
+ - The BFR function now can obtain the PCC (Percentage of Correct Classification) to the Ordinal or binary data (`BFR(..., response_type = 'ordinal')`).
+ - `forceClean` parameter from `cleanDat()` has changed to `noConfirm`.
+
+Revision 12
+
+ - The package includes a better BFR shiny app (use `runBFRInterface()` ).
+
+Revision 10
+
+ - The package now inclues a shiny app.
+
+Past revisions
+
+ - Rename from BGFRA -> BFR -> GFR
+ - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public; this is a pre-release, be careful.
 
 <h2 id="instructions">
   Instructions for proper implementation
@@ -62,7 +78,7 @@ output: github_document
   Installation
 </h3>
 
-To complete installation of dev version of GFR from GitHub, you have to install a few packages first.
+To complete installation of dev version of GFR from GitHub, you have to install [Rtools Software](https://cran.r-project.org/bin/windows/Rtools/) and a few packages first.
 
 ```{r installation, eval = FALSE}
 install.packages('devtools')
@@ -72,6 +88,17 @@ devtools::install_github('frahik/GFR')
 <h3 id="demo">
   Demostration examples
 </h3>
+
+<h4 id="shinyapp">
+  Package Web version
+</h4>
+
+The package includes a shiny app to very easy use of the package, includes the most essencial parts, to use this,
+
+```{r shinyapp, eval = FALSE}
+library(GFR)
+runInterface()
+```
 
 <h4 id="data">
   Availabe data
@@ -102,9 +129,9 @@ paste0('Number of wavelenths:',length( Maize_Wavelengths)) # Load from data Maiz
   Fitting a model
 </h4>
 
+To more simple way to fit a model is with one environment and one trait data,
 
 ```{r fit_model}
-
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 
@@ -117,8 +144,9 @@ plot(fm)
   Predictive model with a K-Folds Cross-validation
 </h4>
 
-```{r predictive_model}
+To do a predictive model with a cross-validation, only we need to provide a list object with the type and the number of crossvalidation to do, in the package is available two cross-validatin types, in the following code, we see the CV K-Folds,
 
+```{r predictive_model}
 data("Wheat_GFR")
 data <- Wheat_GFR[which(Wheat_GFR$Env == 'Drought'), ]
 Crossvalidation_list <- list(Type = 'KFold', nFolds = 3)
@@ -133,8 +161,9 @@ boxplot(pm)
   Generate automatically a linear predictor (Only Multi-Environment example)
 </h4>
 
-```{r auto_ETA}
+For more advanced predictions, we also provide a eta generator, for the estimations, this function automatically prepare the data and do a lot of validations, this is the recomended way to do a proper analysis,
 
+```{r auto_ETA}
 library(GFR)
 data("Wheat_GFR")
 CrossV <- list(Type = 'KFold', nFolds = 3)
@@ -152,9 +181,11 @@ plot(pm2)
   Generate automatically a linear predictor (Multi-Trait & Multi-Environment example)
 </h4>
 
+Also, you can add some special terms, but be carefull,
+
 ```{r auto_ETA2}
 data("Maize_GFR")
-CrossV <- list(Type = 'RandomPartition', NPartitions = 5, PTesting = .25)
+CrossV <- list(Type = 'RandomPartition', NPartitions = 3, PTesting = .25)
 ETA3 <- ETAGenerate(Maize_GFR, basisType = 'Bspline.Basis', Bands = Maize_Bands, Wavelengths = Maize_Wavelengths, priorType = 'BRR', method = 'Simple', nBasis = 21)
 ETA3$Design
 ETA3$Basis
@@ -169,8 +200,10 @@ summary(pm3)
   Handmade linear predictor
 </h4>
 
+If you are a expert and know what are you doing, you can generate the ETA manually,
+
 ```{r HM_ETA}
-CrossV <- list(Type = 'KFold', nFolds = 5)
+CrossV <- list(Type = 'KFold', nFolds = 3)
 ETA4 <- list(Env = list(X = model.matrix(~0+as.factor(Wheat_GFR$Env)), model = 'FIXED'),
              Line = list(X = model.matrix(~0+as.factor(Wheat_GFR$Line)), model = 'BRR'),
              Bands = list(X = Bspline.Basis(Wheat_Bands, Wheat_Wavelengths, nBasis = 23), model = 'BayesA'))
@@ -181,15 +214,20 @@ plot(pm4, select = 'MSEP')
 boxplot(pm4, select = 'MSEP')
 ```
 
-```{r cleaner, echo=F, results='hide'}
-path <- dir()
-files <- path[which(grepl('.dat', path) == TRUE)]
-file.remove(files)
+<h4 id="autoclean">
+  Clean the working directory
+</h4>
+
+If you don't need anymore the files that the `BFR()` function creates, you can clean the directory with the following function provided in the package, 
+```{r cleaner}
+cleanDat(noConfirm = TRUE)
 ```
+
 
 <h2 id="cite">
   How to cite this package
 </h2>
+
 
 First option, by the article paper
 
@@ -212,7 +250,9 @@ If you have any suggestions or feedback, I would love to hear about it. Feel fre
   Authors
 </h2>
 
-
+  
  - Francisco Javier Luna-Vázquez (Author, Maintainer)
  - Osval Antonio Montesinos-López (Author)
-
+ - Abelardo Montesinos-López (Author)
+ - José Crossa (Author)
+ - Gustavo de los campos (Author)

@@ -6,5 +6,5 @@
 #' @usage data('WheatI_GFR')
 #' @format \code{WheatI_GFR) is \code{data.frame} in \code{TidyData} format, 976 row per 3 columns. Also is loaded \code{WheatI_Wavelengths} and \code{WheatI_Bands} which includes the names of the bandas and the bands respectively.
 #' @author Montesinos-Lopez, O. A.
-#'
+#'http://sandsynligvis.dk/articles/18/codebook.html
 NULL

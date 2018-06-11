@@ -4,10 +4,12 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ---- fig.show='hold'----------------------------------------------------
-plot(1:10)
-plot(10:1)
+## ---- eval=FALSE---------------------------------------------------------
+#  ETAGenerate(dataset, datasetID = 'Line', Multivariate = 'Traditional', GenomicMatrix = NULL, REML= NULL, priorType = 'BRR', Bands = NULL, Wavelengths = NULL, method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...)
 
-## ---- echo=FALSE, results='asis'-----------------------------------------
-knitr::kable(head(mtcars, 10))
+## ---- eval=FALSE---------------------------------------------------------
+#  ETAGenerate(dataset, datasetID = 'Line', Multivariate = 'Traditional', GenomicMatrix = NULL, priorType = 'BRR', Bands = NULL, Wavelengths = NULL, method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  ETAGenerate(dataset, datasetID = 'Line', GenomicMatrix = NULL, REML= NULL, Bands = NULL, Wavelengths = NULL, method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...)
 

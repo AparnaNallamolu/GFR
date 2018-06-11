@@ -10,7 +10,7 @@
 #' @export
 summary.BFR <- function(object,...){
 
-    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
+    if (!inherits(object, "BFR")) Error("This function only works for objects of class 'BFR'")
 
     tmp <- paste('--------------------> Summary of data & model <--------------------')
     cat(tmp,'\n\n')
@@ -74,7 +74,7 @@ summary.BFR <- function(object,...){
 #'
 #' @export
 summary.BFRCV <- function(object,...){
-  if (!inherits(object, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
+  if (!inherits(object, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
   return(object$predictions_Summary)
 }
 
@@ -89,7 +89,7 @@ summary.BFRCV <- function(object,...){
 #'
 #' @export
 residuals.BFR <- function(object,...) {
-    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
+    if (!inherits(object, "BFR")) Error("This function only works for objects of class 'BFR'")
 	object$response - object$predictions
 }
 
@@ -103,7 +103,7 @@ residuals.BFR <- function(object,...) {
 #'
 #' @export
 predict.BFR <- function(object,newdata,...){
-    if (!inherits(object, "BFR")) stop("This function only works for objects of class 'BFR'")
+    if (!inherits(object, "BFR")) Error("This function only works for objects of class 'BFR'")
 	object$predictions
 }
 
@@ -119,7 +119,7 @@ predict.BFR <- function(object,newdata,...){
 #' @export
 plot.BFR <- function(x, ...){
   ### Check that object is compatible
-  if (!inherits(x, "BFR")) stop("This function only works for objects of class 'BFR'")
+  if (!inherits(x, "BFR")) Error("This function only works for objects of class 'BFR'")
 
   limits <- range(c(x$response, x$predictions), na.rm = TRUE)
   plot(x$response, x$predictions, main = "Training", xlim = limits, ylim = limits, xlab = 'Response', ylab = 'Prediction', ...);
@@ -139,7 +139,7 @@ plot.BFR <- function(x, ...){
 #' @export
 boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   ### Check that object is compatible
-  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
+  if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
 
   results <- x$predictions_Summary
 
@@ -177,7 +177,7 @@ boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
 #' @export
 plot.BFRCV <- function(x, select = 'Pearson', ...){
   ### Check that object is compatible
-  if (!inherits(x, "BFRCV")) stop("This function only works for objects of class 'BFRCV'")
+  if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
 
   results <- x$predictions_Summary[which(x$predictions_Summary$Fold == 'Average_all'), ]
 
