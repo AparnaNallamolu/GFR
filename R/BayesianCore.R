@@ -1285,7 +1285,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
   }
 
   pb <- progress::progress_bar$new(format = "Fitting the model [:bar] Time remaining: :eta",
-                                   total = nIter, clear = FALSE)
+                                   total = nIter/20L, clear = FALSE, )
 
   # Gibbs sampler
   #time = proc.time()[3]
@@ -2091,7 +2091,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
       }
     }#end of saving samples and computing running means
 
-    if (verbose) {
+    if (verbose && i%%20L==0L) {
         pb$tick()
       }
   }#end of Gibbs sampler
