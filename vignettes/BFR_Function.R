@@ -39,5 +39,5 @@ plot(PM2, select = 'MSEP')
 boxplot(PM2, select = 'MSEP')
 
 ## ------------------------------------------------------------------------
-cleanDat(forceClean = T)
+cleanDat(T)
 
