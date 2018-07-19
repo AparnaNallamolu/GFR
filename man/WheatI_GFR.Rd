@@ -4,6 +4,7 @@
 \name{WheatI_GFR}
 \alias{WheatI_GFR}
 \title{Wheat Data}
+\format{\code{WheatI_GFR} is \code{data.frame} in \code{TidyData} format, 976 row per 3 columns. Also is loaded \code{WheatI_Wavelengths} and \code{WheatI_Bands} which includes the names of the bandas and the bands respectively.}
 \usage{
 data('WheatI_GFR')
 }
