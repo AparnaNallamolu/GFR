@@ -4,7 +4,7 @@
 \alias{cleanDat}
 \title{cleanDat function}
 \usage{
-cleanDat(forceClean = F)
+cleanDat(noConfirm = F)
 }
 \arguments{
 \item{forceClean}{By default is FALSE, else, the function not requiere the confirmation by the user to delete de .dat files.}

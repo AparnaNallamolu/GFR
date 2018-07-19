@@ -79,6 +79,6 @@ boxplot(PM2, select = 'MSEP')
 
 #Clean the directory
 ```{r}
-cleanDat(forceClean = T)
+cleanDat(T)
 ```
 

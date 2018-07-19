@@ -2181,10 +2181,14 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
   }
 
   if (response_type == "ordinal"){
+
     out$probs = post_prob
     out$SD.probs = sqrt(post_prob2 - post_prob^2)
     colnames(out$probs) = lev
     colnames(out$SD.probs) = lev
+
+    out$predictions <- as.integer(colnames(out$probs)[apply(out$probs,1,which.max)])
+
     out$threshold = post_threshold[-c(1, nclass + 1)]
     out$SD.threshold = sqrt(post_threshold2 - post_threshold^2)[-c(1, nclass + 1)]
 
