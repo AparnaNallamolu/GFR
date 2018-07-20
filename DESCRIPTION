@@ -22,16 +22,19 @@ NeedsCompilation: yes
 Collate:
   Basis_Bspline.R
   Basis_Fourier.R
-  BFR.R
   BayesianCore.R
+  BFR.R
+  BSVD.R
   CrossValidation.R
   ETA.R
+  ExplicitImports.R
   FFR.R
   FrequentistCore.R
+  Generic_Methods.R
   Information.R
   Interface.R
   Maize_GFR.R
-  Generic_Methods.R
+  MTME.R
   Utils.R
   Wheat_GFR.R
   WheatI_GFR.R
@@ -43,7 +46,15 @@ Imports:
   matrixcalc,
   Matrix,
   MASS,
-  truncnorm
+  truncnorm,
+  tidyr,
+  dplyr,
+  BMTME,
+  IBCF.MTME,
+  doParallel,
+  foreach,
+  doSNOW,
+  snow
 Suggests:
   testthat,
     knitr,
