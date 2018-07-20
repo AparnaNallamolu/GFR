@@ -37,282 +37,140 @@
 #' @param set_seed (\code{integer}) A seed for replicable research.
 #' @param dec (\code{integer}) Number of decimals to show on the predictions.
 #'
+#' @importFrom stats lm rnorm var vcov
+#' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom tidyr gather
+#' @importFrom foreach %dopar%
 #'
 #' @export
 
-# DATA = data.frame()
-# multivariateAdjust or multivariateEstimation
-# REMOVE response_type (Implementar en data)
+BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
+                saveAt = '', S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL, progressBar = TRUE, verbose = TRUE,
+                rmExistingFiles = TRUE, groups = NULL, testingSet = NULL, set_seed = NULL, digits = 4, parallelCores = 1,
+                Multivariate = NULL, CrossValidation = NULL, dec = NULL, response_type = NULL) {
 
-BFR <- function(data = NULL, datasetID = 'Line',  Multivariate = "Traditional", a=NULL, b=NULL, ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
-                saveAt = '', S0 = NULL, df0 = 5, R2 = 0.5, weights = NULL, verbose = TRUE, rmExistingFiles = TRUE, groups = NULL,
-                CrossValidation = NULL, set_seed = NULL, dec = 4) {
+  ########   DEPRECATED PARAMETERS  #########
+  if(!is.null(CrossValidation)){Message('CrossValidation is deprecated, use testingSet instead, see more using help(BFR).', verbose)}
+  if(!is.null(dec)){Message('dec is deprecated, use digits instead, see more using help(BFR).', verbose)}
+  if(!is.null(Multivariate)){Message('Multivariate is deprecated, use BSVD() function instead, see more using help(BFR).', verbose)}
+  if(!is.null(response_type)){Message('response_type is deprecated, use factor() or as.factor() in $Response column in data instead for ordinal analysis, or numeric to gaussian analysis, see more help(BFR).', verbose)}
+
+  nCores <- detectCores()
+  if(nCores < parallelCores){
+    Message(paste0('The number of cores available is less than the specified in the parallelCores parameter we will use only ', nCores,'.'), verbose)
+    parallelCores <- nCores
+  }
+  ########        INIT VALUES       #########
+  response_type <- ifelse(is.factor(data$Response), 'ordinal', 'gaussian')
+  data$Response <- as.numeric(data$Response)
+
   if (inherits(ETA, 'ETA')) {
     data <- ETA$data
     design <- ETA$Design
     datasetID <- ETA$ID
     ETA <- ETA$ETA
   } else {
-    data <- validate.dataset(data, datasetID, orderData = F, Multivariate = Multivariate)
+    data <- validate.dataset(data, datasetID, orderData = F)
     design <- 'Handmade'
   }
 
-  response_type <- ifelse(is.factor(data$Response), 'ordinal', 'gaussian')
-  data$Response <- as.numeric(data$Response)
-
-  Multivariate <- validate.MTME(Multivariate)
-  if (!is.null(CrossValidation) && Multivariate == 'Traditional') {
-
-    switch(CrossValidation$Type,
-           KFold = {
-             if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
-             PT <- CV.KFold(data, DataSetID = datasetID, K = CrossValidation$nFolds, set_seed)
-             nCV <- CrossValidation$nFolds
-           },
-           RandomPartition = {
-             if (is.null(CrossValidation$NPartitions)) {message('Crossvalidation is used but NPartitions is null, by default NPartitions is set to 10.')}
-             PT <- CV.RandomPart(data, NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
-             nCV <- CrossValidation$NPartitions
-           },
-           Error(paste0('The Cross Validation  ', CrossValidation$Type, " is't implemented"))
-    )
-
-    if (verbose) {
-      Message("This might be time demanding...")
-
-      pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
-    }
-
-    data$Predictions <- NA
+  if (is.null(testingSet)) {
+    out <- BGLR(data$Response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights, verbose, rmExistingFiles, groups)
+  } else if (parallelCores <= 1 && inherits(testingSet, 'CrossValidation')) {
     Tab_Pred <- data.frame()
-    ## Init cross validation
-    for (i in seq_len(nCV)) {
+    nCV <- length(testingSet$CrossValidation_list)
+    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
 
-      if (verbose) {
-        pb$tick(tokens = list(what = paste0( i, ' CV of ', nCV)))
+    for (actual_CV in seq_len(nCV)) {
+      if (progressBar) {
+        pb$tick(tokens = list(what = paste0(actual_CV, ' out of ', nCV)))
       }
 
+      positionTST <- testingSet$CrossValidation_list[[actual_CV]]
       response_NA <-  data$Response
-      Pos_NA <- PT$CrossValidation_list[[paste0('partition',i)]]
-      response_NA[Pos_NA] <- NA
+      response_NA[positionTST] <- NA
       time.init <- proc.time()[3]
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                       verbose = F, rmExistingFiles, groups)
+                 verbose = F, rmExistingFiles, groups)
 
-      #fm <- BGLR(response_NA, ETA, verbose=F)
-      switch(response_type,
-        gaussian = {
-          predicted <- fm$predictions
-          data$Predictions[Pos_NA] <- predicted[Pos_NA]
-          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
-        },
-        ordinal = {
-          predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
-          data$Predictions[Pos_NA] <- predicted[Pos_NA]
+      Tab_Pred <- rbind(Tab_Pred,
+                       data.frame(Position = positionTST,
+                                  Environment = data$Env[positionTST],
+                                  Trait = data$Trait[positionTST],
+                                  Partition = actual_CV,
+                                  Observed = round(data$Response[positionTST], digits),
+                                  Predicted = round(fm$predictions[positionTST], digits)))
+    }
+    cat('Done!\n')
+    out <- list(
+      predictions_Summary = Tab_Pred,
+      CrossValidation_list = testingSet$CrossValidation_list,
+      response = data$Response,
+      Design = design,
+      nCores = parallelCores,
+      response_type =  response_type
+    )
 
-          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-          Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, Time = proc.time()[3] - time.init, nFolds = nCV))
-        },
-          Error(paste0('The response_type: ', response_type, " is't implemented"))
-      )
-    }
-    if (response_type == 'gaussian') {
-      Tab_Pred <- add_mean_amb(Tab_Pred, dec)
-    } else {
-      Tab_Pred <- add_mean_amb_Ordinal(Tab_Pred, dec)
-    }
+    class(out) <- 'BFRCV'
+  } else if (parallelCores > 1 && inherits(testingSet, 'CrossValidation')) {
+    cl <- snow::makeCluster(parallelCores)
+    doSNOW::registerDoSNOW(cl)
+    nCV <- length(testingSet$CrossValidation_list)
 
-    if (verbose) {
-      pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
-      cat('Done.\n')
+    pb <- utils::txtProgressBar(max = nCV, style = 3)
+    progress <- function(n) utils::setTxtProgressBar(pb, n)
+    opts <- list(progress = progress)
+
+    Tab_Pred <- foreach::foreach(actual_CV = seq_len(nCV), .combine = rbind, .packages = 'GFR', .options.snow = opts) %dopar% {
+      positionTST <- testingSet$CrossValidation_list[[actual_CV]]
+      response_NA <-  data$Response
+      response_NA[positionTST] <- NA
+      time.init <- proc.time()[3]
+      fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt = paste0('CV', actual_CV,'_'), S0, df0, R2, weights,
+                 verbose = F, rmExistingFiles, groups)
+
+      data.frame(Position = positionTST,
+                 Environment = data$Env[positionTST],
+                 Trait = data$Trait[positionTST],
+                 Partition = actual_CV,
+                 Observed = round(data$Response[positionTST], digits),
+                 Predicted = round(fm$predictions[positionTST], digits))
     }
+    cat('Done!\n')
+    out <- list(
+      predictions_Summary = Tab_Pred,
+      CrossValidation_list = testingSet$CrossValidation_list,
+      response = data$Response,
+      Design = design,
+      nCores = parallelCores,
+      response_type =  response_type
+    )
+
+    class(out) <- 'BFRCV'
+  } else {
+    positionTST <- testingSet
+    response_NA <-  data$Response
+    response_NA[positionTST] <- NA
+    fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
+               verbose = T, rmExistingFiles, groups)
+    Tab_Pred <- rbind(Tab_Pred,
+                     data.frame(Position = positionTST,
+                                Environment = data$Env[positionTST],
+                                Trait = data$Trait[positionTST],
+                                Partition = actual_CV,
+                                Observed = round(data$Response[positionTST], digits),
+                                Predicted = round(fm$predictions[positionTST], digits)))
 
     out <- list(
       predictions_Summary = Tab_Pred,
-      CrossValidation_list = PT$CrossValidation_list,
+      CrossValidation_list = testingSet$CrossValidation_list,
       response = data$Response,
-      predictions = data$Predictions,
-      Design = design
-    )
-
-    class(out) <- 'BFRCV'
-    return(out)
-  } else if (!is.null(CrossValidation) && Multivariate == 'SVD') {
-
-    switch(CrossValidation$Type,
-           KFold = {
-             if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
-             PT <- CV.KFold(data[,1:3], K = CrossValidation$nFolds, set_seed)
-             nCV <- CrossValidation$nFolds
-           },
-           RandomPartition = {
-             if (is.null(CrossValidation$NPartitions)) {message('Crossvalidation is used but NPartitions is null, by default NPartitions is set to 10.')}
-             PT <- CV.RandomPart(data[,1:3], NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
-             nCV <- CrossValidation$NPartitions
-           },
-           Error(paste0('The Cross Validation  (', CrossValidation$Type, ") is't implemented"))
-    )
-
-    if (verbose) {
-      Message("This might be time demanding...")
-      pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
-    }
-
-    Criteria <- data.frame(matrix(0, ncol = 3, nrow = 9 * nCV))  #Cada columna
-    Env.ALL <- data.frame(matrix(NA, nrow = 9, ncol = 5))
-    ## Init cross validation
-    for (i in seq_len(nCV)) {
-      time.init <- proc.time()[3]
-
-      if (verbose) {
-        pb$tick(tokens = list(what = paste0( i, ' CV of ', nCV)))
-      }
-
-      response <-  as.matrix(data[,-c(1,2)]) #Ignore Line and Env
-      nt <- ncol(response)
-      nI <- length(unique(data$Env))
-      Pos_NA <- PT$CrossValidation_list[[paste0('partition',i)]]
-      training_data <- response[-Pos_NA, ]
-      SVD_Y <- svd(training_data)
-      U <- SVD_Y$u
-      V <- SVD_Y$v
-      tV <- t(V)
-
-      Ytilde <- response %*% V
-      Ytilde[Pos_NA,] <- rep(NA, ncol(response))
-
-      Y_pred <- matrix(NA, nrow = nrow(response), ncol = nt)
-      Beta_PC <- matrix(NA, nrow = nI+1, ncol = nt)
-      SDBeta_PC <- matrix(NA, nrow = nI+1, ncol = nt)
-      Sigma1_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      Sigma2_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      Sigma3_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      SigmaError_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      SD1_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      SD2_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      SD3_PC <- matrix(0, nrow = nt+1, ncol = nt)
-      SDError_PC <- matrix(0, nrow = nt+1, ncol = nt)
-
-      for (i in seq_len(nt)) {
-        y_i <- Ytilde[, i]
-        fm <- BGLR(y_i, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                   verbose = F, rmExistingFiles, groups)
-
-        yhat2 <- fm$predictions
-        betas_est <- fm$mu + fm$ETA[[1]]$b
-        SDbetas_est <- fm$SD.mu + fm$ETA[[1]]$SD.b
-        Y_pred[, i] <- yhat2
-        Beta_PC[, i] <- c(betas_est, fm$mu)
-        SDBeta_PC[, i] <- c(SDbetas_est, fm$SD.mu)
-        Sigma1_PC[i, i] <- fm$ETA[[2]]$varU
-        SD1_PC[i, i] <- fm$ETA[[2]]$SD.varU
-        Sigma2_PC[i, i] <- fm$ETA[[3]]$varU
-        SD2_PC[i, i] <- fm$ETA[[3]]$SD.varU
-        # Sigma3_PC[i, i] <- fm$ETA[[4]]$varU
-        # SD3_PC[i, i] <- fm$ETA[[4]]$SD.varU
-        SigmaError_PC[i, i] <- fm$varE
-        SDError_PC[i, i] <- fm$SD.varE
-
-        # switch(response_type,
-        #        gaussian = {
-        #          predicted <- fm$predictions
-        #          # data$Predictions[Pos_NA] <- predicted[Pos_NA]
-        #          Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-        #                            y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
-        #          Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
-        #        },
-        #        stop(paste0('The response_type: ', response_type, " is't implemented for SVD multivariate method"))
-        # )
-      }
-
-      Y_pred_Final <- Y_pred %*% tV
-
-
-      Y_all = cbind(as.matrix(data[,-c(1,2)]), Y_pred_Final, data$Env)
-      Y_all_tst = Y_all[Pos_NA, ]
-      Y_all_tst
-      Data_pred = data.frame(matrix(NA, ncol = 3, nrow = nt * nI))
-      Traits = noquote(colnames(data[,-c(1,2)]))
-      Env = unique(data$Env)
-      Etiquetas = expand.grid(Trait = Traits, Env = Env)
-
-      Data_pred[, 1] = paste(Etiquetas$Trait, Etiquetas$Env, sep = "_")
-      for (j in 1:nI) {
-        #for (r in 1:nI){
-        Env_i = Y_all_tst[Y_all_tst[, 2 * nt + 1] == j, ]
-        Cor_all_i = cor(Env_i[, -(2 * nt + 1)])
-        cor_U = diag(Cor_all_i[1:(nt), (nt + 1):(2 * nt)])
-        PL = numeric()
-        for (k in 1:nt) {
-          PL = c(PL, mean((Env_i[, k] - Env_i[, nt + k]) ^ 2))
-        }
-        Pos_L = PL
-        for (s in 1:nt) {
-          index = nt * (j - 1) + nt
-          Data_pred[(((index - nt) + 1):index), 2] = cor_U
-          Data_pred[(((index - nt) + 1):index), 3] = c(Pos_L)
-        }
-      }
-      Data_pred
-      colnames(Data_pred) = c("Group", "Cor", "MSEP")
-
-      indexN = 9 * (i - 1) + 9
-      Criteria[(((indexN - 9) + 1):indexN),] = Data_pred
-    }
-
-    Criteria
-    GG = noquote(Data_pred[, 1])
-    for (i in 1:length(GG)) {
-      Criteria.Env_o = Criteria[Criteria[, 1] == GG[i], ]
-      Env.ALL[i, ] = c(
-        GG[i],
-        mean(Criteria.Env_o[, 2], na.rm = TRUE),
-        (sd(Criteria.Env_o[, 2], na.rm = TRUE) / sqrt(20)),
-        mean(Criteria.Env_o[, 3], na.rm = TRUE),
-        (sd(Criteria.Env_o[, 3], na.rm = TRUE) / sqrt(20))
-      )
-
-    }
-    # Env.ALL <- tidyr::separate(Env.ALL, 'Trait_Env', c("Trait", "Env"), sep = "_")
-
-    if (verbose) {
-      pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
-      cat('Done.\n')
-    }
-
-    out <- list(
-      predictions_Summary = Env.ALL,
-      CrossValidation_list = PT$CrossValidation_list,
-      response = data[, -c(1,2)],
-      predictions = Y_pred_Final,
       Design = design,
-      Beta_est = betas_est,
-      SDBeta_est = SDbetas_est,
-      Beta_PC = Beta_PC,
-      SDBeta_PC = SDBeta_PC,
-      Sigma1_PC = Sigma1_PC,
-      SD1_PC = SD1_PC,
-      Sigma2_PC = Sigma2_PC,
-      SD2_PC = SD2_PC,
-      SigmaError_PC = SigmaError_PC,
-      SDError_PC = SDError_PC
+      nCores = parallelCores,
+      response_type =  response_type
     )
 
     class(out) <- 'BFRCV'
-    return(out)
-  } else {
-    return(BGLR(data$Response, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
-                      verbose, rmExistingFiles, groups))
   }
-}
-
-validate.MTME <- function(Multivariate){
-  if (Multivariate %in% c('SVD', 'Traditional')) {
-    return(Multivariate)
-  } else {
-    Error('The Multivariate parameter not found')
-  }
+  return(out)
 }
