@@ -4,7 +4,6 @@
 #'
 #' @param dataset TidyFormat
 #' @param datasetID column with the identifiers.
-#' @param Multivariate By default, when de dataset includes more than one Environment and more than one Trait (MTME) the solution is adjusted by the method traditional, also is possible adjust the MTME by "SVD" <doi: >
 #' @param GenomicMatrix lalalalal
 #' @param REML Logical, By default is NULL, If is TRUE, the priorType is ommited else If is FALSE, the priorType is ommited and.
 #' @param priorType Prior to assign, by default is 'FIXED', could be 'BRR', 'BayesA', 'BayesB', 'BayesC' or 'BL'
@@ -19,11 +18,11 @@
 #' @export
 #'
 #' @examples
-ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional', GenomicMatrix = NULL, REML= NULL, priorType = 'BRR', Bands = NULL, Wavelengths = NULL,
+ETAGenerate <- function(dataset, datasetID = 'Line', GenomicMatrix = NULL, REML= NULL, priorType = 'BRR', Bands = NULL, Wavelengths = NULL,
                         method = 'Simple', basisType = 'Fourier.Basis', nBasis = 1, ...) {
-  dataset <- validate.dataset(dataset, datasetID, TRUE, Multivariate)
+  dataset <- validate.dataset(dataset, datasetID, TRUE)
   Design <- checkDesign(dataset, Bands, REML)
-  priorType <- validate.prior(priorType, Multivariate)
+  priorType <- validate.prior(priorType)
   REML <- validateParadigm(REML)
   # Bands <- validateBands(Bands, Wavelengths)
   # Wavelengths <- validateWavelengths()
@@ -69,7 +68,6 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
                       LinexTrait = ETAList(XL, priorType, interaction1 = dataset$Trait),
                       Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE))
          }, 'Bayes-Multi' = {
-          if (Multivariate == 'Traditional') {
             ETA <- list(Env = ETAList(dataset$Env, Env_prior),
                         Trait = ETAList(dataset$Trait, Trait_prior),
                         Line = ETAList(XL, Line_prior, TRUE, LineK),
@@ -77,33 +75,15 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
                         LinexTrait = ETAList(XL, priorType, interaction1 = dataset$Trait),
                         EnvxTrait = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait),
                         EnvxTraitxLine = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait, interaction2 = dataset$Line))
-          } else if (Multivariate == 'SVD') {
-            ETA <- list(Env = ETAList(dataset$Env, Env_prior),
-                        # Trait = list(X = model.matrix(~0+as.factor(data_Long$Trait)), model = Trait_prior),
-                        Line = ETAList(XL, Line_prior, TRUE, LineK),
-                        LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env, likeKernel = TRUE, withK = T))
-                        # LinexTrait = list(X = model.matrix(~0+XL:as.factor(data_Long$Trait)), model = priorType),
-                        # EnvxTrait = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait)), model = priorType),
-                        # EnvxTraitxLine = list(X = model.matrix(~0+as.factor(data_Long$Env):as.factor(data_Long$Trait):XL), model = priorType))
-
-          }
-
          }, 'Bayes-MultiBands' = {
-           if (Multivariate == 'Traditional') {
-             ETA <- list(Env = ETAList(dataset$Env, Env_prior),
-                         Trait = ETAList(dataset$Trait, Trait_prior),
-                         Line = ETAList(XL, priorType, TRUE, LineK),
-                         LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env),
-                         LinexTrait = ETAList(XL, priorType, interaction1 = dataset$Trait),
-                         EnvxTrait = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait),
-                         EnvxTraitxLine = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait, interaction2 = dataset$Line),
-                         Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE))
-           } else if (Multivariate == 'SVD') {
-             ETA <- list(Env = ETAList(dataset$Env, Env_prior),
-                         Line = ETAList(XL, priorType, TRUE, LineK),
-                         LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env, likeKernel = TRUE, withK = T),
-                         Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE, likeKernel = TRUE, withK = T))
-           }
+           ETA <- list(Env = ETAList(dataset$Env, Env_prior),
+                     Trait = ETAList(dataset$Trait, Trait_prior),
+                     Line = ETAList(XL, priorType, TRUE, LineK),
+                     LinexEnv = ETAList(XL, priorType, interaction1 = dataset$Env),
+                     LinexTrait = ETAList(XL, priorType, interaction1 = dataset$Trait),
+                     EnvxTrait = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait),
+                     EnvxTraitxLine = ETAList(dataset$Env, priorType, interaction1 = dataset$Trait, interaction2 = dataset$Line),
+                     Bands = ETAList(bandsModel(method, Bands, Wavelengths, basisType, nBasis = nBasis, ...), priorType, TRUE))
          }, 'Frequentist-Single' = {
            ETA <- NULL
          }, 'Frequentist-SingleBands' = {
@@ -145,13 +125,10 @@ ETAGenerate <- function(dataset, datasetID = 'Line', Multivariate = 'Traditional
   return(out)
 }
 
-validate.prior <- function(prior, Multivariate) {
+validate.prior <- function(prior) {
   validPriors <- c('BRR', 'BayesA', 'BayesB', 'BayesC', 'BL', 'RHKS', 'FIXED')
 
   if (prior %in% validPriors) {
-    if (Multivariate == 'SVD') {
-      return('RKHS')
-    }
     return(prior)
   }
   Error('The prior provided (', prior, ') is not available, check for misspelling or use a valid prior.')
@@ -166,11 +143,6 @@ validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
   check1 <- GenomicDimension[1] == GenomicDimension[2]
   check2 <- GenomicDimension[1] == length(Lines)
 
-  # if (!check1) {
-  #   GenomicMatrix <- GenomicMatrix %*% t(GenomicMatrix)
-  #   check1 <- GenomicDimension[1] == GenomicDimension[2]
-  # }
-
   if (check1 && check2) {
     GenomicMatrix <- GenomicMatrix[Lines, Lines]
     return(GenomicMatrix)
@@ -180,7 +152,7 @@ validate.GenomicMatrix <- function(GenomicMatrix, Lines) {
 
 }
 
-validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = 'Traditional') {
+validate.dataset <- function(dataset, datasetID, orderData = T) {
   if (is.null(dataset$Env)) {
     dataset$Env <- ''
   } else {
@@ -204,10 +176,6 @@ validate.dataset <- function(dataset, datasetID, orderData = T, Multivariate = '
   }, error = function(e) {
     Error("No identifier provided in dataset, use datesetID parameter to select the column of identifiers")
   })
-
-  if (Multivariate == 'SVD') {
-    dataset <- tidyr::spread(dataset, 'Trait', 'Response')
-  }
 
   if (orderData) {
     if (length(unique(dataset$Trait)) > 1) {
