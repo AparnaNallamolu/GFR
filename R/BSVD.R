@@ -1,19 +1,44 @@
-BSVD <- function(data = NULL, datasetID = 'Line', ETA = NULL, nIter = 1500, burnIn = 500, thin = 5,
-                 saveAt = '', progressBar = TRUE, CrossValidation = NULL, set_seed = NULL, digits = 4) {
+BSVD <- function(data = NULL, datasetID = 'Line', GenomicMatrix = NULL, priorType = 'BRR', nIter = 1500, burnIn = 500, thin = 5,
+                 saveAt = '', verbose = TRUE,progressBar = TRUE, CrossValidation = NULL, set_seed = NULL, digits = 4) {
   if (progressBar) {
-    Message("This might be time demanding...")
-    pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
+    Message("This might be time demanding...", verbose)
+    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
   }
 
   Criteria <- data.frame(matrix(0, ncol = 3, nrow = 9 * nCV))  #Cada columna
   Env.ALL <- data.frame(matrix(NA, nrow = 9, ncol = 5))
 
+
+  priorType <- validate.prior(priorType)
+
+  Env_prior <- ifelse(length(unique(data$Env)) < 10, "FIXED", priorType)
+
+  if (!is.null(GenomicMatrix)) {
+    L <- t(chol(GenomicMatrix))
+    XL <- model.matrix(~0+as.factor(data[, datasetID])) %*% L
+    XL <- kronecker(X = GenomicMatrix, Y = diag(length(unique(data$Env))))
+    rownames(XL) <- data[, datasetID]
+    XL <- validate.GenomicMatrix(XL, data[, datasetID])
+    Line_prior <- 'RKHS'
+    LineK <- TRUE
+  } else {
+    XL <- model.matrix(~0+as.factor(data[, datasetID]))
+    Line_prior <- priorType
+    LineK <- FALSE
+  }
+
+  data <- tidyr::spread(data, 'Trait', 'Response')
+
+  ETA <- list(Env = ETAList(data$Env, Env_prior),
+              Line = ETAList(XL, Line_prior, TRUE, LineK),
+              LinexEnv = ETAList(XL, priorType, interaction1 = data$Env, likeKernel = TRUE, withK = T))
+
   ## Init cross validation
   for (i in seq_len(nCV)) {
     time.init <- proc.time()[3]
 
-    if (verbose) {
-      pb$tick(tokens = list(what = paste0( i, ' CV of ', nCV)))
+    if (progressBar) {
+      pb$tick(tokens = list(what = paste0(actual_CV, ' out of ', nCV)))
     }
 
     response <-  as.matrix(data[,-c(1,2)]) #Ignore Line and Env
