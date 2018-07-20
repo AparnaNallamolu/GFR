@@ -65,20 +65,49 @@ summary.BFR <- function(object,...){
    cat('\n------------------------------------------------------------------\n');
 }
 
-#' @title Summary
+#' @title Summary.BFRCV
 #'
-#' @description Summary of BFRCV object
+#' @description Solo es una prueba
 #'
-#' @param object \code{BFRCV object} BFRCV object, result of use the BFR() function
+#' @param object \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFRCV()
 #' @param ... Further arguments passed to or from other methods.
+#' @param information compact, extended, complete
+#'
+#' @importFrom stats cor
+#' @importFrom dplyr summarise group_by select '%>%' mutate_if funs
 #'
 #' @export
-summary.BFRCV <- function(object,...){
-  if (!inherits(object, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
-  return(object$predictions_Summary)
+summary.BFRCV <- function(object, information = 'compact', digits = 4, ...){
+  if (!inherits(object, "BFRCV")) Stop("This function only works for objects of class 'BFRCV'")
+
+  object$predictions_Summary %>%
+    group_by(Environment, Trait, Partition) %>%
+    summarise(Pearson = cor(Predicted, Observed, use = 'pairwise.complete.obs'),
+              MSEP = mean((Predicted - Observed)^2, na.rm = T)) %>%
+    select(Environment, Trait, Partition, Pearson, MSEP) %>%
+    mutate_if(is.numeric, funs(round(., digits))) %>%
+    as.data.frame() -> presum
+
+  presum %>%  group_by(Environment, Trait) %>%
+    summarise(SE_MSEP = sd(MSEP, na.rm = T)/sqrt(n()), MSEP = mean(MSEP, na.rm = T),
+              SE_Pearson = sd(Pearson, na.rm = T)/sqrt(n()), Pearson = mean(Pearson, na.rm = T))  %>%
+    select(Environment, Trait, Pearson, SE_Pearson, MSEP, SE_MSEP) %>%
+    mutate_if(is.numeric, funs(round(., digits))) %>%
+    as.data.frame() -> finalSum
+
+  out <- switch(information,
+                compact = finalSum,
+                complete = presum,
+                extended = {
+                  finalSum$Partition <- 'All'
+                  presum$Partition <- as.character(presum$Partition)
+                  presum$SE_Pearson <- NA
+                  presum$SE_MSEP <- NA
+                  rbind(presum, finalSum)
+                }
+  )
+  return(out)
 }
-
-
 
 #' @title residuals.BFR
 #'
@@ -141,7 +170,7 @@ boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   ### Check that object is compatible
   if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
 
-  results <- x$predictions_Summary
+  results <- summary(x, 'complete')
 
   if (select == "Pearson") {
     plot.y <- results$Pearson
@@ -179,7 +208,7 @@ plot.BFRCV <- function(x, select = 'Pearson', ...){
   ### Check that object is compatible
   if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
 
-  results <- x$predictions_Summary[which(x$predictions_Summary$Fold == 'Average_all'), ]
+  results <- summary(x, 'complete')
 
   results <- results[order(results[, select]),]
 
