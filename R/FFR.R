@@ -3,11 +3,12 @@
 #' Frequentist Functional Regression
 #'
 #' More details about this function
+#' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom foreach %dopar%
 #' @export
-FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, method = "NR", CrossValidation = NULL, init = NULL, iters = 20, tolpar = 1e-3,
-                tolparinv = 1e-6, verbose = FALSE, constraint = TRUE, EIGEND = FALSE,
-                forced = NULL, IMP = FALSE, complete = TRUE, check.model = TRUE, restrained = NULL,
-                REML = TRUE, init.equal = TRUE, set_seed=NULL){
+FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, method = "NR", testingSet = NULL, parallelCores = 1, init = NULL, iters = 20, tolpar = 1e-3,
+                tolparinv = 1e-6, verbose = FALSE, constraint = TRUE, EIGEND = FALSE, forced = NULL, IMP = FALSE, complete = TRUE, check.model = TRUE, restrained = NULL,
+                REML = TRUE, init.equal = TRUE, set_seed = NULL){
   if (inherits(Z, 'ETA')) {
     X <- Z$ETA[['X']]
     Z <- Z$ETA
@@ -20,87 +21,144 @@ FFR <- function(dataset, datasetID = 'Line', X = NULL, Z = NULL, R = NULL, metho
     design <- 'Handmade'
   }
 
-  if (!is.null(CrossValidation)) {
+  nCores <- detectCores()
+  if(nCores < parallelCores){
+    Message(paste0('The number of cores available is less than the specified in the parallelCores parameter we will use only ', nCores,'.'), verbose)
+    parallelCores <- nCores
+  }
 
-    switch(CrossValidation$Type,
-           KFold = {
-             if (is.null(CrossValidation$nFolds)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 5.')}
-             nCV <- CrossValidation$nFolds
-           },
+  ########        INIT VALUES       #########
+  # get_var_fm <- ifelse(is.factor(data$Response), 'fm$probs', 'fm$predictions')
+  # data$Response <- as.numeric(data$Response)
+  time.end <- c()
 
-           RandomPartition = {
-             if (is.null(CrossValidation$NPartitions)) {message('Crossvalidation is used but nFolds is null, by default nFolds is set to 10.')}
-             PT <- CV.RandomPart(data, NPartitions = CrossValidation$NPartitions, PTesting = CrossValidation$PTesting, Traits.testing = CrossValidation$Traits.testing, set_seed)
-             nCV <- CrossValidation$NPartitions
-           },
-           Error(paste0('ERROR: The Cross Validation  ', CrossValidation$Type, " is't implemented"))
-    )
-
-    if (verbose) {
-      Message("This might be time demanding...")
-
-      pb <- progress::progress_bar$new(format = 'Fitting the :what  [:bar] Time elapsed: :elapsed', total = nCV + 1, clear = FALSE, show_after = 0)
-    }
-
-    data$Predictions <- NA
+  if (is.null(testingSet)) {
+    out <- mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
+                tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
+                forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
+                REML = REML, init.equal = init.equal)
+  } else if (parallelCores <= 1 && inherits(testingSet, 'CrossValidation')) {
     Tab_Pred <- data.frame()
-    ## Init cross validation
-    for (i in seq_len(nCV)) {
+    nCV <- length(testingSet$CrossValidation_list)
+    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] :percent;  Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
 
-      if (verbose) {
-        pb$tick(tokens = list(what = paste0( i, ' CV of ', nCV)))
+    for (actual_CV in seq_len(nCV)) {
+      if (progressBar) {
+        pb$tick(tokens = list(what = paste0(actual_CV, ' out of ', nCV)))
       }
 
+      positionTST <- testingSet$CrossValidation_list[[actual_CV]]
       response_NA <-  data$Response
-      Pos_NA <- PT$CrossValidation_list[[paste0('partition',i)]]
-      response_NA[Pos_NA] <- NA
+      response_NA[positionTST] <- NA
+      time.init <- proc.time()[3]
+      fm <- mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
+                 tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
+                 forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
+                 REML = REML, init.equal = init.equal)
+      if(is.factor(data$Response)) {
+        predictions <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
+      } else{
+        predictions <- fm$predictions
+      }
+
+      Tab_Pred <- rbind(Tab_Pred,
+                        data.frame(Position = positionTST,
+                                   Environment = data$Env[positionTST],
+                                   Trait = data$Trait[positionTST],
+                                   Partition = actual_CV,
+                                   Observed = round(data$Response[positionTST], digits),
+                                   Predicted = round(predictions[positionTST], digits)))
+    }
+    cat('Done!\n')
+    out <- list(
+      predictions_Summary = Tab_Pred,
+      CrossValidation_list = testingSet$CrossValidation_list,
+      response = data$Response,
+      Design = design,
+      nCores = parallelCores,
+      response_type =  response_type
+    )
+
+    class(out) <- 'FFRCV'
+  } else if (parallelCores > 1 && inherits(testingSet, 'CrossValidation')) {
+    cl <- snow::makeCluster(parallelCores)
+    doSNOW::registerDoSNOW(cl)
+    nCV <- length(testingSet$CrossValidation_list)
+
+    pb <- utils::txtProgressBar(max = nCV, style = 3)
+    progress <- function(n) utils::setTxtProgressBar(pb, n)
+    opts <- list(progress = progress)
+
+    Tab_Pred <- foreach::foreach(actual_CV = seq_len(nCV), .combine = rbind, .packages = 'GFR', .options.snow = opts) %dopar% {
+      positionTST <- testingSet$CrossValidation_list[[actual_CV]]
+      response_NA <-  data$Response
+      response_NA[positionTST] <- NA
       time.init <- proc.time()[3]
       fm <- mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
                  tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
                  forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
                  REML = REML, init.equal = init.equal)
 
-      switch(response_type,
-             gaussian = {
-               predicted <- fm$predictions
-               data$Predictions[Pos_NA] <- predicted[Pos_NA]
-               Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-                                 y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA])
-               Tab_Pred <- rbind(Tab_Pred, Cor_Env(Tab, Time = proc.time()[3] - time.init ))
-             },
-             ordinal = {
-               predicted <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
-               data$Predictions[Pos_NA] <- predicted[Pos_NA]
+      if(is.factor(data$Response)) {
+        predictions <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
+      } else{
+        predictions <- fm$predictions
+      }
 
-               Tab <- data.frame(Env = data$Env[Pos_NA], Trait = data$Trait[Pos_NA], Fold = i,
-                                 y_p = predicted[Pos_NA], y_o = data$Response[Pos_NA] )
-               Tab_Pred <- rbind(Tab_Pred, Cor_Env_Ordinal(Tab, Time = proc.time()[3] - time.init))
-             },
-             Error(paste0('The response_type: ', response_type, " is't implemented"))
+      data.frame(
+        Position = positionTST,
+        Environment = data$Env[positionTST],
+        Trait = data$Trait[positionTST],
+        Partition = actual_CV,
+        Observed = round(data$Response[positionTST], digits),
+        Predicted = round(predictions[positionTST], digits)
       )
     }
-
-    Tab_Pred <- add_mean_amb(Tab_Pred, dec)
-
-    if (verbose) {
-      pb$tick(tokens = list(what = paste0(i, ' CV of ', nCV)))
-      cat('Done.\n')
-    }
-
+    cat('Done!\n')
     out <- list(
       predictions_Summary = Tab_Pred,
-      CrossValidation_list = PT$CrossValidation_list,
+      CrossValidation_list = testingSet$CrossValidation_list,
       response = data$Response,
-      predictions = data$Predictions,
-      Design = design
+      Design = design,
+      nCores = parallelCores,
+      response_type =  response_type
     )
 
     class(out) <- 'FFRCV'
-    return(out)
-  }else{
-    return(mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
-                tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
-                forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
-                REML = REML, init.equal = init.equal))
+  } else {
+    positionTST <- testingSet$CrossValidation_list[[actual_CV]]
+    response_NA <-  data$Response
+    response_NA[positionTST] <- NA
+    time.init <- proc.time()[3]
+    fm <- mmer(Y = dataset$Response, X = X, Z = Z, R = R, method = method, init = init, iters = iters, tolpar = tolpar,
+               tolparinv = tolparinv, verbose = verbose, constraint = constraint, EIGEND = EIGEND,
+               forced = forced, IMP = IMP, complete = complete, check.model = check.model, restrained = restrained,
+               REML = REML, init.equal = init.equal)
+
+    if(is.factor(data$Response)) {
+      predictions <- as.integer(colnames(fm$probs)[apply(fm$probs,1,which.max)])
+    } else{
+      predictions <- fm$predictions
+    }
+    Tab_Pred <- rbind(Tab_Pred,
+                      data.frame(Position = positionTST,
+                                 Environment = data$Env[positionTST],
+                                 Trait = data$Trait[positionTST],
+                                 Partition = actual_CV,
+                                 Observed = round(data$Response[positionTST], digits),
+                                 Predicted = round(predictions[positionTST], digits)))
+
+    out <- list(
+      predictions_Summary = Tab_Pred,
+      CrossValidation_list = testingSet$CrossValidation_list,
+      response = data$Response,
+      Design = design,
+      nCores = parallelCores,
+      response_type =  response_type
+    )
+
+    class(out) <- 'FFRCV'
   }
+  return(out)
+
 }
