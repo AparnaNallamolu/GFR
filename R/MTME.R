@@ -25,7 +25,7 @@ MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, 
   Yhat_post <- matrix(NA, ncol = nCV, nrow = nrow(Y)) # save predictions
   nTraits <- dim(Y)[2L]
   results <- data.frame() # save cross-validation results
-  pb <- progress::progress_bar$new(format = ':what  [:bar]; Time elapsed: :elapsed - ETA: :eta',
+  pb <- progress::progress_bar$new(format = ':what  [:bar]:percent;  Time elapsed: :elapsed',
                                    total = 2L*(nCV*nTraits), clear = FALSE, show_after = 0)
 
   for (t in seq_len(nTraits)) {
