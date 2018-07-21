@@ -5,11 +5,11 @@
 \title{FFR}
 \usage{
 FFR(dataset, datasetID = "Line", X = NULL, Z = NULL, R = NULL,
-  method = "NR", CrossValidation = NULL, init = NULL, iters = 20,
-  tolpar = 0.001, tolparinv = 1e-06, verbose = FALSE, constraint = TRUE,
-  EIGEND = FALSE, forced = NULL, IMP = FALSE, complete = TRUE,
-  check.model = TRUE, restrained = NULL, REML = TRUE, init.equal = TRUE,
-  set_seed = NULL)
+  method = "NR", testingSet = NULL, parallelCores = 1, init = NULL,
+  iters = 20, tolpar = 0.001, tolparinv = 1e-06, verbose = FALSE,
+  constraint = TRUE, EIGEND = FALSE, forced = NULL, IMP = FALSE,
+  complete = TRUE, check.model = TRUE, restrained = NULL, REML = TRUE,
+  init.equal = TRUE, set_seed = NULL)
 }
 \description{
 Frequentist Functional Regression
