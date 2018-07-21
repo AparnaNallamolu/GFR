@@ -39,7 +39,6 @@
 #'
 #' @importFrom stats lm rnorm var vcov
 #' @importFrom utils txtProgressBar setTxtProgressBar
-#' @importFrom tidyr gather
 #' @importFrom foreach %dopar%
 #'
 #' @export
@@ -63,7 +62,9 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
   ########        INIT VALUES       #########
   response_type <- ifelse(is.factor(data$Response), 'ordinal', 'gaussian')
   data$Response <- as.numeric(data$Response)
+  time.end <- c()
 
+  ########         inherits         #########
   if (inherits(ETA, 'ETA')) {
     data <- ETA$data
     design <- ETA$Design
@@ -79,7 +80,7 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
   } else if (parallelCores <= 1 && inherits(testingSet, 'CrossValidation')) {
     Tab_Pred <- data.frame()
     nCV <- length(testingSet$CrossValidation_list)
-    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
+    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] :percent; Time elapsed: :elapsed', total = nCV+1L, clear = FALSE, show_after = 0)
 
     for (actual_CV in seq_len(nCV)) {
       if (progressBar) {
@@ -92,7 +93,7 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
       time.init <- proc.time()[3]
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                  verbose = F, rmExistingFiles, groups)
-
+      time.end[actual_CV] <- proc.time()[3] - time.init
       Tab_Pred <- rbind(Tab_Pred,
                        data.frame(Position = positionTST,
                                   Environment = data$Env[positionTST],
@@ -101,6 +102,7 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
                                   Observed = round(data$Response[positionTST], digits),
                                   Predicted = round(fm$predictions[positionTST], digits)))
     }
+    pb$tick(tokens = list(what = paste0(actual_CV, ' out of ', nCV)))
     cat('Done!\n')
     out <- list(
       predictions_Summary = Tab_Pred,
@@ -108,7 +110,11 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
       response = data$Response,
       Design = design,
       nCores = parallelCores,
-      response_type =  response_type
+      response_type =  response_type,
+      executionTime = time.end,
+      nIter = nIter,
+      burnIn = burnIn,
+      thin = thin
     )
 
     class(out) <- 'BFRCV'
@@ -121,14 +127,14 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
     progress <- function(n) utils::setTxtProgressBar(pb, n)
     opts <- list(progress = progress)
 
-    Tab_Pred <- foreach::foreach(actual_CV = seq_len(nCV), .combine = rbind, .packages = 'GFR', .options.snow = opts) %dopar% {
+    Tab_Pred <- foreach::foreach(actual_CV = seq_len(nCV), .combine = rbind, .packages = 'GFR', .options.snow = opts, .export = 'time.end') %dopar% {
       positionTST <- testingSet$CrossValidation_list[[actual_CV]]
       response_NA <-  data$Response
       response_NA[positionTST] <- NA
       time.init <- proc.time()[3]
       fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt = paste0('CV', actual_CV,'_'), S0, df0, R2, weights,
                  verbose = F, rmExistingFiles, groups)
-
+      time.end[actual_CV] <- proc.time()[3] - time.init
       data.frame(Position = positionTST,
                  Environment = data$Env[positionTST],
                  Trait = data$Trait[positionTST],
@@ -143,7 +149,11 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
       response = data$Response,
       Design = design,
       nCores = parallelCores,
-      response_type =  response_type
+      response_type =  response_type,
+      executionTime = time.end,
+      nIter = nIter,
+      burnIn = burnIn,
+      thin = thin
     )
 
     class(out) <- 'BFRCV'
@@ -151,6 +161,7 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
     positionTST <- testingSet
     response_NA <-  data$Response
     response_NA[positionTST] <- NA
+    time.init <- proc.time()[3]
     fm <- BGLR(response_NA, response_type, a, b, ETA, nIter, burnIn, thin, saveAt, S0, df0, R2, weights,
                verbose = T, rmExistingFiles, groups)
     Tab_Pred <- rbind(Tab_Pred,
@@ -160,17 +171,22 @@ BFR <- function(data = NULL, datasetID = 'Line', a=NULL, b=NULL, ETA = NULL, nIt
                                 Partition = actual_CV,
                                 Observed = round(data$Response[positionTST], digits),
                                 Predicted = round(fm$predictions[positionTST], digits)))
-
+    time.end[1L] <- proc.time()[3] - time.init
     out <- list(
       predictions_Summary = Tab_Pred,
       CrossValidation_list = testingSet$CrossValidation_list,
       response = data$Response,
       Design = design,
       nCores = parallelCores,
-      response_type =  response_type
+      response_type =  response_type,
+      executionTime = time.end,
+      nIter = nIter,
+      burnIn = burnIn,
+      thin = thin
     )
 
     class(out) <- 'BFRCV'
   }
+
   return(out)
 }
