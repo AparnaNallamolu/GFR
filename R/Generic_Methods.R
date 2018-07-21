@@ -65,11 +65,12 @@ summary.BFR <- function(object,...){
    cat('\n------------------------------------------------------------------\n');
 }
 
-#' @title Summary.BFRCV
+
+#' @title Summary.MTMECV
 #'
 #' @description Solo es una prueba
 #'
-#' @param object \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFRCV()
+#' @param object \code{MTMECV object} Objeto MTMECV, resultado de ejecutar MTME()
 #' @param ... Further arguments passed to or from other methods.
 #' @param information compact, extended, complete
 #'
@@ -77,10 +78,10 @@ summary.BFR <- function(object,...){
 #' @importFrom dplyr summarise group_by select '%>%' mutate_if funs
 #'
 #' @export
-summary.BFRCV <- function(object, information = 'compact', digits = 4, ...){
-  if (!inherits(object, "BFRCV")) Stop("This function only works for objects of class 'BFRCV'")
+summary.MTMECV <- function(object, information = 'compact', digits = 4, ...){
+  if (!inherits(object, "MTMECV")) Stop("This function only works for objects of class 'MTMECV'")
 
-  object$predictions_Summary %>%
+  object$results %>%
     group_by(Environment, Trait, Partition) %>%
     summarise(Pearson = cor(Predicted, Observed, use = 'pairwise.complete.obs'),
               MSEP = mean((Predicted - Observed)^2, na.rm = T)) %>%
@@ -108,6 +109,107 @@ summary.BFRCV <- function(object, information = 'compact', digits = 4, ...){
   )
   return(out)
 }
+
+
+#' @title Summary.BFRCV
+#'
+#' @description Solo es una prueba
+#'
+#' @param object \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFRCV()
+#' @param ... Further arguments passed to or from other methods.
+#' @param information compact, extended, complete
+#'
+#' @importFrom stats cor
+#' @importFrom dplyr summarise group_by select '%>%' mutate_if funs
+#'
+#' @export
+summary.BFRCV <- function(object, information = 'compact', digits = 4, ...){
+  if (!inherits(object, "BFRCV")) Stop("This function only works for objects of class 'BFRCV'")
+
+  switch (object$response_type,
+          gaussian = {
+            object$predictions_Summary %>%
+              group_by(Environment, Trait, Partition) %>%
+              summarise(Pearson = cor(Predicted, Observed, use = 'pairwise.complete.obs'),
+                        MSEP = mean((Predicted - Observed)^2, na.rm = T)) %>%
+              select(Environment, Trait, Partition, Pearson, MSEP) %>%
+              mutate_if(is.numeric, funs(round(., digits))) %>%
+              as.data.frame() -> presum
+
+            presum %>%  group_by(Environment, Trait) %>%
+              summarise(SE_MSEP = sd(MSEP, na.rm = T)/sqrt(n()), MSEP = mean(MSEP, na.rm = T),
+                        SE_Pearson = sd(Pearson, na.rm = T)/sqrt(n()), Pearson = mean(Pearson, na.rm = T))  %>%
+              select(Environment, Trait, Pearson, SE_Pearson, MSEP, SE_MSEP) %>%
+              mutate_if(is.numeric, funs(round(., digits))) %>%
+              as.data.frame() -> finalSum
+
+            if(information == 'extended') {
+              finalSum$Partition <- 'All'
+              presum$Partition <- as.character(presum$Partition)
+              presum$SE_Pearson <- NA
+              presum$SE_MSEP <- NA
+              extended <- rbind(presum, finalSum)
+            }
+          },
+          ordinal = {
+            object$predictions_Summary %>%
+              group_by(Environment, Trait, Partition) %>%
+              summarise(CC = sum(diag(prop.table(table(factor(Predicted, levels = sort(unique(Observed))), as.factor(Observed))))),
+                        MSEP = mean((Predicted - Observed)**2, na.rm = T)) %>%
+              select(Environment, Trait, Partition, CC, MSEP) %>%
+              as.data.frame() -> presum
+
+            presum %>%
+              group_by(Environment, Trait) %>%
+              summarise(SE_MSEP = sd(MSEP, na.rm = T), MSEP = mean(MSEP, na.rm = T),
+                        SE_CC_2 = sd(CC, na.rm = T)/sqrt(n()),
+                        CC = mean(CC, na.rm = T),
+                        SE_CC = sqrt((CC*(1 - CC))/n())) %>%
+              select(Environment, Trait, CC, SE_CC, SE_CC_2, MSEP, SE_MSEP) %>%
+              as.data.frame() -> finalSum
+
+            if(information == 'extended') {
+              finalSum$Partition <- 'All'
+              presum$Partition <- as.character(presum$Partition)
+              presum$SE_CC <- NA
+              presum$SE_CC_2 <- NA
+              presum$SE_MSEP <- NA
+              extended <- rbind(presum, finalSum)
+            }
+          },
+          Error('The $Response type of the dataset was not detected correctly, please check it.')
+  )
+
+  out <- switch(information,
+                compact = finalSum,
+                complete = presum,
+                extended = extended
+  )
+  return(out)
+}
+
+
+#' Print BFRCV information object
+#'
+#' @param x object a
+#' @param ...  more objects
+#'
+#' @return test
+#' @export
+#'
+print.BFRCV <- function(x, ...){
+  cat('Fitted Model with: \n',
+      'eta = \n', 'usign ',
+      x$nIter, ' iterations, burning the first ', x$burnIn, ' and thining every ', x$thin, '\n',
+      'Average runtime by CV', mean(x$executionTime) ,'\n\n',
+      'Summary of the predictions: \n')
+
+  print.data.frame(summary(x, 'compact', digits = 3), print.gap = 2L, quote = FALSE)
+
+  cat('\n Use str() function to found more datailed information.')
+  invisible(x)
+}
+
 
 #' @title residuals.BFR
 #'
@@ -155,45 +257,6 @@ plot.BFR <- function(x, ...){
   abline(a = 0, b = 1, lty = 3)
 }
 
-#' @title boxplot.BFRCV
-#'
-#' @description Solo es una prueba
-#'
-#' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
-#' @param select \code{string} Pearson or MSEP
-#' @param ordered \code{logic} TRUE or FALSE
-#' @param ... Further arguments passed to or from other methods.
-#'
-#' @importFrom graphics boxplot
-#' @export
-boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
-  ### Check that object is compatible
-  if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
-
-  results <- summary(x, 'complete')
-
-  if (select == "Pearson") {
-    plot.y <- results$Pearson
-    ylab <- "Pearson's Correlation"
-  } else if (select == "MSEP") {
-    plot.y <- results$MSEP
-    ylab <- "MSEP Average"
-  }
-
-  if (length(unique(results$Env)) > 1) {
-    results$TxE <- paste0(results$Trait, '_', results$Env)
-
-    if (ordered) {
-      results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
-    }
-    boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
-  }else{
-    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
-  }
-
-
-}
-
 #' @title Plot BFRCV graph
 #'
 #' @description Plot from BFRCV object
@@ -216,6 +279,126 @@ plot.BFRCV <- function(x, select = 'Pearson', ...){
     results$SE <- 1.96 * results$SE_Pearson
     ylab <- "Pearson's Correlation"
   } else if (select == "MSEP") {
+    results$SE <- 1.96 * results$SE_MSEP[which(results$Fold == 'Average_all')]
+    ylab <- select
+  }
+  x.labels <- paste0(results$Trait, '_', results$Env)
+  plot.x <- 1:length(x.labels)
+  plot(plot.x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
+       type = 'p', ylab = ylab, xlab = '', xaxt = "n", las = 2)
+  axis(1, at = plot.x, labels = x.labels, las = 2)
+  arrows(plot.x, results[, select] - results$SE, plot.x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
+}
+
+#' @title boxplot.BFRCV
+#'
+#' @description Solo es una prueba
+#'
+#' @param x \code{BFRCV object} Objeto BFRCV, resultado de ejecutar BFR() con el parametro folds > 2
+#' @param select \code{string} Pearson or MSEP
+#' @param ordered \code{logic} TRUE or FALSE
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @importFrom graphics boxplot
+#' @export
+boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
+  ### Check that object is compatible
+  if (!inherits(x, "BFRCV")) Error("This function only works for objects of class 'BFRCV'")
+
+  results <- summary(x, 'complete')
+
+  switch (select,
+          Pearson = {
+            plot.y <- results$Pearson
+            ylab <- "Pearson's Correlation"
+          }, MSEP = {
+            plot.y <- results$MSEP
+            ylab <- "MSEP Average"
+          }, CC = {
+            plot.y <- results$CC
+            ylab <- "Classification correct average"
+          },
+          Error('Error in select parameter.')
+  )
+
+  if (length(unique(results$Env)) > 1) {
+    results$TxE <- paste0(results$Trait, '_', results$Env)
+
+    if (ordered) {
+      results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
+    }
+    boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
+  }else{
+    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
+  }
+}
+
+#' @title boxplot.MTMECV
+#'
+#' @description Solo es una prueba
+#'
+#' @param x \code{MTMECV object} Objeto MTMECV, resultado de ejecutar MTME()
+#' @param select \code{string} Pearson or MSEP
+#' @param ordered \code{logic} TRUE or FALSE
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @importFrom graphics boxplot
+#' @export
+boxplot.MTMECV <- function(x, select = 'Pearson', ordered = TRUE, ...){
+  ### Check that object is compatible
+  if (!inherits(x, "MTMECV")) Error("This function only works for objects of class 'MTMECV'")
+
+  results <- summary(x, 'complete')
+
+  switch (select,
+          Pearson = {
+            plot.y <- results$Pearson
+            ylab <- "Pearson's Correlation"
+          }, MSEP = {
+            plot.y <- results$MSEP
+            ylab <- "MSEP Average"
+          }, CC = {
+            plot.y <- results$CC
+            ylab <- "Classification correct average"
+          },
+          Error('Error in select parameter.')
+  )
+
+  if (length(unique(results$Env)) > 1) {
+    results$TxE <- paste0(results$Trait, '_', results$Env)
+
+    if (ordered) {
+      results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
+    }
+    boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
+  }else{
+    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
+  }
+}
+
+
+#' @title Plot MTMECV graph
+#'
+#' @description Plot from MTMECV object
+#'
+#' @param x \code{MTMECV object} MTMECV object, result of use the MTME() function
+#' @param select \code{character} By default ('Pearson'), plot the Pearson Correlations of the MTME Object, else ('MSEP'), plot the MSEP of the MTMECV Object.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @importFrom graphics arrows axis plot
+#' @export
+plot.MTMECV <- function(x, select = 'Pearson', ...){
+  ### Check that object is compatible
+  if (!inherits(x, "MTMECV")) Error("This function only works for objects of class 'MTMECV'")
+
+  results <- summary(x)
+  results <- results[order(results[, select]),]
+
+  if (select == "Pearson") {
+    results$SE <- 1.96 * results$SE_Pearson
+    ylab <- "Pearson's Correlation"
+  } else if (select == "MSEP") {
+
     results$SE <- 1.96 * results$SE_MSEP[which(results$Fold == 'Average_all')]
     ylab <- select
   }
