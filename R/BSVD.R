@@ -2,7 +2,7 @@ BSVD <- function(data = NULL, datasetID = 'Line', GenomicMatrix = NULL, priorTyp
                  saveAt = '', verbose = TRUE,progressBar = TRUE, CrossValidation = NULL, set_seed = NULL, digits = 4) {
   if (progressBar) {
     Message("This might be time demanding...", verbose)
-    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what  [:bar] Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
+    pb <- progress::progress_bar$new(format = 'Fitting Cross-Validation :what [:bar] :percent; Time elapsed: :elapsed', total = nCV, clear = FALSE, show_after = 0)
   }
 
   Criteria <- data.frame(matrix(0, ncol = 3, nrow = 9 * nCV))  #Cada columna

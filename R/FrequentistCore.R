@@ -422,7 +422,7 @@ MNR <- function(Y, X = NULL, ZETA = NULL, R = NULL, init = NULL, iters = 20, tol
   if (verbose){
     count <- 0
     tot <- iters
-    pb <- progress::progress_bar$new(format = "Fitting the model [:bar] Time remaining: :eta",
+    pb <- progress::progress_bar$new(format = "Fitting the model [:bar] :percent; Time remaining: :eta",
                                      total = tot, clear = FALSE)
   }
   ####### algorithm
