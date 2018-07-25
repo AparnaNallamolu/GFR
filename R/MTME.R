@@ -1,6 +1,6 @@
 #' Multi-trait Multi-Environment
 #'
-#' @param data data
+#' @param dataset dataset
 #' @param ETA eta
 #' @param nIter number of iterations
 #' @param burnIn number of burning
@@ -17,8 +17,8 @@
 #' @examples
 #' ETA=list(Env=list(X=Z.E,model="BRR"),Gen = list(X = Z.G, model = 'BRR'), EnvGen=list(X=Z.EG,model="BRR"))
 #' CrossValidation <- BMTME::CV.RandomPart(pheno, NPartitions = 10, PTesting = 0.2, set_seed = 123)
-MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, progressBar = TRUE, CrossValidation = NULL, set_seed = NULL, digits = 4, ...){
-  matrixData <- getMatrixForm(data, onlyTrait = T) ## Get matrix format data
+MTME <- function(dataset = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, progressBar = TRUE, CrossValidation = NULL, set_seed = NULL, digits = 4, ...){
+  matrixData <- getMatrixForm(dataset, onlyTrait = T) ## Get matrix format data
   Y <- matrixData[, -c(1L,2L)] # get pheno data
   newY <- Y # to include covariance data
   nCV <- length(CrossValidation$CrossValidation_list) #Number of cross-validations
@@ -27,7 +27,7 @@ MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, 
   results <- data.frame() # save cross-validation results
   pb <- progress::progress_bar$new(format = ':what  [:bar]:percent;  Time elapsed: :elapsed',
                                    total = 2L*(nCV*nTraits), clear = FALSE, show_after = 0)
-
+  # Covariance
   for (t in seq_len(nTraits)) {
     y2 <- Y[, t] #Loop each trait
     for (actual_CV in seq_len(nCV)) {
@@ -35,9 +35,9 @@ MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, 
         pb$tick(tokens = list(what = paste0('Estimating covariance of trait ', colnames(Y)[t], ' in CV ', actual_CV, ' out of ', nCV)))
       }
       y1 <- y2
-      indices <- CrossValidation$CrossValidation_list[[actual_CV]]
-      Pos_ts <- which(indices == 1L)
-      y1[-Pos_ts] <- NA
+      positionTST <- CrossValidation$CrossValidation_list[[actual_CV]]
+      y1[positionTST] <- NA
+
       fm <- BGLR(y = y1, ETA = ETA, nIter = nIter, burnIn = burnIn, thin = thin, verbose = F, ...)
       Yhat_post[, progressBar] <- fm$predictions #fm$predictions
     }
@@ -47,6 +47,8 @@ MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, 
   }
 
   XPV <- scale(newY[, (1L+nTraits):(2L*nTraits)])
+  ETA1 <- ETA
+  ETA1$Cov_PreVal <- list(X = XPV, model = "BRR")
 
   for (t in seq_len(nTraits)) {
     y2 <- Y[, t]
@@ -57,8 +59,7 @@ MTME <- function(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5, 
       y1 <- y2
       positionTST <- CrossValidation$CrossValidation_list[[actual_CV]]
       y1[positionTST] <- NA
-      ETA1 <- ETA
-      ETA1$Cov_PreVal <- list(X = XPV, model = "BRR")
+
       fm1 <- BGLR(y = y1, ETA = ETA1, nIter = nIter, burnIn = burnIn, thin = thin, verbose = F, ...)
 
       results <- rbind(results, data.frame(Position = positionTST,
