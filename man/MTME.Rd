@@ -4,12 +4,12 @@
 \alias{MTME}
 \title{Multi-trait Multi-Environment}
 \usage{
-MTME(data = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5,
+MTME(dataset = NULL, ETA = NULL, nIter = 2500, burnIn = 500, thin = 5,
   progressBar = TRUE, CrossValidation = NULL, set_seed = NULL,
   digits = 4, ...)
 }
 \arguments{
-\item{data}{data}
+\item{dataset}{dataset}
 
 \item{ETA}{eta}
 
