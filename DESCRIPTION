@@ -1,6 +1,6 @@
 Package: GFR
 Title: GFR (Genomic Functional Regression)
-Version: 0.9-14
+Version: 0.9-15
 Date: 2018-02-16
 Authors@R: c(person("Francisco Javier", "Luna-Vazquez", email = "frahik@gmail.com", role = c("aut", "cre")),
              person("Osval Antonio", "Montesinos-Lopez", email= "oamontes1@ucol.mx", role = "aut"),
