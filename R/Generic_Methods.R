@@ -405,7 +405,7 @@ plot.MTMECV <- function(x, select = 'Pearson', ...){
   x.labels <- paste0(results$Trait, '_', results$Env)
   plot.x <- 1:length(x.labels)
   plot(plot.x, results[, select], ylim = range(c(results[, select] - results$SE, results[, select] + results$SE)),
-       type = 'p', ylab = ylab, xlab = '', xaxt = "n", las = 2)
+       type = 'p', ylab = ylab, xlab = '', xaxt = "n", ...)
   axis(1, at = plot.x, labels = x.labels, las = 2)
   arrows(plot.x, results[, select] - results$SE, plot.x, results[, select] + results$SE, code = 3, length = 0.02, angle = 90)
 }
