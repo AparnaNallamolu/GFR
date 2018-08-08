@@ -324,12 +324,15 @@ boxplot.BFRCV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   if (length(unique(results$Env)) > 1) {
     results$TxE <- paste0(results$Trait, '_', results$Env)
 
-    if (ordered) {
+    if (ordered && select != 'MSEP') {
       results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
+    } else if (ordered && select == 'MSEP') {
+      results$TxE  <- with(results, reorder(TxE , MSEP, median, na.rm = T))
     }
+
     boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
   }else{
-    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
+    boxplot(plot.y, col = "grey", ylab = ylab, ...)
   }
 }
 
@@ -367,12 +370,15 @@ boxplot.MTMECV <- function(x, select = 'Pearson', ordered = TRUE, ...){
   if (length(unique(results$Env)) > 1) {
     results$TxE <- paste0(results$Trait, '_', results$Env)
 
-    if (ordered) {
+    if (ordered && select != 'MSEP') {
       results$TxE  <- with(results, reorder(TxE , Pearson, median, na.rm = T))
+    } else if (ordered && select == 'MSEP') {
+      results$TxE  <- with(results, reorder(TxE , MSEP, median, na.rm = T))
     }
+
     boxplot(plot.y ~ results$TxE, col = "grey", ylab = ylab, ...)
   }else{
-    boxplot(plot.y, col = "grey", xlab = 'Environment', ylab = ylab, ...)
+    boxplot(plot.y, col = "grey", ylab = ylab, ...)
   }
 }
 
