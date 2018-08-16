@@ -1285,7 +1285,7 @@ BGLR <- function(y, response_type = "gaussian", a = NULL, b = NULL, ETA = NULL, 
   }
 
   pb <- progress::progress_bar$new(format = "Fitting the model [:bar] :percent; Time remaining: :eta",
-                                   total = nIter/20L, clear = FALSE, )
+                                   total = nIter/20L, clear = FALSE)
 
   # Gibbs sampler
   #time = proc.time()[3]
